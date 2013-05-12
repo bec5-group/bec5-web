@@ -22,4 +22,5 @@ urlpatterns = patterns('',
     url(r'^action/get-profiles/$', 'becv.views.get_profiles'),
     url(r'^action/get-ovens/$', 'becv.views.get_ovens'),
     url(r'^action/get-temps/$', 'becv.views.get_temps'),
+    url(r'^action/get-setpoint/$', 'becv.views.get_setpoint'),
 )

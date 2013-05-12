@@ -101,6 +101,16 @@ function HomePageCtrl($scope, $http) {
         });
         return id;
     };
+    $scope.message_has_error = function () {
+        for (var i in $scope.messages) {
+            if (!$scope.messages.hasOwnProperty(i))
+                continue;
+            if ($scope.messages[i].type == 'error') {
+                return true;
+            }
+        }
+        return false;
+    };
 
     $http.get('/action/get-ovens/', {
         cache: false,
@@ -159,11 +169,33 @@ function HomePageCtrl($scope, $http) {
             this.ids = ids;
             this.all = all;
         },
+        set_cur: function (id) {
+            this.cur_changed = true;
+            this.cur = id;
+        },
+        update_cur_setpoint: function () {
+            var that = this;
+            $http.get('/action/get-setpoint/', {
+                cache: false,
+                timeout: 10000
+            }).success(function (data, status) {
+                that.cur_setpoint = data;
+                if (!that.cur_changed || !that.cur) {
+                    that.cur = data.id;
+                }
+            }).error(function (data, status) {
+                add_message("Error " + status +
+                            ', when getting current set point.', 'error');
+            });
+        },
         _init: function () {
             this.ids = [];
             this.all = {};
             this.cur = '';
             this.status = 0;
+            this.cur_setpoint = {};
+            this.cur_changed = false;
+            this.update_cur_setpoint();
         },
         do_apply: function () {
             if (!this.cur)
@@ -171,6 +203,7 @@ function HomePageCtrl($scope, $http) {
             this.status = 1;
             var that = this;
             var cur = this.all[this.cur].name;
+            this.cur_changed = false;
             $http.get('/action/set-profile/' + this.cur + '/', {
                 cache: false,
                 timeout: 10000
@@ -178,6 +211,7 @@ function HomePageCtrl($scope, $http) {
                 that.status = 2;
                 add_message('Successfully set profile to "' + cur + '".',
                             'success');
+                that.update_cur_setpoint();
             }).error(function (data, status) {
                 that.status = 3;
                 add_message("Error " + status +
@@ -188,4 +222,5 @@ function HomePageCtrl($scope, $http) {
     }
 
     $scope.TProfile = new TempProfileMgr();
+    $scope.log_collapsed = false;
 }

@@ -101,3 +101,18 @@ def get_temps(request, callback=None):
     }
     return HttpResponse(tojson(temps, callback),
                         content_type="application/json")
+
+@auth_jsonp
+def get_setpoint(request, callback=None):
+    import random
+    setpoint = {
+        'id': 'on',
+        'name': "On",
+        'temps': {
+            'out': 500 + random.randrange(-100, 100) / 10.0,
+            'middle': 480 + random.randrange(-100, 100) / 10.0,
+            'bottom': 460 + random.randrange(-100, 100) / 10.0
+        }
+    }
+    return HttpResponse(tojson(setpoint, callback),
+                        content_type="application/json")

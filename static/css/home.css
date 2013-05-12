@@ -43,3 +43,7 @@ html, body {
     opacity: 0;
     line-height: 0;
 }
+
+.msg-button-error {
+    font-weight: bold !important;
+}

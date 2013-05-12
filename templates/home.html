@@ -88,7 +88,8 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
   </div>
   <div style="margin: 10px;">
     <alert ng-repeat="msg in messages | orderBy:'id':true" type="msg.type"
-           close="close_message(msg.id)" class="text-left">
+           close="close_message(msg.id)" class="text-left"
+           ng-animate="'message-list'">
       {[ msg.date | date:'yyyy MMM d HH:mm:ss' ]}<br/>
       <b>{[ msg.message ]}</b>
     </alert>

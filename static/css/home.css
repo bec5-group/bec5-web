@@ -11,3 +11,35 @@ html, body {
     width: 30px;
     height: 30px;
 }
+
+.message-list-enter-setup {
+    -webkit-transition: .4s linear all;
+    -moz-transition: .4s linear all;
+    -ms-transition: .4s linear all;
+    -o-transition: .4s linear all;
+    transition: .4s linear all;
+
+    opacity: 0;
+    line-height: 0;
+}
+
+.message-list-enter-setup.message-list-enter-start {
+    opacity: 1;
+    line-height: 100%;
+}
+
+.message-list-leave-setup {
+    -webkit-transition: .4s linear all;
+    -moz-transition: .4s linear all;
+    -ms-transition: .4s linear all;
+    -o-transition: .4s linear all;
+    transition: .4s linear all;
+
+    opacity: 1;
+    line-height: 100%;
+}
+
+.message-list-leave-setup.message-list-leave-start {
+    opacity: 0;
+    line-height: 0;
+}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+  html, body {
+      height: 100%;
+  }
+</style>
+<title>BEC-V Login Page</title>
+{% endblock %}
+
+{% block body %}
+{% if user.is_authenticated %}
+You have already logged in.
+{% else %}
+<div class="hero-unit" style="height: 100%;" class="text-center">
+  <h2 style="display: block;" class="text-center">
+    BEC-V Login Page
+  </h2>
+  <div class="text-center">
+    <form action="/accounts/login/" method="post">
+      {% if form.errors %}
+      <alert type="'error'">
+        Sorry, that's not a valid username or password
+      </alert>
+      {% endif %}
+      {% csrf_token %}
+      <div style="display: inline-block;" class="text-left">
+        <label for="username">User Name</label>
+        <input type="text" name="username" placeholder="User Name"/>
+        <label for="password">Password</label>
+        <input type="password" name="password" placeholder="Password"/>
+        <input type="hidden" name="next" value="{{ next|escape }}"/>
+        <br/>
+        <button type="submit" class="btn"
+                style="display: inline-block;">
+          <i class="icon-user"></i> Login
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script src="/static/js/home.js"></script>
+<style type="text/css">
+  html, body {
+      background-color: #fbfdfd;
+  }
+  .big-text {
+      font-size: 30px !important;
+      font-weight: bold !important;
+  }
+</style>
+<title>BEC-V</title>
+{% endblock %}
+
+{% block body_attr %}
+ng-controller="HomePageCtrl"
+{% endblock %}
+
+{% block body %}
+<div class="navbar">
+  <div class="navbar-inner">
+    <div class="brand">BEC-V</div>
+    <ul class="nav">
+      <li title-btn="'oven-temp'" ng-model="active_tab">
+        <a href="#">Oven Temperature</a>
+      </li>
+      <li title-btn="'oven-control'" ng-model="active_tab">
+        <a href="#">Oven Control</a>
+      </li>
+    </ul>
+    <a href="/accounts/logout/" class="btn" style="float: right;"><i class="icon-user"></i> Logout</a>
+  </div>
+</div>
+<div class="text-center">
+  <div style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]}; display: {[ {true: 'inline-block', false: 'none'}[active_tab == 'oven-control'] ]}">
+    <table class="table table-hover table-bordered">
+      <thead>
+        <th>Select Profile Name <i class="icon-arrow-down"></i></th>
+        <th ng-repeat="ctrl in TControls">{[ ctrl.name ]}</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="id in TProfile.ids"
+            ng-class="{false: '', true: 'success'}[id == TProfile.cur]">
+          <td ng-click="TProfile.cur = id"
+              style="cursor: pointer;">{[ TProfile.all[id].name ]}</td>
+          <td ng-repeat="ctrl in TControls">
+            {[ TProfile.all[id].temps[ctrl.id] | number:1 ]}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="btn btn-info"
+            ng-class="{false: '', true: 'disabled'}[!TProfile.all[TProfile.cur]]"
+            ng-click="TProfile.do_apply()">
+      <i class="icon-ok icon-white"></i> Apply
+    </button>
+    <img src="/static/img/loading.gif" width="20px"
+         style="display: {[ {true: 'inline-block', false: 'none'}[TProfile.busy] ]}"/>
+  </div>
+  <div style="display: {[ {true: 'inline-block', false: 'none'}[active_tab == 'oven-temp'] ]};">
+    <table class="table">
+      <thead>
+        <th>Controller</th>
+        <th>Temperature</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="ctrl in TControls">
+          <td class="big-text">{[ ctrl.name ]}</td>
+          <td class="big-text text-info">
+            {[ TValues[ctrl.id] | number:1 ]} &deg;C
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <label class="checkbox" style="display: inline-block;">
+      <input type="checkbox">Automatic Update</input>
+    </label>
+  </div>
+</div>
+{% endblock %}

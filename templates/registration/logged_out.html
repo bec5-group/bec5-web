@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+  html, body {
+      height: 100%;
+  }
+</style>
+<title>BEC-V Logged Out</title>
+{% endblock %}
+
+{% block body %}
+<div class="navbar">
+  <div class="navbar-inner">
+    <div class="brand">BEC-V</div>
+    <a href="/accounts/login/" class="btn" style="float: right;"><i class="icon-user"></i> Login</a>
+  </div>
+</div>
+<p class="lead text-center">
+  You have logged out. Click <a href="/accounts/login/">here</a> to login again.
+</p>
+{% endblock %}

@@ -32,6 +32,8 @@ becv_app
 
 function HomePageCtrl($scope) {
     $scope.active_tab = 'oven-temp';
+    if (window.location.hash)
+        $scope.active_tab = window.location.hash.substring(1);
 
     $scope.TControls = [{
         id: 'bottom',

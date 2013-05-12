@@ -1,7 +1,16 @@
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.views import redirect_to_login
 from django.shortcuts import render
+from django.contrib.auth import views as auth_views
 import json
+
+_login = auth_views.login
+
+def login(req, *args, **kwargs):
+    if req.method == 'POST' and not req.POST.get('remember', None):
+        req.session.set_expiry(0)
+    return _login(req, *args, **kwargs)
+auth_views.login = login
 
 def home(request):
     if not request.user.is_authenticated():

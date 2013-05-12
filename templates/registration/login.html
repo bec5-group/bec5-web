@@ -6,17 +6,23 @@
       height: 100%;
   }
 </style>
+<script src="/static/js/login.js"></script>
 <title>BEC-V Login Page</title>
 {% endblock %}
 
 {% block body %}
-{% if user.is_authenticated %}
-You have already logged in.
-{% else %}
 <div class="hero-unit" style="height: 100%;" class="text-center">
   <h2 style="display: block;" class="text-center">
     BEC-V Login Page
   </h2>
+  {% if user.is_authenticated %}
+  <alert type="'success'">
+    You have already logged in. Redirect to
+    <a href="{{ next | default:'/' | escape }}">previous page</a> in
+    <b redirect-cnt="{{ next|escape }}" timeout="5"></b> seconds.
+    Click <a href="/accounts/logout/">here</a> to logout.
+  </alert>
+  {% else %}
   <div class="text-center">
     <form action="/accounts/login/" method="post">
       {% if form.errors %}
@@ -30,8 +36,10 @@ You have already logged in.
         <input type="text" name="username" placeholder="User Name"/>
         <label for="password">Password</label>
         <input type="password" name="password" placeholder="Password"/>
+        <label class="checkbox">
+          <input type="checkbox" name="remember" checked="true"/> Remember Me
+        </label>
         <input type="hidden" name="next" value="{{ next|escape }}"/>
-        <br/>
         <button type="submit" class="btn"
                 style="display: inline-block;">
           <i class="icon-user"></i> Login
@@ -39,6 +47,6 @@ You have already logged in.
       </div>
     </form>
   </div>
-</div>
 {% endif %}
+</div>
 {% endblock %}

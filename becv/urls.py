@@ -5,7 +5,7 @@ from django.views.generic.base import RedirectView
 from django.contrib import admin
 admin.autodiscover()
 
-from django.contrib.auth.views import login, logout
+from django.contrib.auth.views import logout
 
 urlpatterns = patterns('',
     url(r'^$', 'becv.views.home', name='home'),
@@ -15,7 +15,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^accounts/login/$', login),
+    url(r'^accounts/login/$', 'becv.views.login'),
     url(r'^accounts/logout/$', logout),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/')),
     # url(r'^action/oven/(?P<action>[^/]*)/$', 'becv.views.set_oven'),

@@ -6,6 +6,8 @@ becv_app
                 var timeout = parseInt($attrs.timeout);
                 if (!url)
                     url = "/";
+                if (url.search('#') < 0)
+                    url += location.hash;
                 if (!timeout || timeout <= 0)
                     timeout = 5;
 
@@ -21,6 +23,20 @@ becv_app
 
                 check_timeout();
                 var interval_id = setInterval(check_timeout, 1000);
+            }
+        };
+    })
+    .directive('hrefHash', function () {
+        return {
+            link: function ($scope, $ele, $attrs) {
+                var attr = $attrs.hrefHash;
+                if (!attr)
+                    attr = "href";
+                var url = $attrs[attr];
+                if (!url)
+                    url = "";
+                url += location.hash;
+                $ele.attr(attr, url);
             }
         };
     });

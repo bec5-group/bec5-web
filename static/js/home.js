@@ -29,6 +29,38 @@ becv_app
             }
         };
     }]);
+becv_app.directive('condDisp', function () {
+    return {
+        link: function ($scope, $ele, $attrs) {
+            var exp = $attrs.condDisp;
+            var value = $scope.$eval(exp);
+            var disp_type = $attrs.condDispType;
+            if (!disp_type)
+                disp_type = "inline-block";
+
+            $scope.$watch(function () {
+                value = $scope.$eval(exp);
+                return value;
+            }, function (modelValue) {
+                if (value){
+                    $ele.css("display", disp_type);
+                } else {
+                    $ele.css("display", "none");
+                }
+            });
+        }
+    };
+});
+// Array Remove - By John Resig (MIT Licensed)
+Array.prototype.remove = function(from, to) {
+    if (from)
+        from = parseInt(from);
+    if (to)
+        to = parseInt(to);
+    var rest = this.slice((to || from) + 1 || this.length);
+    this.length = from < 0 ? this.length + from : from;
+    return this.push.apply(this, rest);
+};
 
 function HomePageCtrl($scope, $http) {
     var tabs = {
@@ -40,16 +72,47 @@ function HomePageCtrl($scope, $http) {
     if (!($scope.active_tab in tabs))
         $scope.active_tab = 'oven-temp';
 
+    $scope.messages = [];
+    $scope.close_message = function (id) {
+        for (var i in $scope.messages) {
+            if (!$scope.messages.hasOwnProperty(i))
+                continue;
+            if ($scope.messages[i].id == id) {
+                $scope.messages.remove(i);
+                break;
+            }
+        }
+    };
+    var message_id_cnt = 0;
+    function add_message(msg, type) {
+        if (!msg)
+            return;
+        if (!type)
+            type = "";
+        if ($scope.messages.length >= 5) {
+            $scope.messages.length = 4;
+        }
+        var id = message_id_cnt++;
+        $scope.messages.unshift({
+            id: id,
+            message: msg,
+            type: type,
+            date: new Date()
+        });
+        return id;
+    };
+
     $http.get('/action/get-ovens/').success(function (data, status) {
         $scope.TControls = data;
     }).error(function (data, status) {
-        // TODO
+        add_message("Error " + status + ", when getting oven list.", 'error');
     });
 
     $http.get('/action/get-profiles/').success(function (data, status) {
         $scope.TProfile.set_profiles(data);
     }).error(function (data, status) {
-        // TODO
+        add_message("Error " + status + ", when getting profile list.",
+                    'error');
     });
 
     $scope.TControls = [];
@@ -61,7 +124,8 @@ function HomePageCtrl($scope, $http) {
         $http.get('/action/get-temps/').success(function (data, status) {
             $scope.TValues = data;
         }).error(function (data, status) {
-            // TODO
+            add_message("Error " + status + ", when getting temperatures.",
+                        'error');
         });
     }
     update_temps();
@@ -90,21 +154,24 @@ function HomePageCtrl($scope, $http) {
             this.ids = [];
             this.all = {};
             this.cur = '';
-            this.busy = false;
+            this.status = 0;
         },
         do_apply: function () {
             if (!this.cur)
                 return;
-            this.busy = true;
+            this.status = 1;
             var that = this;
+            var cur = this.all[this.cur].name;
             $http.get('/action/set-profile/' + this.cur + '/')
                 .success(function (data, status) {
-                    that.busy = false;
-                    // TODO
-                    console.log("apply", data ? 'success' : 'failed');
+                    that.status = 2;
+                    add_message('Successfully set profile to "' + cur + '".',
+                                'success');
                 }).error(function (data, status) {
-                    that.busy = false;
-                    // TODO
+                    that.status = 3;
+                    add_message("Error " + status +
+                                ', when setting profile to "' + cur + '".',
+                                'error');
                 });
         }
     }

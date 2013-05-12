@@ -27,7 +27,7 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
   </div>
 </div>
 <div class="text-center">
-  <div style="display: {[ {true: 'inline-block', false: 'none'}[active_tab == 'oven-control'] ]}">
+  <div cond-disp="active_tab == 'oven-control'">
     <table class="table table-hover table-bordered">
       <thead>
         <th>Select Profile Name <i class="icon-arrow-down"></i></th>
@@ -47,15 +47,27 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
         </tr>
       </tbody>
     </table>
-    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" width="20px"/>
+    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon"/>
     <button class="btn btn-info"
             ng-class="{false: '', true: 'disabled'}[!TProfile.all[TProfile.cur]]"
             ng-click="TProfile.do_apply()">
       <i class="icon-ok icon-white"></i> Apply
     </button>
-    <img src="{[ {true: '/static/img/loading.gif', false: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='}[TProfile.busy] ]}" width="20px"/>
+    <div class="apply-status-icon" style="display: inline-block;">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon" cond-disp="TProfile.status == 0"/>
+      <img src="/static/img/loading.gif" class="apply-status-icon"
+           cond-disp="TProfile.status == 1"/>
+      <div cond-disp="TProfile.status == 2"
+           style="display: inline-block; padding: 5px; height: 30px">
+        <i class="icon-ok"></i>
+      </div>
+      <div cond-disp="TProfile.status &gt; 2"
+           style="display: inline-block; padding: 5px; height: 30px">
+        <i class="icon-remove"></i>
+      </div>
+    </div>
   </div>
-  <div style="display: {[ {true: 'inline-block', false: 'none'}[active_tab == 'oven-temp'] ]};">
+  <div cond-disp="active_tab == 'oven-temp'">
     <table class="table">
       <thead>
         <th>Controller</th>
@@ -73,6 +85,13 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
     <label class="checkbox" style="display: inline-block;">
       <input type="checkbox" ng-model="auto_temp">Automatic Update</input>
     </label>
+  </div>
+  <div style="margin: 10px;">
+    <alert ng-repeat="msg in messages | orderBy:'id':true" type="msg.type"
+           close="close_message(msg.id)" class="text-left">
+      {[ msg.date | date:'yyyy MMM d HH:mm:ss' ]}<br/>
+      <b>{[ msg.message ]}</b>
+    </alert>
   </div>
 </div>
 {% endblock %}

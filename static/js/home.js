@@ -121,7 +121,10 @@ function HomePageCtrl($scope, $http) {
     $scope.TValues = {};
 
     function update_temps() {
-        $http.get('/action/get-temps/').success(function (data, status) {
+        $http.get('/action/get-temps/', {
+            cache: false,
+            timeout: 10000,
+        }).success(function (data, status) {
             $scope.TValues = data;
         }).error(function (data, status) {
             add_message("Error " + status + ", when getting temperatures.",

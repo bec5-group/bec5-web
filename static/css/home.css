@@ -1,0 +1,7 @@
+html, body {
+    background-color: #fbfdfd;
+}
+.big-text {
+    font-size: 30px !important;
+    font-weight: bold !important;
+}

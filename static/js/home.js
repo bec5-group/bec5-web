@@ -30,69 +30,82 @@ becv_app
         };
     }]);
 
-function HomePageCtrl($scope) {
-    $scope.active_tab = 'oven-temp';
+function HomePageCtrl($scope, $http) {
+    var tabs = {
+        'oven-temp': true,
+        'oven-control': true
+    };
     if (window.location.hash)
         $scope.active_tab = window.location.hash.substring(1);
+    if (!($scope.active_tab in tabs))
+        $scope.active_tab = 'oven-temp';
 
-    $scope.TControls = [{
-        id: 'bottom',
-        name: 'Bottom'
-    }, {
-        id: 'middle',
-        name: 'Middle'
-    }, {
-        id: 'out',
-        name: 'Out'
-    }];
+    $http.get('/action/get-ovens/').success(function (data, status) {
+        $scope.TControls = data;
+    }).error(function (data, status) {
+        // TODO
+    });
 
-    $scope.TValues = {
-        out: 500,
-        middle: 480,
-        bottom: 460
-    };
+    $http.get('/action/get-profiles/').success(function (data, status) {
+        $scope.TProfile.set_profiles(data);
+    }).error(function (data, status) {
+        // TODO
+    });
+
+    $scope.TControls = [];
+    $scope.auto_temp = false;
+
+    $scope.TValues = {};
+
+    function update_temps() {
+        $http.get('/action/get-temps/').success(function (data, status) {
+            $scope.TValues = data;
+        }).error(function (data, status) {
+            // TODO
+        });
+    }
+    update_temps();
+    setInterval(function () {
+        if ($scope.auto_temp) {
+            update_temps();
+        }
+    }, 10000);
 
     function TempProfileMgr() {
         this._init.apply(this, arguments);
     }
 
     TempProfileMgr.prototype = {
+        set_profiles: function (profiles) {
+            var ids = [];
+            var all = {};
+            for (var i in profiles) {
+                ids[i] = profiles[i].id;
+                all[profiles[i].id] = profiles[i];
+            }
+            this.ids = ids;
+            this.all = all;
+        },
         _init: function () {
-            this.ids = ['off', 'stand_by', 'on'];
-            this.all = {
-                off: {
-                    name: 'Off',
-                    temps: {
-                        out: 240,
-                        middle: 220,
-                        bottom: 200
-                    }
-                },
-                stand_by: {
-                    name: 'Stand By',
-                    temps: {
-                        out: 525,
-                        middle: 480,
-                        bottom: 460
-                    }
-                },
-                on: {
-                    name: 'On',
-                    temps: {
-                        out: 525,
-                        middle: 500,
-                        bottom: 480
-                    }
-                }
-            };
+            this.ids = [];
+            this.all = {};
             this.cur = '';
             this.busy = false;
         },
         do_apply: function () {
             if (!this.cur)
                 return;
-            this.busy = !this.busy;
-            console.log("Apply", this.cur);
+            this.busy = true;
+            var that = this;
+            $http.get('/action/set-profile/' + this.cur + '/')
+                .success(function (data, status) {
+                    that.busy = false;
+                    // TODO
+                    console.log("apply", data ? 'success' : 'failed');
+                }).error(function (data, status) {
+                    that.busy = false;
+                    // TODO
+                });
         }
     }
 

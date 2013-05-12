@@ -102,13 +102,19 @@ function HomePageCtrl($scope, $http) {
         return id;
     };
 
-    $http.get('/action/get-ovens/').success(function (data, status) {
+    $http.get('/action/get-ovens/', {
+        cache: false,
+        timeout: 10000
+    }).success(function (data, status) {
         $scope.TControls = data;
     }).error(function (data, status) {
         add_message("Error " + status + ", when getting oven list.", 'error');
     });
 
-    $http.get('/action/get-profiles/').success(function (data, status) {
+    $http.get('/action/get-profiles/', {
+        cache: false,
+        timeout: 10000
+    }).success(function (data, status) {
         $scope.TProfile.set_profiles(data);
     }).error(function (data, status) {
         add_message("Error " + status + ", when getting profile list.",
@@ -165,17 +171,19 @@ function HomePageCtrl($scope, $http) {
             this.status = 1;
             var that = this;
             var cur = this.all[this.cur].name;
-            $http.get('/action/set-profile/' + this.cur + '/')
-                .success(function (data, status) {
-                    that.status = 2;
-                    add_message('Successfully set profile to "' + cur + '".',
-                                'success');
-                }).error(function (data, status) {
-                    that.status = 3;
-                    add_message("Error " + status +
-                                ', when setting profile to "' + cur + '".',
-                                'error');
-                });
+            $http.get('/action/set-profile/' + this.cur + '/', {
+                cache: false,
+                timeout: 10000
+            }).success(function (data, status) {
+                that.status = 2;
+                add_message('Successfully set profile to "' + cur + '".',
+                            'success');
+            }).error(function (data, status) {
+                that.status = 3;
+                add_message("Error " + status +
+                            ', when setting profile to "' + cur + '".',
+                            'error');
+            });
         }
     }
 

@@ -1,5 +1,4 @@
 from django.db import models
-from . import utils
 
 class TempController(models.Model):
     cid = models.CharField(max_length=1000, primary_key=True)

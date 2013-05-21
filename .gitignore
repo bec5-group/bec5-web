@@ -29,3 +29,4 @@ __pycache__/
 *.fdb_latexmk
 *.table
 *.gnuplot
+*.db

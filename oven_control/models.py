@@ -44,13 +44,14 @@ def remove_controller(controller):
     controller.delete()
     return True
 
+
 def get_profiles():
     return TempProfile.objects.all()
 
 def get_profile(pid):
     return TempProfile.objects.get(id=pid)
 
-def get_profile_temps(profile):
+def get_profile_temps(profile, use_default=True):
     if not isinstance(profile, TempProfile):
         profile = get_profile(profile)
     set_points = TempSetPoint.objects.filter()
@@ -60,13 +61,14 @@ def get_profile_temps(profile):
         try:
             temps[id] = set_points.get(control=controller).temperature
         except:
-            temps[id] = controller.default_temp
+            if use_default:
+                temps[id] = controller.default_temp
     return temps
 
 def add_profile(name, **kw):
     return TempProfile.objects.create(name=name, **kw)
 
-def set_profile_temps(profile, temps):
+def set_profile_temps(profile, temps, ignore_error=True):
     if not isinstance(profile, TempProfile):
         profile = get_profile(profile)
     temp_sets = []
@@ -75,7 +77,9 @@ def set_profile_temps(profile, temps):
             controller = get_controller(cid)
             temp = float(temp)
         except:
-            return False
+            if not ignore_error:
+                return False
+            continue
         temp_sets.append((controller, temp))
     for controller, temp in temp_sets:
         TempSetPoint.objects.filter(control=controller,
@@ -83,4 +87,13 @@ def set_profile_temps(profile, temps):
         TempSetPoint.objects.create(control=controller,
                                     profile=profile,
                                     temperature=temp)
+    return True
+
+def remove_profile(profile):
+    try:
+        if not isinstance(profile, TempProfile):
+            profile = get_profile(profile)
+    except:
+        return False
+    profile.delete()
     return True

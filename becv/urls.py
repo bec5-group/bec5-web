@@ -31,6 +31,14 @@ urlpatterns = patterns('',
     url(r'^action/get-ovens/$', 'becv.views.get_ovens'),
 
     url(r'^action/set-profile/(?P<profile>[^/]*)/$', 'becv.views.set_profile'),
+    url(r'^action/set-profile/(?P<profile>[^/]*)/(?P<name>[^/]*)/$',
+        'becv.views.set_profile'),
+    url(r'^action/set-profile/(?P<profile>[^/]*)/(?P<name>[^/]*)/(?P<order>[^/]*)/$', 'becv.views.set_profile'),
+
+    url(r'^action/add-profile/(?P<name>[^/]*)/$', 'becv.views.add_profile'),
+    url(r'^action/add-profile/(?P<name>[^/]*)/(?P<order>[^/]*)/$',
+        'becv.views.add_profile'),
+
     url(r'^action/set-temp/(?P<cid>[^/]*)/(?P<temp>[-.0-9]*)/$',
         'becv.views.set_temp'),
     url(r'^action/get-temps/$', 'becv.views.get_temps'),

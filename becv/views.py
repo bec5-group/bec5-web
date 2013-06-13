@@ -173,11 +173,44 @@ def get_ovens(request):
              'name': controller.name}
              for controller in oven_models.get_controllers()]
 
+@return_jsonp
+@auth_jsonp
+def set_profile(request, profile=None, name=None, order=None):
+    profile = oven_models.get_profile(profile)
+    if name:
+        profile.name = name
+    if order is not None:
+        profile.order = order
+    profile.save()
+    oven_models.set_profile_temps(profile, request.GET, True)
+    return True
 
 @return_jsonp
 @auth_jsonp
-def set_profile(request, profile=None):
-    return True
+def add_profile(request, name=None, **kwargs):
+    profile = oven_models.add_profile(name, **kwargs)
+    oven_models.set_profile_temps(profile, request.GET, True)
+    return {
+        'id': profile.id,
+        'name': profile.name,
+    }
+
+@return_jsonp
+@auth_jsonp
+def get_profile_setting(request, pid=None):
+    profile = oven_models.get_profile(pid)
+    return {
+        'id': profile.id,
+        'name': profile.name,
+        'order': profile.order,
+        'temps': oven_models.get_profile_temps(profile, False)
+    }
+
+@return_jsonp
+@auth_jsonp
+def del_profile(request, pid=None):
+    return oven_models.remove_profile(pid)
+
 
 @return_jsonp
 def get_temps(request):

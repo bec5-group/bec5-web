@@ -5,6 +5,13 @@
 {% block head %}
 <link href="/static/css/home.css" rel="stylesheet"/>
 <title>BEC-V</title>
+<style type="text/css">
+  .cancel-button {
+      width: 22px;
+      height: 22px;
+      padding: 2px 3px;
+  }
+</style>
 {% endblock %}
 
 {% block body_attr %}
@@ -29,8 +36,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
     <div style="display: inline-block; float: right;">
       {% if user.is_authenticated %}
       <gravatar-image data-email="user.email" data-size="30"
-                      data-secure="true">
-      </gravatar-image>
+                      data-secure="true"></gravatar-image>
       <a href="/accounts/logout/" class="btn">
         <i class="icon-user"></i> Logout
       </a>
@@ -83,7 +89,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
                         ng-click="TProfile.edit_setpoint()">
                   <i class="icon-hdd icon-white"></i> Save
                 </button>
-                <button class="btn btn-mini"
+                <button class="btn btn-mini cancel-button"
                         ng-click="TProfile.cancel_edit_setpoint()">
                   <i class="icon-remove"></i>
                 </button>
@@ -97,7 +103,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
       <thead>
         <tr class="text-info">
           <th style="text-align: center;">
-            Select Profile Name <i class="icon-arrow-down"></i>
+            Select Profile <i class="icon-arrow-down"></i>
           </th>
           <th ng-repeat="ctrl in TControls" style="text-align: center;">
             {[ ctrl.name ]}
@@ -124,7 +130,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
                       ng-click="TProfile.edit_profile(id)">
                 <i class="icon-edit"></i> Edit
               </button>
-              <button class="btn btn-mini btn-danger"
+              <button class="btn btn-mini btn-danger cancel-button"
                       ng-click="TProfile.remove_profile(id)">
                 <i class="icon-remove icon-white"></i>
               </button>
@@ -176,7 +182,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
             <button class="btn btn-mini" ng-click="setController(ctrl.id)">
               <i class="icon-edit"></i> Setting
             </button>
-            <button class="btn btn-mini btn-danger"
+            <button class="btn btn-mini btn-danger cancel-button"
                     ng-click="removeController(ctrl)">
               <i class="icon-remove icon-white"></i>
             </button>

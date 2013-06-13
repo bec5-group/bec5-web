@@ -219,9 +219,9 @@ def del_profile(request, pid=None):
 def get_temps(request):
     import random
     temps = {
-        'top': 500 + random.randrange(-100, 100) / 10.0,
-        'middle': 480 + random.randrange(-100, 100) / 10.0,
-        'bottom': 460 + random.randrange(-100, 100) / 10.0
+        '1': 500 + random.randrange(-100, 100) / 10.0,
+        '2': 480 + random.randrange(-100, 100) / 10.0,
+        '3': 460 + random.randrange(-100, 100) / 10.0
     }
     return temps
 

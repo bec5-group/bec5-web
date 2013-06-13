@@ -44,11 +44,13 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
 </div>
 <div class="text-center">
   <div cond-disp="home_tabs.active == 'oven-control'">
-    <table class="table table-hover table-bordered">
+    <table class="table">
       <thead>
         <tr class="text-info">
-          <th>Current Setpoint</th>
-          <th ng-repeat="ctrl in TControls">{[ ctrl.name ]}</th>
+          <th style="text-align: center;">Current Setpoint</th>
+          <th ng-repeat="ctrl in TControls" style="text-align: center;">
+            {[ ctrl.name ]}
+          </th>
           <th cond-disp="permissions['oven-settemp']"
               cond-disp-type="table-cell"></th>
         </tr>
@@ -60,22 +62,33 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
           </td>
           <td ng-repeat="ctrl in TControls"
               style="margin: 0; padding: 0; vertical-align: middle;"
-              ng-switch="!!editingOvenTemps">
+              ng-switch="!!TProfile.editing_setpoint">
             <input ng-switch-when="true" type="number" step="any"
                    class="input-mini" style="margin: 0; height: 100%;"
-                   ng-model="TProfile.cur_setpoint.temps[ctrl.id]"/>
-            <input ng-switch-default type="text" step="any"
+                   ng-model="TProfile.edited_setpoint[ctrl.id]"/>
+            <input ng-switch-default type="text" step="any" readonly
                    class="input-mini" style="margin: 0; height: 100%;"
-                   ng-model="TProfile.cur_setpoint.temps[ctrl.id]"
-                   readonly/>
+                   ng-model="TProfile.cur_setpoint.temps[ctrl.id]"/>
           </td>
           <td cond-disp="permissions['oven-settemp']"
               cond-disp-type="table-cell">
-            <button class="btn btn-mini" ng-click="editOvenTemps()"
-                    style="width: 60px; text-align: left;">
-              <i class="icon-edit"></i>
-              {[{false: 'Edit', true: 'Save'}[!!editingOvenTemps]]}
-            </button>
+            <div style="min-width: 90px;" ng-switch="!TProfile.editing_setpoint">
+              <span ng-switch-when="true">
+                <button class="btn btn-mini" ng-click="TProfile.edit_setpoint()">
+                  <i class="icon-edit"></i> Change
+                </button>
+              </span>
+              <span ng-switch-default>
+                <button class="btn btn-mini btn-success"
+                        ng-click="TProfile.edit_setpoint()">
+                  <i class="icon-hdd icon-white"></i> Save
+                </button>
+                <button class="btn btn-mini"
+                        ng-click="TProfile.cancel_edit_setpoint()">
+                  <i class="icon-remove"></i>
+                </button>
+              </span>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -83,32 +96,46 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
     <table class="table table-hover table-bordered">
       <thead>
         <tr class="text-info">
-          <th>Select Profile Name <i class="icon-arrow-down"></i></th>
-          <th ng-repeat="ctrl in TControls">{[ ctrl.name ]}</th>
+          <th style="text-align: center;">
+            Select Profile Name <i class="icon-arrow-down"></i>
+          </th>
+          <th ng-repeat="ctrl in TControls" style="text-align: center;">
+            {[ ctrl.name ]}
+          </th>
           <th cond-disp="permissions['oven-setprofile-temp']"
               cond-disp-type="table-cell"></th>
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="id in TProfile.ids" ng-click="TProfile.set_cur(id)"
+        <tr ng-repeat="id in TProfile.ids"
             ng-class="{false: '', true: 'success'}[id == TProfile.cur]"
             style="cursor: pointer;">
-          <td>
+          <td ng-click="TProfile.set_cur(id)">
             <input type="radio" value="{[ id ]}" ng-model="TProfile.cur"/>
             <b>{[ TProfile.all[id].name ]}</b>
           </td>
-          <td ng-repeat="ctrl in TControls">
+          <td ng-repeat="ctrl in TControls" ng-click="TProfile.set_cur(id)">
             {[ TProfile.all[id].temps[ctrl.id] | number:1 ]}
           </td>
           <td cond-disp="permissions['oven-setprofile-temp']"
-              cond-disp-type="table-cell">
-            <button class="btn btn-mini"><i class="icon-edit"></i> Edit</button>
+              cond-disp-type="table-cell" style="cursor: default;">
+            <div>
+              <button class="btn btn-mini"
+                      ng-click="TProfile.edit_profile(id)">
+                <i class="icon-edit"></i> Edit
+              </button>
+              <button class="btn btn-mini btn-danger"
+                      ng-click="TProfile.remove_profile(id)">
+                <i class="icon-remove icon-white"></i>
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
     <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon"/>
-    <button class="btn" cond-disp="permissions['oven-setprofile-temp']">
+    <button class="btn" cond-disp="permissions['oven-setprofile-temp']"
+            ng-click="TProfile.add_profile()">
       <i class="icon-plus"></i> Add Profile
     </button>
     <button class="btn btn-info"
@@ -159,11 +186,12 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
     </table>
     <div>
       <div class="checkbox"
-           style="display: inline-block; vertical-align: middle;">
+           style="display: inline-block;">
         <input type="checkbox" ng-model="auto_temp">Automatic Update</input>
       </div>
+      <br/>
       <button class="btn" cond-disp="permissions['oven-setcontroller']"
-              style="vertical-align: middle;" ng-click="addController()">
+              ng-click="addController()">
         <i class="icon-plus"></i> Add Controller
       </button>
     </div>
@@ -190,4 +218,5 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
 {% block script %}
 <script src="/static/js/home.js"></script>
 <script src="/static/js/controller_edit.js"></script>
+<script src="/static/js/profile_edit.js"></script>
 {% endblock %}

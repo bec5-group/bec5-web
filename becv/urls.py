@@ -30,17 +30,20 @@ urlpatterns = patterns('',
     url(r'^action/get-profiles/$', 'becv.views.get_profiles'),
     url(r'^action/get-ovens/$', 'becv.views.get_ovens'),
 
-    url(r'^action/set-profile/(?P<profile>[^/]*)/$', 'becv.views.set_profile'),
-    url(r'^action/set-profile/(?P<profile>[^/]*)/(?P<name>[^/]*)/$',
-        'becv.views.set_profile'),
-    url(r'^action/set-profile/(?P<profile>[^/]*)/(?P<name>[^/]*)/(?P<order>[^/]*)/$', 'becv.views.set_profile'),
-
     url(r'^action/add-profile/(?P<name>[^/]*)/$', 'becv.views.add_profile'),
     url(r'^action/add-profile/(?P<name>[^/]*)/(?P<order>[^/]*)/$',
         'becv.views.add_profile'),
 
-    url(r'^action/set-temp/(?P<cid>[^/]*)/(?P<temp>[-.0-9]*)/$',
-        'becv.views.set_temp'),
+    url(r'^action/get-profile-setting/(?P<pid>[^/]*)/$',
+        'becv.views.get_profile_setting'),
+
+    url(r'^action/set-profile/(?P<profile>[^/]*)/$', 'becv.views.set_profile'),
+    url(r'^action/set-profile/(?P<profile>[^/]*)/(?P<name>[^/]*)/$',
+        'becv.views.set_profile'),
+    url(r'^action/set-profile/(?P<profile>[^/]*)/(?P<name>[^/]*)/(?P<order>[^/]*)/$', 'becv.views.set_profile'),
+    url(r'^action/del-profile/(?P<pid>[^/]*)/$', 'becv.views.del_profile'),
+
+    url(r'^action/set-temps/$', 'becv.views.set_temps'),
     url(r'^action/get-temps/$', 'becv.views.get_temps'),
     url(r'^action/get-setpoint/$', 'becv.views.get_setpoint'),
 )

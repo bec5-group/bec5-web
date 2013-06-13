@@ -183,7 +183,10 @@ def set_profile(request, profile=None, name=None, order=None):
         profile.order = order
     profile.save()
     oven_models.set_profile_temps(profile, request.GET, True)
-    return True
+    return {
+        'id': profile.id,
+        'name': profile.name
+    }
 
 @return_jsonp
 @auth_jsonp
@@ -224,20 +227,19 @@ def get_temps(request):
 
 @return_jsonp
 @auth_jsonp
-def set_temp(request, cid=None, temp=None):
-    temp = float(temp)
+def set_temps(request):
     return True
 
 @return_jsonp
 def get_setpoint(request):
     import random
     setpoint = {
-        'id': 'on',
+        'id': '3',
         'name': "On",
         'temps': {
-            'top': 500 + random.randrange(-100, 100) / 10.0,
-            'middle': 480 + random.randrange(-100, 100) / 10.0,
-            'bottom': 460 + random.randrange(-100, 100) / 10.0
+            '1': 500 + random.randrange(-100, 100) / 10.0,
+            '2': 480 + random.randrange(-100, 100) / 10.0,
+            '3': 460 + random.randrange(-100, 100) / 10.0
         }
     }
     return setpoint

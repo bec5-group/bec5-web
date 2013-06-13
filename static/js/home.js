@@ -222,6 +222,28 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                 this.cur_setpoint = {};
                 this.cur_changed = false;
                 this.update_cur_setpoint();
+                this.editing_setpoint = false;
+                this.edited_setpoint = {};
+            },
+            edit_setpoint: function () {
+                if (this.editing_setpoint) {
+                    var that = this;
+                    var url = ('/action/set-temps/?' +
+                               $.param(this.edited_setpoint));
+                    json_request(url, function (data, status) {
+                        add_message('Successfully changed setpoint', 'success');
+                        that.update_cur_setpoint();
+                        that.editing_setpoint = false;
+                    }, 'Change Setpoint');
+                } else {
+                    this.edited_setpoint = $.extend(
+                        {}, this.cur_setpoint.temps);
+                    this.editing_setpoint = true;
+                }
+            },
+            cancel_edit_setpoint: function () {
+                this.editing_setpoint = false;
+                this.edited_setpoint = {};
             },
             do_apply: function () {
                 if (!this.all[this.cur])
@@ -230,7 +252,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                 var that = this;
                 var cur = this.all[this.cur].name;
                 this.cur_changed = false;
-                var url = '/action/set-profile/' + this.cur + '/'
+                var url = '/action/set-profile/' + this.cur + '/';
                 json_request(url, function (data, status) {
                     that.status = 2;
                     add_message('Successfully set profile to "' +
@@ -239,16 +261,86 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                 }, 'Set profile to "' + cur + '"', function (data, status) {
                     that.status = 3;
                 });
-            }
+            },
+            show_profile_dialog: function (values, cb) {
+                var d = $dialog.dialog({
+                    resolve: {
+                        value: function () {
+                            return values;
+                        }
+                    }
+                });
+                d.open('/static/html/profile_edit.html',
+                       'ProfileEditCtrl').then(cb);
+            },
+            add_profile: function () {
+                this.show_profile_dialog({
+                    order: 0.0,
+                    ctrls: $scope.TControls,
+                    temps: {}
+                }, function (res) {
+                    if (!res)
+                        return;
+                    var url = '/action/add-profile/' + res.name;
+                    if (!(res.order === undefined))
+                        url += '/' + res.order;
+                    url += '/?' + $.param(res.temps);
+                    json_request(url, function (data, status) {
+                        add_message('Successfully added profile "' +
+                                    data.name + '".', 'success');
+                        get_profiles();
+                    }, 'Add Profile');
+                });
+            },
+            edit_profile: function (id) {
+                var url = '/action/get-profile-setting/' + id + '/';
+                var that = this;
+                json_request(url, function (data, status) {
+                    data.ctrls = $scope.TControls;
+                    that.show_profile_dialog(data, function (res) {
+                        if (!res)
+                            return;
+                        var url = '/action/set-profile/' + id + '/' + res.name;
+                        if (!(res.order === undefined))
+                            url += '/' + res.order;
+                        url += '/?' + $.param(res.temps);
+                        json_request(url, function (data, status) {
+                            add_message('Successfully changed profile "' +
+                                        data.name + '".', 'success');
+                            get_profiles();
+                        }, 'Edit profile');
+                    });
+                }, "Get profile setting.");
+            },
+            remove_profile: function (id) {
+                var that = this;
+                var profile = this.all[id];
+                var msgbox = $dialog.messageBox(
+                    'Delete Profile',
+                    'Do you REALLY want to delete profile' + profile.name + '?',
+                    [{
+                        label: "Yes, I'm sure",
+                        result: 'yes',
+                        cssClass: 'btn-danger'
+                    }, {
+                        label: "Nope",
+                        result: 'no'
+                    }]);
+                msgbox.open().then(function (result) {
+                    if (!(result === 'yes'))
+                        return;
+                    var url = ('/action/del-profile/' + profile.id + '/');
+                    json_request(url, function (data, status) {
+                        add_message('Successfully deleted profile "' +
+                                    profile.name + '".', 'success');
+                        get_profiles();
+                    }, 'Delete profile');
+                });
+            },
         }
 
         $scope.TProfile = new TempProfileMgr();
         $scope.log_collapsed = false;
-
-        $scope.editingOvenTemps = false;
-        $scope.editOvenTemps = function () {
-            $scope.editingOvenTemps = !$scope.editingOvenTemps;
-        }
 
         function showControllerDialog(values, cb) {
             var d = $dialog.dialog({
@@ -263,7 +355,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
         }
 
         $scope.setController = function (id) {
-            var url = '/action/get-ctrl-setting/' + id + '/'
+            var url = '/action/get-ctrl-setting/' + id + '/';
             json_request(url, function (data, status) {
                 showControllerDialog(data, function (res) {
                     if (!res)
@@ -297,7 +389,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                     update_temps();
                 }, 'Add Controller');
             });
-        }
+        };
 
         $scope.removeController = function (ctrl) {
             var msgbox = $dialog.messageBox(
@@ -321,6 +413,6 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                     update_temps();
                 }, 'Delete controller');
             });
-        }
+        };
     }
 }]);

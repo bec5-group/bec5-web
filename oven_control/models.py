@@ -54,15 +54,15 @@ def get_profile(pid):
 def get_profile_temps(profile, use_default=True):
     if not isinstance(profile, TempProfile):
         profile = get_profile(profile)
-    set_points = TempSetPoint.objects.filter()
+    set_points = TempSetPoint.objects.filter(profile=profile)
     temps = {}
     for controller in get_controllers():
         cid = controller.id
         try:
-            temps[id] = set_points.get(control=controller).temperature
+            temps[cid] = set_points.get(control=controller).temperature
         except:
             if use_default:
-                temps[id] = controller.default_temp
+                temps[cid] = controller.default_temp
     return temps
 
 def add_profile(name, **kw):

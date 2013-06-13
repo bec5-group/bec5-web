@@ -68,10 +68,15 @@ Array.prototype.remove = function(from, to) {
 
 becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($scope, $http, $dialog) {
     $scope.init = function (permissions, user) {
+        $scope.condVar = function (cond, t, f) {
+            if (cond)
+                return t;
+            return f;
+        };
         $scope.user = user;
         $scope.redirect_to_login = function (name) {
             window.location = '/accounts/login/?next=/#' + name
-        }
+        };
         $scope.permissions = permissions;
         $scope.home_tabs = {
             all: [{

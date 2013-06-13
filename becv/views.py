@@ -192,7 +192,7 @@ def add_profile(request, name=None, **kwargs):
     oven_models.set_profile_temps(profile, request.GET, True)
     return {
         'id': profile.id,
-        'name': profile.name,
+        'name': profile.name
     }
 
 @return_jsonp

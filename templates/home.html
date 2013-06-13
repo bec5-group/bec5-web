@@ -58,13 +58,21 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
           <td>
             <b>{[ TProfile.cur_setpoint.name || '(Unknown)' ]}</b>
           </td>
-          <td ng-repeat="ctrl in TControls">
-            {[ TProfile.cur_setpoint.temps[ctrl.id] | number:1 ]}
+          <td ng-repeat="ctrl in TControls"
+              style="margin: 0; padding: 0; vertical-align: middle;"
+              ng-switch="!!editingOvenTemps">
+            <input ng-switch-when="true" type="number" step="any"
+                   class="input-mini" style="margin: 0; height: 100%;"
+                   ng-model="TProfile.cur_setpoint.temps[ctrl.id]"/>
+            <input ng-switch-default type="text" step="any"
+                   class="input-mini" style="margin: 0; height: 100%;"
+                   ng-model="TProfile.cur_setpoint.temps[ctrl.id]"
+                   readonly/>
           </td>
           <td cond-disp="permissions['oven-settemp']"
-              cond-disp-type="table-cell"
-              contentditable="{[!!editingOvenTemps]}">
-            <button class="btn btn-mini" ng-click="editOvenTemps()">
+              cond-disp-type="table-cell">
+            <button class="btn btn-mini" ng-click="editOvenTemps()"
+                    style="width: 60px; text-align: left;">
               <i class="icon-edit"></i>
               {[{false: 'Edit', true: 'Save'}[!!editingOvenTemps]]}
             </button>

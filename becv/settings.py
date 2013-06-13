@@ -131,7 +131,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
-    'oven_control'
+    'oven_control',
+    'jsonify'
 )
 
 # A sample logging configuration. The only tangible logging

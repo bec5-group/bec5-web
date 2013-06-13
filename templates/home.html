@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
+{% load jsonify %}
+
 {% block head %}
-<script src="/static/js/home.js"></script>
 <link href="/static/css/home.css" rel="stylesheet"/>
 <title>BEC-V</title>
 {% endblock %}
@@ -9,6 +10,7 @@
 {% block body_attr %}
 ng-controller="HomePageCtrl"
 style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
+ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
 {% endblock %}
 
 {% block body %}
@@ -16,23 +18,39 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
   <div class="navbar-inner">
     <div class="brand">BEC-V</div>
     <ul class="nav">
-      <li title-btn="'oven-temp'" ng-model="active_tab">
-        <a href="#oven-temp">Oven Temperature</a>
-      </li>
-      <li title-btn="'oven-control'" ng-model="active_tab">
-        <a href="#oven-control">Oven Control</a>
+      <li ng-repeat="tab in home_tabs.all" title-btn="tab.id"
+          title-btn-clicked="{false: false, true: redirect_to_login}[!permissions[tab.id]]"
+          title-btn-model="home_tabs.active">
+        <a href="#{[{false: '', true: tab.id}[!!permissions[tab.id]]]}">
+          <i class="icon-lock" cond-disp="!permissions[tab.id]"></i> {[tab.name]}
+        </a>
       </li>
     </ul>
-    <a href="/accounts/logout/" class="btn" style="float: right;"><i class="icon-user"></i> Logout</a>
+    <div style="display: inline-block; float: right;">
+      {% if user.is_authenticated %}
+      <gravatar-image data-email="user.email" data-size="30"
+                      data-secure="true">
+      </gravatar-image>
+      <a href="/accounts/logout/" class="btn">
+        <i class="icon-user"></i> Logout
+      </a>
+      {% else %}
+      <a href="/accounts/login/" class="btn">
+        <i class="icon-user"></i> Login
+      </a>
+      {% endif %}
+    </div>
   </div>
 </div>
 <div class="text-center">
-  <div cond-disp="active_tab == 'oven-control'">
+  <div cond-disp="home_tabs.active == 'oven-control'">
     <table class="table table-hover table-bordered">
       <thead>
         <tr class="text-info">
           <th>Current Setpoint</th>
           <th ng-repeat="ctrl in TControls">{[ ctrl.name ]}</th>
+          <th cond-disp="permissions['oven-settemp']"
+              cond-disp-type="table-cell"></th>
         </tr>
       </thead>
       <tbody>
@@ -43,6 +61,14 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
           <td ng-repeat="ctrl in TControls">
             {[ TProfile.cur_setpoint.temps[ctrl.id] | number:1 ]}
           </td>
+          <td cond-disp="permissions['oven-settemp']"
+              cond-disp-type="table-cell"
+              contentditable="{[!!editingOvenTemps]}">
+            <button class="btn btn-mini" ng-click="editOvenTemps()">
+              <i class="icon-edit"></i>
+              {[{false: 'Edit', true: 'Save'}[!!editingOvenTemps]]}
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -51,6 +77,8 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
         <tr class="text-info">
           <th>Select Profile Name <i class="icon-arrow-down"></i></th>
           <th ng-repeat="ctrl in TControls">{[ ctrl.name ]}</th>
+          <th cond-disp="permissions['oven-setprofile-temp']"
+              cond-disp-type="table-cell"></th>
         </tr>
       </thead>
       <tbody>
@@ -64,10 +92,17 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
           <td ng-repeat="ctrl in TControls">
             {[ TProfile.all[id].temps[ctrl.id] | number:1 ]}
           </td>
+          <td cond-disp="permissions['oven-setprofile-temp']"
+              cond-disp-type="table-cell">
+            <button class="btn btn-mini"><i class="icon-edit"></i> Edit</button>
+          </td>
         </tr>
       </tbody>
     </table>
     <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon"/>
+    <button class="btn" cond-disp="permissions['oven-setprofile-temp']">
+      <i class="icon-plus"></i> Add Profile
+    </button>
     <button class="btn btn-info"
             ng-class="{false: '', true: 'disabled'}[!TProfile.all[TProfile.cur]]"
             ng-click="TProfile.do_apply()">
@@ -87,11 +122,13 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
       </div>
     </div>
   </div>
-  <div cond-disp="active_tab == 'oven-temp'">
+  <div cond-disp="home_tabs.active == 'oven-temp'">
     <table class="table">
       <thead>
         <th>Controller</th>
         <th>Temperature</th>
+        <th cond-disp="permissions['oven-setconroller']"
+            cond-disp-type="table-cell"></th>
       </thead>
       <tbody>
         <tr ng-repeat="ctrl in TControls">
@@ -99,12 +136,29 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
           <td class="big-text text-info">
             {[ TValues[ctrl.id] | number:1 ]} &deg;C
           </td>
+          <td cond-disp="permissions['oven-setcontroller']"
+              cond-disp-type="table-cell">
+            <button class="btn btn-mini" ng-click="setController(ctrl.id)">
+              <i class="icon-edit"></i> Setting
+            </button>
+            <button class="btn btn-mini btn-danger"
+                    ng-click="removeController(ctrl)">
+              <i class="icon-remove icon-white"></i>
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
-    <label class="checkbox" style="display: inline-block;">
-      <input type="checkbox" ng-model="auto_temp">Automatic Update</input>
-    </label>
+    <div>
+      <div class="checkbox"
+           style="display: inline-block; vertical-align: middle;">
+        <input type="checkbox" ng-model="auto_temp">Automatic Update</input>
+      </div>
+      <button class="btn" cond-disp="permissions['oven-setcontroller']"
+              style="vertical-align: middle;" ng-click="addController()">
+        <i class="icon-plus"></i> Add Controller
+      </button>
+    </div>
   </div>
   <div style="margin: 10px;">
     <button class="btn btn-mini btn-link" style="width: 50%;"
@@ -124,4 +178,8 @@ style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
     </div>
   </div>
 </div>
+{% endblock %}
+{% block script %}
+<script src="/static/js/home.js"></script>
+<script src="/static/js/controller_edit.js"></script>
 {% endblock %}

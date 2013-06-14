@@ -25,9 +25,13 @@
     <div collapse="!show_advanced">
       <div class="control-group">
         <label class="control-label" for="ctrl-order">Order</label>
-        <div class="controls">
+        <div class="controls" ng-switch="!show_advanced">
           <input type="number" id="ctrl-order" placeholder="Profile Order."
-                 ng-model="value.order" step="any" class="input-medium">
+                 ng-model="value.order" step="any" class="input-medium"
+                 ng-switch-when="false">
+          <input type="number" id="ctrl-order" placeholder="Profile Order."
+                 ng-model="value.order" step="any" class="input-medium"
+                 ng-switch-default tabindex="-1">
         </div>
       </div>
     </div>

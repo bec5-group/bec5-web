@@ -3,6 +3,7 @@ from . import models as ctrl_models
 from . import utils
 import weakref
 
+# Run parent's .run() periodically or when activated in a separate thread.
 class ThreadHelper(object):
     def __init__(self, parent):
         self.__parent = weakref.ref(parent)
@@ -45,6 +46,7 @@ class ThreadHelper(object):
             if not self.__run_iter():
                 break
 
+# class that uses ThreadHelper
 class WithHelper(object):
     def __init__(self):
         self.__helper = ThreadHelper(self)

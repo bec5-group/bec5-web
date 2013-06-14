@@ -40,19 +40,26 @@
     <div collapse="!show_advanced">
       <div class="control-group">
         <label class="control-label" for="ctrl-order">Order</label>
-        <div class="controls">
+        <div class="controls" ng-switch="!show_advanced">
           <input type="number" id="ctrl-order" placeholder="Controller Order."
-                 ng-model="value.order" step="any" class="input-medium">
+                 ng-model="value.order" step="any" class="input-medium"
+                 ng-switch-when="false">
+          <input type="number" id="ctrl-order" placeholder="Controller Order."
+                 ng-model="value.order" step="any" class="input-medium"
+                 ng-switch-default tabindex="-1">
         </div>
       </div>
       <div class="control-group">
         <label class="control-label" for="ctrl-default">
           Default Temperature
         </label>
-        <div class="controls">
+        <div class="controls" ng-switch="!show_advanced">
           <input type="number" id="ctrl-default" ng-model="value.default_temp"
                  placeholder="Controller Default Temperature." step="any"
-                 class="input-medium">
+                 class="input-medium" ng-switch-when="false">
+          <input type="number" id="ctrl-default" ng-model="value.default_temp"
+                 placeholder="Controller Default Temperature." step="any"
+                 class="input-medium" ng-switch-default tabindex="-1">
         </div>
       </div>
     </div>

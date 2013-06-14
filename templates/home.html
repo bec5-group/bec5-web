@@ -36,7 +36,8 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
     <div style="display: inline-block; float: right;">
       {% if user.is_authenticated %}
       <gravatar-image data-email="user.email" data-size="30"
-                      data-secure="true"></gravatar-image>
+                      data-secure="true">
+      </gravatar-image>
       <a href="/accounts/logout/" class="btn">
         <i class="icon-user"></i> Logout
       </a>

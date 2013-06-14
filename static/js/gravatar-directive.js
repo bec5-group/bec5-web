@@ -31,7 +31,7 @@ angular.module('ui-gravatar', ['md5'])
                     // parse the default image url
                     var defaultUrl = attrs.default || '';
                     // construct the tag to insert into the element
-                    var tag = '<img class="gravatar-icon" src="' + (attrs.secure ? 'https://secure' : 'http://www' ) + '.gravatar.com/avatar/' + hash + '?s=' + size + '&r=' + rating + '&d=' + defaultUrl + '" >'
+                    var tag = '<img class="gravatar-icon img-rounded" src="' + (attrs.secure ? 'https://secure' : 'http://www' ) + '.gravatar.com/avatar/' + hash + '?s=' + size + '&r=' + rating + '&d=' + defaultUrl + '" >'
                     //remove any existing imgs
                     $(elm).find(".gravatar-icon").remove();
                     // insert the tag into the element

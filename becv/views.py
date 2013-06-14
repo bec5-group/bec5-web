@@ -73,11 +73,12 @@ def home(request):
     logged_in = user.is_authenticated()
     return render(request, 'home.html', {
         'action_permissions': {
-            'oven-control': logged_in,
+            'oven-control': user.has_perm('oven_control.set_profile'),
             'oven-temp': True,
-            'oven-settemp': logged_in,
-            'oven-setprofile-temp': logged_in,
-            'oven-setcontroller': logged_in
+            'oven-settemp': user.has_perm('oven_control.set_temp'),
+            'oven-setprofile-temp': user.has_perm(
+                'oven_control.set_profile_temp'),
+            'oven-setcontroller': user.has_perm('oven_control.set_controller')
         },
         'user_obj': to_user_obj(user)
     })
@@ -115,15 +116,29 @@ def return_jsonp(func):
                                 content_type="application/json")
     return _func
 
-def auth_jsonp(func):
+def arg_deco(func):
+    def _func(*args, **kwargs):
+        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+            return func(args[0])
+        def _deco(__func):
+            return func(__func, *args, **kwargs)
+        return _deco
+    return _func
+
+@arg_deco
+def auth_jsonp(func, *perms):
     def _func(request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        user = request.user
+        if not user.is_authenticated():
             raise JSONPError(401)
+        for perm in perms:
+            if not user.has_perm(perm):
+                raise JSONPError(403)
         return func(request, *args, **kwargs)
     return _func
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp('oven_control.set_controller')
 def add_controller(request):
     ctrl = oven_models.add_controller(
         request.GET['name'], request.GET['addr'], request.GET['port'],
@@ -143,7 +158,7 @@ def get_controller_setting(request, cid=None):
                             'default_temp'))
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp('oven_control.set_controller')
 def set_controller(request, cid=None):
     ctrl = oven_models.get_controller(cid)
     for key in ('name', 'addr', 'port', 'number', 'order', 'default_temp'):
@@ -156,7 +171,7 @@ def set_controller(request, cid=None):
     }
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp('oven_control.set_controller')
 def del_controller(request, cid=None):
     return oven_models.remove_controller(cid)
 
@@ -174,8 +189,8 @@ def get_ovens(request):
              for controller in oven_models.get_controllers()]
 
 @return_jsonp
-@auth_jsonp
-def set_profile(request, profile=None, name=None, order=None):
+@auth_jsonp('oven_control.set_profile_temp')
+def edit_profile(request, profile=None, name=None, order=None):
     profile = oven_models.get_profile(profile)
     if name:
         profile.name = name
@@ -189,7 +204,7 @@ def set_profile(request, profile=None, name=None, order=None):
     }
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp('oven_control.set_profile_temp')
 def add_profile(request, name=None, **kwargs):
     profile = oven_models.add_profile(name, **kwargs)
     oven_models.set_profile_temps(profile, request.GET, True)
@@ -210,7 +225,7 @@ def get_profile_setting(request, pid=None):
     }
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp('oven_control.set_profile_temp')
 def del_profile(request, pid=None):
     return oven_models.remove_profile(pid)
 
@@ -226,8 +241,13 @@ def get_temps(request):
     return temps
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp('oven_control.set_temp')
 def set_temps(request):
+    return True
+
+@return_jsonp
+@auth_jsonp('oven_control.set_profile')
+def set_profile(request, profile=None):
     return True
 
 @return_jsonp

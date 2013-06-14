@@ -9,12 +9,20 @@ class TempController(models.Model):
     default_temp = models.FloatField(default=0.0)
     class Meta:
         ordering = ['order', 'default_temp', 'name']
+        permissions = (
+            ('set_temp', "Can set controller temperatures."),
+            ('set_controller', "Can change controller setting.")
+        )
 
 class TempProfile(models.Model):
     name = models.CharField(unique=True, max_length=1000)
     order = models.FloatField(default=0.0)
     class Meta:
         ordering = ['order', 'name']
+        permissions = (
+            ('set_profile', "Can change profile."),
+            ('set_profile_temp', "Can change profile setting.")
+        )
 
 class TempSetPoint(models.Model):
     control = models.ForeignKey(TempController)

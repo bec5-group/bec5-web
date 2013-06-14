@@ -300,7 +300,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                     that.show_profile_dialog(data, function (res) {
                         if (!res)
                             return;
-                        var url = '/action/set-profile/' + id + '/' + res.name;
+                        var url = '/action/edit-profile/' + id + '/' + res.name;
                         if (!(res.order === undefined))
                             url += '/' + res.order;
                         url += '/?' + $.param(res.temps);

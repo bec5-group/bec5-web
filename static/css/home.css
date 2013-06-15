@@ -47,3 +47,8 @@ html, body {
 .msg-button-error {
     font-weight: bold !important;
 }
+.cancel-button {
+    width: 22px;
+    height: 22px;
+    padding: 2px 3px;
+}

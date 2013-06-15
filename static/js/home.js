@@ -68,6 +68,7 @@ Array.prototype.remove = function(from, to) {
 
 becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($scope, $http, $dialog) {
     $scope.init = function (permissions, user) {
+        $scope.show_advanced_actions = false;
         $scope.condVar = function (cond, t, f) {
             if (cond)
                 return t;
@@ -87,6 +88,22 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                 name: 'Oven Control'
             }],
             active: 'oven-temp'
+        }
+        function is_tab(perm) {
+            for (var i in $scope.home_tabs.all) {
+                if (perm == $scope.home_tabs.all[i].id) {
+                    return true;
+                }
+            }
+            console.log(perm);
+            return false;
+        }
+        $scope.has_advanced_actions = false;
+        for (var perm in permissions) {
+            if ((!permissions[perm]) || is_tab(perm))
+                continue;
+            $scope.has_advanced_actions = true;
+            break;
         }
         if (window.location.hash) {
             var hash_tab = window.location.hash.substring(1);

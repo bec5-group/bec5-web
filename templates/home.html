@@ -5,13 +5,6 @@
 {% block head %}
 <link href="/static/css/home.css" rel="stylesheet"/>
 <title>BEC-V</title>
-<style type="text/css">
-  .cancel-button {
-      width: 22px;
-      height: 22px;
-      padding: 2px 3px;
-  }
-</style>
 {% endblock %}
 
 {% block body_attr %}
@@ -58,7 +51,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
           <th ng-repeat="ctrl in TControls" style="text-align: center;">
             {[ ctrl.name ]}
           </th>
-          <th cond-disp="permissions['oven-settemp']"
+          <th cond-disp="permissions['oven-settemp'] && show_advanced_actions"
               cond-disp-type="table-cell"></th>
         </tr>
       </thead>
@@ -77,7 +70,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
                    class="input-mini" style="margin: 0; height: 100%;"
                    ng-model="TProfile.cur_setpoint.temps[ctrl.id]"/>
           </td>
-          <td cond-disp="permissions['oven-settemp']"
+          <td cond-disp="permissions['oven-settemp'] && show_advanced_actions"
               cond-disp-type="table-cell">
             <div style="min-width: 90px;" ng-switch="!TProfile.editing_setpoint">
               <span ng-switch-when="true">
@@ -109,7 +102,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
           <th ng-repeat="ctrl in TControls" style="text-align: center;">
             {[ ctrl.name ]}
           </th>
-          <th cond-disp="permissions['oven-setprofile-temp']"
+          <th cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
               cond-disp-type="table-cell"></th>
         </tr>
       </thead>
@@ -124,7 +117,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
           <td ng-repeat="ctrl in TControls" ng-click="TProfile.set_cur(id)">
             {[ TProfile.all[id].temps[ctrl.id] | number:1 ]}
           </td>
-          <td cond-disp="permissions['oven-setprofile-temp']"
+          <td cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
               cond-disp-type="table-cell" style="cursor: default;">
             <div>
               <button class="btn btn-mini"
@@ -141,7 +134,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
       </tbody>
     </table>
     <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon"/>
-    <button class="btn" cond-disp="permissions['oven-setprofile-temp']"
+    <button class="btn" cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
             ng-click="TProfile.add_profile()">
       <i class="icon-plus"></i> Add Profile
     </button>
@@ -169,7 +162,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
       <thead>
         <th>Controller</th>
         <th>Temperature</th>
-        <th cond-disp="permissions['oven-setconroller']"
+        <th cond-disp="permissions['oven-setconroller'] && show_advanced_actions"
             cond-disp-type="table-cell"></th>
       </thead>
       <tbody>
@@ -178,7 +171,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
           <td class="big-text text-info">
             {[ TValues[ctrl.id] | number:1 ]} &deg;C
           </td>
-          <td cond-disp="permissions['oven-setcontroller']"
+          <td cond-disp="permissions['oven-setcontroller'] && show_advanced_actions"
               cond-disp-type="table-cell">
             <button class="btn btn-mini" ng-click="setController(ctrl.id)">
               <i class="icon-edit"></i> Setting
@@ -197,11 +190,21 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
         <input type="checkbox" ng-model="auto_temp">Automatic Update</input>
       </div>
       <br/>
-      <button class="btn" cond-disp="permissions['oven-setcontroller']"
-              ng-click="addController()">
-        <i class="icon-plus"></i> Add Controller
-      </button>
+      <div collapse="!show_advanced_actions">
+        <button class="btn" cond-disp="permissions['oven-setcontroller']"
+                ng-click="addController()">
+          <i class="icon-plus"></i> Add Controller
+        </button>
+      </div>
     </div>
+  </div>
+  <div style="margin: 10px;" cond-disp="has_advanced_actions"
+       cond-disp-type="block">
+    <button class="btn btn-mini"
+            ng-click="show_advanced_actions = !show_advanced_actions">
+      {[ {true: 'Show', false: 'Hide'}[!show_advanced_actions] ]}
+      Advanced Options
+    </button>
   </div>
   <div style="margin: 10px;">
     <button class="btn btn-mini btn-link" style="width: 50%;"

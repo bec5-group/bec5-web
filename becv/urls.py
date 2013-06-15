@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     url(r'^accounts/login/$', 'becv.views.login'),
     url(r'^accounts/logout/$', logout),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/')),
+    url(r'^favicon.ico$', RedirectView.as_view(url='/static/img/favicon.png')),
 
     url(r'^action/add-controller/$', 'becv.views.add_controller'),
     url(r'^action/get-ctrl-setting/(?P<cid>[^/]*)/$',

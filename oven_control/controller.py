@@ -83,6 +83,8 @@ class Controller(WithHelper):
         self.__addr = addr
         self.__devs = {}
         self.start()
+    def add_dev(self, dev_type, dev_addr, *args):
+        pass
     def run(self):
         pass
 

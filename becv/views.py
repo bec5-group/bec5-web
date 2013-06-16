@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.contrib.auth import views as auth_views
 
 import oven_control.models as oven_models
+import oven_control.manager as oven_manager
 
 import json
 
@@ -229,37 +230,20 @@ def get_profile_setting(request, pid=None):
 def del_profile(request, pid=None):
     return oven_models.remove_profile(pid)
 
-
 @return_jsonp
 def get_temps(request):
-    import random
-    temps = {
-        '1': 500 + random.randrange(-100, 100) / 10.0,
-        '2': 480 + random.randrange(-100, 100) / 10.0,
-        '3': 460 + random.randrange(-100, 100) / 10.0
-    }
-    return temps
+    return oven_models.controller_manager.get_temps()
 
 @return_jsonp
 @auth_jsonp('oven_control.set_temp')
 def set_temps(request):
-    return True
+    return oven_models.controller_manager.set_temps(request.GET)
 
 @return_jsonp
 @auth_jsonp('oven_control.set_profile')
 def set_profile(request, profile=None):
-    return True
+    return oven_models.controller_manager.set_profile(profile)
 
 @return_jsonp
 def get_setpoint(request):
-    import random
-    setpoint = {
-        'id': '3',
-        'name': "On",
-        'temps': {
-            '1': 500 + random.randrange(-100, 100) / 10.0,
-            '2': 480 + random.randrange(-100, 100) / 10.0,
-            '3': 460 + random.randrange(-100, 100) / 10.0
-        }
-    }
-    return setpoint
+    return oven_models.controller_manager.get_setpoint()

@@ -181,3 +181,5 @@ LOGGING = {
         }
     }
 }
+
+DATA_LOG_DIR = becv_dir('log')

@@ -155,6 +155,9 @@ class Controller(WithHelper):
             self.write_set('*', self.dev_no, 2, self.set_temp)
     def __get_real_temp(self):
         temp = self.read_temp('*', self.dev_no, 1)
+        # REMOVE ME
+        if self.set_temp is not None:
+            self.temp = self.set_temp
         if temp is not None:
             self.temp = temp
     def run(self):

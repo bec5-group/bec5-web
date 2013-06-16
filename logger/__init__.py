@@ -2,6 +2,7 @@ import logging
 import os
 from os import path as _path
 import datetime
+from .date_fname import DateFileStream
 
 class TimeLogHandler(logging.StreamHandler):
     """
@@ -14,25 +15,8 @@ class TimeLogHandler(logging.StreamHandler):
         Initialize the handler.
         """
         logging.Handler.__init__(self)
-        self.__fname_fmt = filename_fmt
-        self.__dirname = _path.abspath(dirname)
-        self.__cur_fname = None
-        self.__cur_stream = None
-
-    def __get_stream(self):
-        d = datetime.datetime.now()
-        fname = d.strftime(self.__fname_fmt)
-        full_name = _path.join(self.__dirname, fname)
-        if full_name == self.__cur_fname:
-            return
-        try:
-            self.__cur_stream.close()
-        except:
-            pass
-        self.__cur_stream = open(full_name, 'a')
-        self.__cur_fname = full_name
+        self.__stm_factory = DateFileStream(filename_fmt, dirname, 'a')
 
     @property
     def stream(self):
-        self.__get_stream()
-        return self.__cur_stream
+        return self.__stm_factory.stream

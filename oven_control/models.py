@@ -1,6 +1,13 @@
+from __future__ import print_function
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from . import controller
+from logger import bin_logger
+from django.conf import settings
+from django.utils import timezone as dj_tz
+import datetime
+import time
+import json
 
 class TempController(models.Model):
     name = models.CharField(unique=True, max_length=1000)
@@ -15,6 +22,10 @@ class TempController(models.Model):
             ('set_temp', "Can set controller temperatures."),
             ('set_controller', "Can change controller setting.")
         )
+    def __str__(self):
+        return json.dumps(dict((k, getattr(self, k))
+                               for k in ('name', 'addr', 'port', 'number',
+                                         'order', 'default_temp')), indent=2)
 
 class TempProfile(models.Model):
     name = models.CharField(unique=True, max_length=1000)
@@ -25,6 +36,9 @@ class TempProfile(models.Model):
             ('set_profile', "Can change profile."),
             ('set_profile_temp', "Can change profile setting.")
         )
+    def __str__(self):
+        return json.dumps(dict((k, getattr(self, k))
+                               for k in ('name', 'order')), indent=2)
 
 class TempSetPoint(models.Model):
     control = models.ForeignKey(TempController)
@@ -129,9 +143,10 @@ def remove_profile(profile):
 class ControllerWrapper(object):
     def __init__(self, ctrl):
         self.ctrl = ctrl
-        self.temp = None
+        self.__temp = None
         self.__set_temp = None
         self.real_set_temp = None
+        self.__json_fname = None
         # create a controller for every wrapper
         # this is probably not the most elegant way but I'm too lazy to
         # write a better one (create a controller for every address/ip).
@@ -141,10 +156,70 @@ class ControllerWrapper(object):
         self.__ctrl = controller.Controller((self.ctrl.addr, self.ctrl.port),
                                             self)
         self.__ctrl.timeout = 2
+        log_name_fmt = ('temp_log_%s' % self.ctrl.id) + '-%Y-%m-%d.log'
+        self.__logger = bin_logger.BinDateLogger(log_name_fmt,
+                                                 settings.DATA_LOG_DIR, '<Qd')
+        bin_logger.BinDateLogger.opened.connect(self.__on_log_open,
+                                                sender=self.__logger)
+    def __on_log_open(self, sender=None, name=None, **kwargs):
+        if name.endswith('.log'):
+            name = name[:-4]
+        name = name + '.json'
+        self.__json_fname = name
+        try:
+            self.__write_setting()
+        except:
+            pass
+    def __get_old_setting(self, fname, setting):
+        try:
+            with open(fname) as fh:
+                saved_settings = json.load(fh)
+            last_setting = saved_settings[-1]
+            for k, v in setting.items():
+                if last_setting[k] != v:
+                    return saved_settings
+            return
+        except:
+            return []
+    def __write_setting(self):
+        fname = self.__json_fname
+        ctrl = self.ctrl
+        setting = {
+            'name': ctrl.name,
+            'addr': ctrl.addr,
+            'port': ctrl.port,
+            'number': ctrl.number
+        }
+        old_setting = self.__get_old_setting(fname, setting)
+        if old_setting is None:
+            return
+        if settings.USE_TZ:
+            cur_tz = dj_tz.get_current_timezone()
+            timestr = dj_tz.now().astimezone(cur_tz).strftime(
+                '%Y-%m-%d_%H:%M:%S@%z')
+        else:
+            timestr = dj_tz.now().strftime('%Y-%m-%d_%H:%M:%S')
+        setting['time'] = timestr
+        setting['time_stamp'] = time.time()
+        old_setting.append(setting)
+        with open(fname, 'w') as fh:
+            ctrl = self.ctrl
+            content = json.dumps(old_setting, indent=2)
+            fh.write(content)
+    @property
+    def temp(self):
+        return self.__temp
+    @temp.setter
+    def temp(self, value):
+        value = float(value)
+        self.__temp = value
+        self.__logger.write_struct(int(time.time()), value)
     def remove(self):
         self.__ctrl.stop()
     def check(self):
-        self.__ctrl.addr = (self.ctrl.addr, self.ctrl.port)
+        self.__ctrl.addr = self.ctrl.addr, self.ctrl.port
+        if self.__json_fname is not None:
+            self.__write_setting()
     @property
     def dev_no(self):
         return self.ctrl.number
@@ -173,6 +248,7 @@ class ControllerManager(object):
             cid = int(ctrl.id)
             try:
                 ctrls[cid] = self.__ctrls[cid]
+                ctrls[cid].ctrl = ctrl
                 ctrls[cid].check()
                 del self.__ctrls[cid]
             except:

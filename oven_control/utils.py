@@ -35,14 +35,6 @@ def send_once(addr, s):
         so.close()
     return res
 
-def try_send(addr, s, n=1):
-    for i in range(n):
-        res = send_once(addr, s)
-        if res:
-            break
-        sleep(.1)
-    return res
-
 def to_ins(*args, **kwargs):
     if len(kwargs):
         if len(args) == 1 and isinstance(args[0], collections.Iterable):
@@ -82,19 +74,19 @@ def _handle_ret(handler, prefix, res):
 def wrap_cmd(cmd, use_dev_no=True):
     def _wrap_cmd(func):
         if not use_dev_no:
-            def _func(addr, prefix, grp_no, n, *args, **kwargs):
+            def _func(addr, prefix, grp_no, *args, **kwargs):
                 cmd_args = func(*args, **kwargs)
                 full_cmd = "%0.2X%s" % (grp_no, cmd)
                 s = "%s%s%s\r" % (prefix, full_cmd, cmd_args)
                 return _handle_ret(_func.__ret_handler, full_cmd,
-                                   try_send(addr, s, n))
+                                   send_once(addr, s))
         else:
-            def _func(addr, prefix, grp_no, n, dev_no, *args, **kwargs):
+            def _func(addr, prefix, grp_no, dev_no, *args, **kwargs):
                 cmd_args = func(*args, **kwargs)
                 full_cmd = "%0.2X%s%0.2X" % (grp_no, cmd, dev_no)
                 s = "%s%s%s\r" % (prefix, full_cmd, cmd_args)
                 return _handle_ret(_func.__ret_handler, full_cmd,
-                                   try_send(addr, s, n))
+                                   send_once(addr, s))
         @to_ins((lambda res: True,))
         @set_attr.ret_handler(_func)
         def _(ret_func):

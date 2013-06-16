@@ -1,5 +1,4 @@
 import threading
-from . import models as ctrl_models
 from . import utils
 import weakref
 
@@ -43,6 +42,7 @@ class ThreadHelper(object):
         while self.__running:
             self.__event.wait(self.timeout)
             self.__event.clear()
+            print('run')
             if not self.__run_iter():
                 break
 
@@ -63,7 +63,10 @@ class WithHelper(object):
         return self.__helper.timeout
     @timeout.setter
     def timeout(self, value):
+        old_value = self.__helper.timeout
         self.__helper.timeout = value
+        if value != old_value:
+            self.activate()
     def __del__(self):
         self.__helper.stop()
 
@@ -86,7 +89,13 @@ class Controller(WithHelper):
     def add_dev(self, dev_type, dev_addr, *args):
         pass
     def run(self):
-        pass
+        print(self.__addr)
+    @property
+    def addr(self):
+        return self.__addr
+    @addr.setter
+    def addr(self, addr):
+        self.__addr = addr
 
 class NotReadyException(Exception):
     pass
@@ -122,11 +131,11 @@ class ControllerWorker(object):
         use_dev_no = getattr(cmd_func, 'use_dev_no', True)
         if use_dev_no:
             def send_func(self, args=(), kwargs={}):
-                return cmd_func(self.__ctrl, self.__prefix, self.__grp_no, 1,
+                return cmd_func(self.__ctrl, self.__prefix, self.__grp_no,
                                 self.__dev_no, *args, **kwargs)
         else:
             def send_func(self, args=(), kwargs={}):
-                return cmd_func(self.__ctrl, self.__prefix, self.__grp_no, 1,
+                return cmd_func(self.__ctrl, self.__prefix, self.__grp_no,
                                 *args, **kwargs)
         def _deco(_func):
             def func(self):

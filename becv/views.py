@@ -6,7 +6,6 @@ from django.shortcuts import render
 from django.contrib.auth import views as auth_views
 
 import oven_control.models as oven_models
-import oven_control.manager as oven_manager
 
 import json
 

@@ -4,7 +4,7 @@
 
 {% block head %}
 <link href="/static/css/home.css" rel="stylesheet"/>
-<title>BEC-V</title>
+<title>BEC 5</title>
 {% endblock %}
 
 {% block body_attr %}
@@ -16,7 +16,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
 {% block body %}
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="brand">BEC-V</div>
+    <div class="brand">BEC 5</div>
     <ul class="nav">
       <li ng-repeat="tab in home_tabs.all" title-btn="tab.id"
           title-btn-clicked="{false: false, true: redirect_to_login}[!permissions[tab.id]]"

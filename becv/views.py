@@ -8,6 +8,9 @@ from django.contrib.auth import views as auth_views
 import oven_control.models as oven_models
 
 import json
+import logging
+
+auth_logger = logging.getLogger('becv.auth_request')
 
 def _print_with_style(prefix, suffix, *arg, **kwarg):
     end = '\n'
@@ -131,9 +134,18 @@ def auth_jsonp(func, *perms):
         user = request.user
         if not user.is_authenticated():
             raise JSONPError(401)
+        try:
+            log_args_str = ('args: %s; kwargs: %s; GET: %s'%
+                            (json.dumps(args), json.dumps(kwargs),
+                             json.dumps(request.GET)))
+        except:
+            log_args_str = 'log_args_str error;'
+        log_str = '%s by %s; %s' % (func.__name__, user.username, log_args_str)
         for perm in perms:
             if not user.has_perm(perm):
+                auth_logger.error(log_str)
                 raise JSONPError(403)
+        auth_logger.info(log_str)
         return func(request, *args, **kwargs)
     return _func
 

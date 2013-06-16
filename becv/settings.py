@@ -142,7 +142,13 @@ INSTALLED_APPS = (
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'auth_format': {
+            'format': "[%(asctime)s] %(levelname)s %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -153,6 +159,13 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'auth_log': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': becv_dir('log', 'auth_action_log'),
+            'when': 'D',
+            'formatter': "auth_format"
         }
     },
     'loggers': {
@@ -161,5 +174,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'becv.auth_request': {
+            'handlers': ['auth_log'],
+            'level': 'INFO',
+            'propagate': False
+        }
     }
 }

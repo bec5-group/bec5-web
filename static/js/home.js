@@ -95,7 +95,6 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                     return true;
                 }
             }
-            console.log(perm);
             return false;
         }
         $scope.has_advanced_actions = false;
@@ -253,8 +252,14 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                         that.editing_setpoint = false;
                     }, 'Change Setpoint');
                 } else {
-                    this.edited_setpoint = $.extend(
-                        {}, this.cur_setpoint.temps);
+                    this.edited_setpoint = {}
+                    for (var id in this.cur_setpoint.temps) {
+                        if (!this.cur_setpoint.temps.hasOwnProperty(id))
+                            continue;
+                        // value from this.cur_setpoint.temps may be strings
+                        this.edited_setpoint[id] = parseFloat(
+                            this.cur_setpoint.temps[id]);
+                    }
                     this.editing_setpoint = true;
                 }
             },

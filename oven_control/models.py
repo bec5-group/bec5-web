@@ -132,18 +132,28 @@ class ControllerWrapper(object):
         self.temp = None
         self.__set_temp = None
         self.real_set_temp = None
-        self.__ctrl = controller.Controller((self.ctrl.addr, self.ctrl.port))
+        # create a controller for every wrapper
+        # this is probably not the most elegant way but I'm too lazy to
+        # write a better one (create a controller for every address/ip).
+        # It will also be better to handle device number etc in wrapper
+        # and use the controller object just for sending and recieving
+        # messages
+        self.__ctrl = controller.Controller((self.ctrl.addr, self.ctrl.port),
+                                            self)
         self.__ctrl.timeout = 2
     def remove(self):
         self.__ctrl.stop()
     def check(self):
         self.__ctrl.addr = (self.ctrl.addr, self.ctrl.port)
     @property
+    def dev_no(self):
+        return self.ctrl.number
+    @property
     def set_temp(self):
         return self.__set_temp
     @set_temp.setter
     def set_temp(self, value):
-        self.__set_temp = value
+        self.__set_temp = float(value)
         self.__ctrl.activate()
 
 class ControllerManager(object):
@@ -160,7 +170,7 @@ class ControllerManager(object):
     def __update_ctrl_list(self):
         ctrls = {}
         for ctrl in get_controllers.no_lock():
-            cid = ctrl.id
+            cid = int(ctrl.id)
             try:
                 ctrls[cid] = self.__ctrls[cid]
                 ctrls[cid].check()
@@ -179,13 +189,15 @@ class ControllerManager(object):
         self.__set_temps(temps)
     def __set_temps(self, temps):
         for cid, temp in temps.items():
+            cid = int(cid)
             try:
-                self.__ctrls[cid].set_temp = temp
+                self.__ctrls[cid].set_temp = float(temp)
             except:
                 pass
         return True
     def set_profile(self, profile):
         self.__profile_id = profile
+        self.__set_temps(get_profile_temps(profile))
         return True
     @with_oven_control_lock
     def get_setpoint(self):
@@ -196,7 +208,7 @@ class ControllerManager(object):
         return {
             'id': self.__profile_id,
             'name': profile_name,
-            'temps': dict((cid, ctrl.real_set_temp) for (cid, ctrl)
+            'temps': dict((cid, ctrl.set_temp) for (cid, ctrl)
                           in self.__ctrls.items())
         }
 

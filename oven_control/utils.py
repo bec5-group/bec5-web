@@ -1,4 +1,3 @@
-from time import sleep
 import socket
 import collections
 
@@ -33,6 +32,7 @@ def send_once(addr, s):
         res = b''
     finally:
         so.close()
+    # print(addr, s, res)
     return res
 
 def to_ins(*args, **kwargs):

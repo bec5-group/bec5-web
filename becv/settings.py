@@ -162,9 +162,9 @@ LOGGING = {
         },
         'auth_log': {
             'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': becv_dir('log', 'auth_action_log'),
-            'when': 'D',
+            'class': 'logger.TimeLogHandler',
+            'filename_fmt': 'auth_action_log-%Y-%m-%d.log',
+            'dirname': becv_dir('log'),
             'formatter': "auth_format"
         }
     },

@@ -19,7 +19,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
     <div class="brand">BEC 5</div>
     <ul class="nav">
       <li ng-repeat="tab in home_tabs.all" title-btn="tab.id"
-          title-btn-clicked="{false: false, true: redirect_to_login}[!permissions[tab.id]]"
+          title-btn-clicked="{false: false, true: redirect_or_message}[!permissions[tab.id]]"
           title-btn-model="home_tabs.active">
         <a href="#{[{false: '', true: tab.id}[!!permissions[tab.id]]]}">
           <i class="icon-lock" cond-disp="!permissions[tab.id]"></i> {[tab.name]}

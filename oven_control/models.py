@@ -16,6 +16,12 @@ def to_finite(s):
         raise ValueError(val)
     return val
 
+def fix_non_finite(s):
+    try:
+        return to_finite(s)
+    except:
+        return 0.0
+
 class TempController(models.Model):
     name = models.CharField(unique=True, max_length=1000)
     addr = models.CharField(max_length=1000)
@@ -264,7 +270,7 @@ class ControllerManager(object):
             del self.__ctrls[cid]
         self.__ctrls = ctrls
     def get_temps(self):
-        return dict((cid, ctrl.temp) for (cid, ctrl)
+        return dict((cid, fix_non_finite(ctrl.temp)) for (cid, ctrl)
                     in self.__ctrls.items())
     def set_temps(self, temps):
         self.__profile_id = None
@@ -292,7 +298,7 @@ class ControllerManager(object):
         return {
             'id': self.__profile_id,
             'name': profile_name,
-            'temps': dict((cid, ctrl.set_temp) for (cid, ctrl)
+            'temps': dict((cid, fix_non_finite(ctrl.set_temp)) for (cid, ctrl)
                           in self.__ctrls.items())
         }
 

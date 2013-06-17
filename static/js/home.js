@@ -110,7 +110,11 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
             for (var i in all_tabs) {
                 if (all_tabs[i].id == hash_tab) {
                     if (!$scope.permissions[hash_tab]) {
-                        $scope.redirect_to_login(hash_tab);
+                        if (!$scope.user.username) {
+                            $scope.redirect_to_login(hash_tab);
+                        } else {
+                            window.location.hash = '';
+                        }
                     } else {
                         $scope.home_tabs.active = hash_tab;
                     }

@@ -123,14 +123,12 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
             var all_tabs = $scope.home_tabs.all;
             for (var i in all_tabs) {
                 if (all_tabs[i].id == hash_tab) {
-                    if (!$scope.permissions[hash_tab]) {
-                        if (!$scope.user.username) {
-                            $scope.redirect_to_login(hash_tab);
-                        } else {
-                            window.location.hash = '';
-                        }
-                    } else {
+                    if ($scope.permissions[hash_tab]) {
                         $scope.home_tabs.active = hash_tab;
+                    } else if ($scope.user.username) {
+                        window.location.hash = '';
+                    } else {
+                        $scope.redirect_to_login(hash_tab);
                     }
                     break;
                 }
@@ -153,9 +151,8 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
             if (!msg)
                 return;
             type = type || "";
-            if ($scope.messages.length >= 5) {
+            if ($scope.messages.length >= 5)
                 $scope.messages.length = 4;
-            }
             var id = message_id_cnt++;
             $scope.messages.unshift({
                 id: id,

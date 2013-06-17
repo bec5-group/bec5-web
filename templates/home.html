@@ -61,8 +61,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
             <b>{[ TProfile.cur_setpoint.name || '(Unknown)' ]}</b>
           </td>
           <td ng-repeat="ctrl in TControls"
-              style="margin: 0; padding: 0; vertical-align: middle;"
-              class="text-center"
+              style="margin: 0; padding: 0; vertical-align: middle; text-align: center;"
               ng-switch="!!TProfile.editing_setpoint">
             <input ng-switch-when="true" type="number" step="any"
                    class="input-mini"

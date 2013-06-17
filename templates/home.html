@@ -65,10 +65,12 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
               class="text-center"
               ng-switch="!!TProfile.editing_setpoint">
             <input ng-switch-when="true" type="number" step="any"
-                   class="input-mini" style="margin: 0; height: 100%;"
+                   class="input-mini"
+                   style="margin: 0; height: 100%; display: inline-block;"
                    ng-model="TProfile.edited_setpoint[ctrl.id]"/>
             <input ng-switch-default type="text" step="any" readonly
-                   class="input-mini" style="margin: 0; height: 100%;"
+                   class="input-mini"
+                   style="margin: 0; height: 100%; display: inline-block;"
                    ng-model="TProfile.cur_setpoint.temps[ctrl.id]"/>
           </td>
           <td cond-disp="permissions['oven-settemp'] && show_advanced_actions"

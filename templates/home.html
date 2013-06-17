@@ -62,6 +62,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
           </td>
           <td ng-repeat="ctrl in TControls"
               style="margin: 0; padding: 0; vertical-align: middle;"
+              class="text-center"
               ng-switch="!!TProfile.editing_setpoint">
             <input ng-switch-when="true" type="number" step="any"
                    class="input-mini" style="margin: 0; height: 100%;"

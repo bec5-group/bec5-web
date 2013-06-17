@@ -159,8 +159,7 @@ class ControllerWrapper(object):
         log_name_fmt = ('temp_log_%s' % self.ctrl.id) + '-%Y-%m-%d.log'
         self.__logger = bin_logger.BinDateLogger(log_name_fmt,
                                                  settings.DATA_LOG_DIR, '<Qd')
-        bin_logger.BinDateLogger.opened.connect(self.__on_log_open,
-                                                sender=self.__logger)
+        self.__logger.opened.connect(self.__on_log_open)
     def __on_log_open(self, sender=None, name=None, **kwargs):
         if name.endswith('.log'):
             name = name[:-4]

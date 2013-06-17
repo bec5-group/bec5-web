@@ -78,18 +78,25 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
         $scope.redirect_to_login = function (name) {
             window.location = '/accounts/login/?next=/#' + name
         };
+        var permission_alert_count = {};
         $scope.redirect_or_message = function (name) {
             if (!$scope.user.username) {
                 $scope.redirect_to_login(hash_tab);
             } else {
-                var msgbox = $dialog.messageBox(
-                    'Sorry',
-                    ('Sorry your account ' + $scope.user.username +
-                     'is not allowed to preform this action.'), [{
-                         label: "Close",
-                         result: 'close'
-                     }]);
-                msgbox.open();
+                if (permission_alert_count[name])
+                    return;
+                permission_alert_count[name] = 1;
+                alert('Sorry your account ' + $scope.user.username +
+                      'is not allowed to preform this action.');
+                // Some how doesn't work properly.
+                // var msgbox = $dialog.messageBox(
+                //     'Sorry',
+                //     ('Sorry your account ' + $scope.user.username +
+                //      'is not allowed to preform this action.'), [{
+                //          label: "Close",
+                //          result: 'close'
+                //      }]);
+                // msgbox.open();
             }
         }
         $scope.permissions = permissions;

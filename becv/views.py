@@ -253,7 +253,10 @@ def set_temps(request):
 @return_jsonp
 @auth_jsonp('oven_control.set_profile')
 def set_profile(request, profile=None):
-    return oven_models.controller_manager.set_profile(profile)
+    res = oven_models.controller_manager.set_profile(profile)
+    if not res:
+        raise JSONPError(400)
+    return res
 
 @return_jsonp
 def get_setpoint(request):

@@ -8,6 +8,13 @@ from django.utils import timezone as dj_tz
 import datetime
 import time
 import json
+import math
+
+def to_finite(s):
+    val = float(s)
+    if math.isnan(val) or math.isinf(val):
+        raise ValueError(val)
+    return val
 
 class TempController(models.Model):
     name = models.CharField(unique=True, max_length=1000)
@@ -116,7 +123,7 @@ def set_profile_temps(profile, temps, ignore_error=True):
     for cid, temp in temps.items():
         try:
             controller = get_controller.no_lock(cid)
-            temp = float(temp)
+            temp = to_finite(temp)
         except:
             if not ignore_error:
                 return False
@@ -210,7 +217,7 @@ class ControllerWrapper(object):
         return self.__temp
     @temp.setter
     def temp(self, value):
-        value = float(value)
+        value = to_finite(value)
         self.__temp = value
         self.__logger.write_struct(int(time.time()), value)
     def remove(self):
@@ -227,7 +234,7 @@ class ControllerWrapper(object):
         return self.__set_temp
     @set_temp.setter
     def set_temp(self, value):
-        self.__set_temp = float(value)
+        self.__set_temp = to_finite(value)
         self.__ctrl.activate()
 
 class ControllerManager(object):
@@ -261,16 +268,18 @@ class ControllerManager(object):
                     in self.__ctrls.items())
     def set_temps(self, temps):
         self.__profile_id = None
-        self.__set_temps(temps)
+        return self.__set_temps(temps)
     def __set_temps(self, temps):
         for cid, temp in temps.items():
             cid = int(cid)
             try:
-                self.__ctrls[cid].set_temp = float(temp)
+                self.__ctrls[cid].set_temp = to_finite(temp)
             except:
                 pass
         return True
     def set_profile(self, profile):
+        if not profile:
+            return
         self.__profile_id = profile
         self.__set_temps(get_profile_temps(profile))
         return True

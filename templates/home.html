@@ -16,29 +16,39 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
 {% block body %}
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="brand">BEC 5</div>
-    <ul class="nav">
-      <li ng-repeat="tab in home_tabs.all" title-btn="tab.id"
-          title-btn-clicked="{false: false, true: redirect_or_message}[!permissions[tab.id]]"
-          title-btn-model="home_tabs.active">
-        <a href="#{[{false: '', true: tab.id}[!!permissions[tab.id]]]}">
-          <i class="icon-lock" cond-disp="!permissions[tab.id]"></i> {[tab.name]}
-        </a>
-      </li>
-    </ul>
-    <div style="display: inline-block; float: right;">
-      {% if user.is_authenticated %}
-      <gravatar-image data-email="user.email" data-size="30"
-                      data-secure="true">
-      </gravatar-image>
-      <a href="/accounts/logout/" class="btn">
-        <i class="icon-user"></i> Logout
+    <div class="container" style="vertical-align: middle;">
+      <a class="btn btn-navbar" data-toggle="collapse"
+         data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
       </a>
-      {% else %}
-      <a href="/accounts/login/" class="btn">
-        <i class="icon-user"></i> Login
-      </a>
-      {% endif %}
+      <div class="brand">BEC 5</div>
+      <div class="nav-collapse collapse">
+        <ul class="nav">
+          <li ng-repeat="tab in home_tabs.all" title-btn="tab.id"
+              title-btn-clicked="{false: false, true: redirect_or_message}[!permissions[tab.id]]"
+              title-btn-model="home_tabs.active">
+            <a href="#{[{false: '', true: tab.id}[!!permissions[tab.id]]]}">
+              <i class="icon-lock" cond-disp="!permissions[tab.id]"></i> {[tab.name]}
+            </a>
+          </li>
+        </ul>
+        <div style="display: inline-block; float: right;">
+          {% if user.is_authenticated %}
+          <gravatar-image data-email="user.email" data-size="30"
+                          data-secure="true">
+          </gravatar-image>
+          <a href="/accounts/logout/" class="btn btn-mini">
+            <i class="icon-user"></i> Logout
+          </a>
+          {% else %}
+          <a href="/accounts/login/" class="btn btn-mini">
+            <i class="icon-user"></i> Login
+          </a>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -1,13 +1,17 @@
 from __future__ import print_function
+import threading
+
+__print_lock = threading.Lock()
 
 def _print_with_style(prefix, suffix, *arg, **kwarg):
-    end = '\n'
-    if 'end' in kwarg:
-        end = kwarg['end']
-    kwarg['end'] = ''
-    print(prefix, end='')
-    print(*arg, **kwarg)
-    print(suffix, end=end)
+    with __print_lock:
+        end = '\n'
+        if 'end' in kwarg:
+            end = kwarg['end']
+        kwarg['end'] = ''
+        print(prefix, end='')
+        print(*arg, **kwarg)
+        print(suffix, end=end)
 
 def printr(*arg, **kwarg):
     _print_with_style('\033[31;1m', '\033[0m', *arg, **kwarg)

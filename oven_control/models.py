@@ -1,5 +1,5 @@
 from __future__ import print_function
-from django.db import models
+from django.db import models, DatabaseError
 from django.db.models.signals import post_save, post_delete
 from . import controller
 from logger import bin_logger
@@ -312,4 +312,7 @@ class ControllerManager(object):
                           in self.__ctrls.items())
         }
 
-controller_manager = ControllerManager()
+try:
+    controller_manager = ControllerManager()
+except DatabaseError:
+    pass

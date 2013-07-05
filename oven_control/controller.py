@@ -229,6 +229,8 @@ class Controller(WithHelper):
                 self.set_temp = real_set_temp
         if not real_set_temp is None:
             self.clear_error('get_set_temp')
+            if self.__set_temp_ok():
+                self.clear_error('update_set_temp')
         else:
             self.set_error('get_set_temp',
                            'Get setpoint failed.')
@@ -239,21 +241,29 @@ class Controller(WithHelper):
             self.__disp_set_temp = disp_set_temp
         if not disp_set_temp is None:
             self.clear_error('get_disp_temp')
+            if self.__disp_temp_ok():
+                self.clear_error('update_disp_temp')
         else:
             self.set_error('get_disp_temp',
                            'Get display setpoint failed.')
+    def __set_temp_ok(self):
+        return (self.set_temp is not None and
+                self.real_set_temp is not None and
+                -0.15 <= (self.real_set_temp - self.set_temp) <= 0.15)
+    def __disp_temp_ok(self):
+        return (self.set_temp is not None and
+                self.__disp_set_temp is not None and
+                -0.15 <= (self.__disp_set_temp - self.set_temp) <= 0.15)
     def run(self):
         reseted = False
         if (self.set_temp is not None and
-            (self.real_set_temp is None or
-             not -0.15 <= (self.real_set_temp - self.set_temp) <= 0.15)):
+            (self.real_set_temp is None or self.__set_temp_ok())):
             self.__update_set_temp()
         if self.__need_reset:
             reseted = True
             self.__reset_set_temp()
         if (self.set_temp is not None and
-            (self.__disp_set_temp is None or
-             not -0.15 <= (self.__disp_set_temp - self.set_temp) <= 0.15)):
+            (self.__disp_set_temp is None or self.__disp_temp_ok())):
             self.__update_disp_temp()
         if reseted:
             sleep(2.5)

@@ -1,6 +1,7 @@
 import os
 from os import path as _path
 import datetime
+import time
 from becv_utils import ObjSignal
 
 class DateFileBase(object):
@@ -9,16 +10,21 @@ class DateFileBase(object):
     opened = ObjSignal(providing_args=['name'])
 
 class DateFileStream(DateFileBase):
-    def __init__(self, filename_fmt, dirname, mode='a'):
+    def __init__(self, filename_fmt, dirname, mode='a', file_open=open,
+                 read_mode='r', read_open=open):
         self.__fname_fmt = filename_fmt
         self.__dirname = _path.abspath(dirname)
         self.__cur_fname = None
         self.__cur_stream = None
         self.__mode = mode
-    def __get_stream(self):
-        d = datetime.datetime.now().replace(microsecond=0)
+        self.__file_open = file_open
+        self.__read_mode = read_mode
+    def calc_name(self, d):
+        d = d.replace(microsecond=0)
         fname = d.strftime(self.__fname_fmt)
-        full_name = _path.join(self.__dirname, fname)
+        return _path.join(self.__dirname, fname)
+    def __get_stream(self):
+        full_name = self.calc_name(datetime.datetime.now())
         if full_name == self.__cur_fname:
             return
         old_fname = self.__cur_fname
@@ -28,7 +34,7 @@ class DateFileStream(DateFileBase):
                 self.__cur_stream.close()
         except:
             pass
-        self.__cur_stream = open(full_name, self.__mode)
+        self.__cur_stream = self.__file_open(full_name, self.__mode)
         self.opened.send_robust(name=full_name)
         if old_fname is not None:
             self.changed.send_robust(new_name=full_name, old_name=old_fname)

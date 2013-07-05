@@ -32,7 +32,6 @@ def send_once(addr, s):
         res = b''
     finally:
         so.close()
-    # print(addr, s, res)
     return res
 
 def to_ins(*args, **kwargs):
@@ -93,6 +92,7 @@ def wrap_cmd(cmd, use_dev_no=True):
             _func.__ret_handler = ret_func
             return _func
         _func.use_dev_no = use_dev_no
+        _func.__name__ = func.__name__
         return _func
     return _wrap_cmd
 

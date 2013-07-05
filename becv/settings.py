@@ -135,6 +135,8 @@ INSTALLED_APPS = (
     'jsonify'
 )
 
+LOGGING_DIR = becv_dir('log')
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -144,10 +146,6 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters': {
-        'auth_format': {
-            'format': "[%(asctime)s] %(levelname)s %(message)s",
-            'datefmt': "%d/%b/%Y %H:%M:%S"
-        },
     },
     'filters': {
         'require_debug_false': {
@@ -160,13 +158,6 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        'auth_log': {
-            'level': 'INFO',
-            'class': 'logger.TimeLogHandler',
-            'filename_fmt': 'auth_action_log-%Y-%m-%d.log',
-            'dirname': becv_dir('log'),
-            'formatter': "auth_format"
-        }
     },
     'loggers': {
         'django.request': {
@@ -174,11 +165,6 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'becv.auth_request': {
-            'handlers': ['auth_log'],
-            'level': 'INFO',
-            'propagate': False
-        }
     }
 }
 

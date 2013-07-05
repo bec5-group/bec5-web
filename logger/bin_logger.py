@@ -29,8 +29,9 @@ def load_struct(fname, fmt):
         return load_struct_fh(fh, fmt)
 
 class BinDateLogger(DateFileStream):
-    def __init__(self, filename_fmt, dirname, fmt):
-        DateFileStream.__init__(self, filename_fmt, dirname, mode='ab')
+    def __init__(self, filename_fmt, dirname, fmt, **kwargs):
+        DateFileStream.__init__(self, filename_fmt, dirname, mode='ab',
+                                **kwargs)
         self.__fmt = fmt
     def write_struct(self, *args):
         stm = self.stream

@@ -7,12 +7,26 @@ from django.contrib.auth import views as auth_views
 
 import oven_control.models as oven_models
 from becv_utils import print_except
+from logger import TimeLogger
+import settings
+import gzip
+
+def open_append_gzip(fname, mode):
+    try:
+        with gzip.open(fname, 'r') as fh:
+            data = fh.read()
+    except:
+        data = ''
+    fh = gzip.open(fname, 'w')
+    fh.write(data)
+    return fh
+
+auth_logger = TimeLogger(filename_fmt='auth_action_log-%Y-%m-%d.json.gz',
+                         dirname=settings.LOGGING_DIR,
+                         file_open=open_append_gzip,
+                         read_open=gzip.open)
 
 import json
-import logging
-
-auth_logger = logging.getLogger('becv.auth_request')
-
 
 _login = auth_views.login
 
@@ -78,6 +92,7 @@ def return_jsonp(func):
             print_except()
             return HttpResponse(tojson(None, cb), status=500,
                                 content_type="application/json")
+    _func.__name__ = func.__name__
     return _func
 
 def arg_deco(func):
@@ -87,6 +102,7 @@ def arg_deco(func):
         def _deco(__func):
             return func(__func, *args, **kwargs)
         return _deco
+    _func.__name__ = func.__name__
     return _func
 
 @arg_deco
@@ -95,19 +111,20 @@ def auth_jsonp(func, *perms):
         user = request.user
         if not user.is_authenticated():
             raise JSONPError(401)
-        try:
-            log_args_str = ('args: %s; kwargs: %s; GET: %s'%
-                            (json.dumps(args), json.dumps(kwargs),
-                             json.dumps(request.GET)))
-        except:
-            log_args_str = 'log_args_str error;'
-        log_str = '%s by %s; %s' % (func.__name__, user.username, log_args_str)
+        log_obj = {
+            'arg': args,
+            'kw': kwargs,
+            'GET': request.GET,
+            'a': func.__name__,
+            'u': user.username,
+        }
         for perm in perms:
             if not user.has_perm(perm):
-                auth_logger.error(log_str)
+                auth_logger.error(**log_obj)
                 raise JSONPError(403)
-        auth_logger.info(log_str)
+        auth_logger.info(**log_obj)
         return func(request, *args, **kwargs)
+    _func.__name__ = func.__name__
     return _func
 
 @return_jsonp

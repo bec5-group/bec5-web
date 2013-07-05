@@ -30,3 +30,4 @@ __pycache__/
 *.table
 *.gnuplot
 *.db
+/static_root/

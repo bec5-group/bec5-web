@@ -27,3 +27,6 @@ class ObjSignal(Signal):
         if obj is None:
             return self
         return SignalWrapper(self, obj)
+
+def bind_signal(src, dst):
+    src.connect(lambda sender=None, **kwargs: dst.send_robust(sender, **kwargs))

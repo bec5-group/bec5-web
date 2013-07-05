@@ -7,19 +7,9 @@ from django.contrib.auth import views as auth_views
 
 import oven_control.models as oven_models
 from becv_utils import print_except
-from logger import TimeLogger
+from logger import TimeLogger, open_append_gzip
 import settings
 import gzip
-
-def open_append_gzip(fname, mode):
-    try:
-        with gzip.open(fname, 'r') as fh:
-            data = fh.read()
-    except:
-        data = ''
-    fh = gzip.open(fname, 'w')
-    fh.write(data)
-    return fh
 
 auth_logger = TimeLogger(filename_fmt='auth_action_log-%Y-%m-%d.json.gz',
                          dirname=settings.LOGGING_DIR,
@@ -239,3 +229,8 @@ def set_profile(request, profile=None):
 @return_jsonp
 def get_setpoint(request):
     return oven_models.controller_manager.get_setpoint()
+
+@return_jsonp
+@auth_jsonp
+def get_ctrl_errors(request):
+    return oven_models.controller_manager.get_errors()

@@ -48,4 +48,5 @@ urlpatterns = patterns('',
     url(r'^action/set-temps/$', 'becv.views.set_temps'),
     url(r'^action/get-temps/$', 'becv.views.get_temps'),
     url(r'^action/get-setpoint/$', 'becv.views.get_setpoint'),
+    url(r'^action/get-ctrl-errors/$', 'becv.views.get_ctrl_errors'),
 )

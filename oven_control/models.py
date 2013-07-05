@@ -168,11 +168,13 @@ class ControllerWrapper(object):
         # messages
         self.__ctrl = controller.Controller((self.ctrl.addr, self.ctrl.port),
                                             self)
-        self.__ctrl.timeout = 2
+        self.__ctrl.timeout = 10
         log_name_fmt = ('temp_log_%s' % self.ctrl.id) + '-%Y-%m-%d.log'
         self.__logger = bin_logger.BinDateLogger(log_name_fmt,
                                                  settings.DATA_LOG_DIR, '<Qd')
         self.__logger.opened.connect(self.__on_log_open)
+    def get_errors(self):
+        return self.__ctrl.get_errors()
     def __on_log_open(self, sender=None, name=None, **kwargs):
         if name.endswith('.log'):
             name = name[:-4]
@@ -269,6 +271,14 @@ class ControllerManager(object):
             self.__ctrls[cid].remove()
             del self.__ctrls[cid]
         self.__ctrls = ctrls
+    def get_errors(self):
+        errors = {}
+        for cid, ctrl in self.__ctrls.items():
+            ctrl_errors = ctrl.get_errors()
+            if ctrl_errors:
+                errors[cid] = {'name': ctrl.ctrl.name,
+                               'errors': ctrl_errors}
+        return errors
     def get_temps(self):
         return dict((cid, fix_non_finite(ctrl.temp)) for (cid, ctrl)
                     in self.__ctrls.items())

@@ -44,8 +44,27 @@ class DateFileStream(DateFileBase):
         self.__get_stream()
         return self.__cur_stream
 
-class TimeLog(DateFileBase):
-    def __init__(self, filename_fmt, dirname):
+class RecordCache(object):
+    def __init__(self, record_num):
         pass
-    def write_record(self, stm, t, *args, **kwargs):
+    def records_reader(self, name):
+        pass
+    def get_records(self, name):
+        pass
+    def put_cache(self, name, records):
+        pass
+
+class TimeLog(DateFileBase):
+    def __init__(self, filename_fmt, dirname, binary=False):
+        self.__date_strm = DateFileStream(filename_fmt, dirname,
+                                          mode='ba' if binary else 'a')
+        bind_signal(self.__date_strm.opened, self.opened)
+        bind_signal(self.__date_strm.changed, self.changed)
+        bind_signal(self.__date_strm.closed, self.closed)
+    def write(self, data):
+        return self.write_record(self.__date_strm.stream, time.time(),
+                                 datetime.datetime.now().replace(microsecond=0))
+    def write_record(self, strm, timestamp, d, data):
+        pass
+    def read_records(self, strm):
         pass

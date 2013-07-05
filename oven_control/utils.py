@@ -34,14 +34,10 @@ def send_once(addr, s):
         so.close()
     return res
 
-def to_ins(*args, **kwargs):
-    if len(kwargs):
-        if len(args) == 1 and isinstance(args[0], collections.Iterable):
-            args = args[0]
-        return lambda func: func(*args, **kwargs)
-    if len(args) == 1 and callable(args[0]):
-        return args[0]()
-    return lambda func: func(*args)
+def to_ins(args, **kwargs):
+    if callable(args):
+        return args()
+    return lambda func: func(*args, **kwargs)
 
 @to_ins
 def set_attr():

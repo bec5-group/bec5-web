@@ -81,7 +81,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
         var permission_alert_count = {};
         $scope.redirect_or_message = function (name) {
             if (!$scope.user.username) {
-                $scope.redirect_to_login(hash_tab);
+                $scope.redirect_to_login(name);
             } else {
                 if (permission_alert_count[name])
                     return;

@@ -185,13 +185,13 @@ class Controller(WithHelper):
     def run(self):
         reseted = False
         if (self.set_temp is not None and
-            (self.real_set_temp is None or self.__set_temp_ok())):
+            (self.real_set_temp is None or not self.__set_temp_ok())):
             self.__update_set_temp()
         if self.__need_reset:
             reseted = True
             self.__reset_set_temp()
         if (self.set_temp is not None and
-            (self.__disp_set_temp is None or self.__disp_temp_ok())):
+            (self.__disp_set_temp is None or not self.__disp_temp_ok())):
             self.__update_disp_temp()
         if reseted:
             sleep(2.5)

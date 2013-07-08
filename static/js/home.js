@@ -45,6 +45,8 @@ becv_app.directive('condDisp', function () {
 
             $scope.$watch(function () {
                 value = $scope.$eval(exp);
+                if ($.isPlainObject(value))
+                    value = !$.isEmptyObject(value)
                 return value;
             }, function (modelValue) {
                 if (value){
@@ -192,7 +194,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                     return true;
                 }
             }
-            return false;
+            return !$.isEmptyObject($scope.TProfile.cur_error);
         };
 
         function json_request(url, callback, error_name, err_cb) {
@@ -236,6 +238,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
         setInterval(function () {
             if ($scope.auto_temp) {
                 update_temps();
+                $scope.TProfile.update_cur_errors();
             }
         }, 10000);
 
@@ -267,6 +270,14 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                     }
                 }, "Get current set point.");
             },
+            update_cur_errors: function () {
+                if (!$scope.user.username)
+                    return;
+                var that = this;
+                json_request('/action/get-ctrl-errors/', function (data, status) {
+                    that.cur_error = data;
+                }, "Get current error.");
+            },
             _init: function () {
                 this.ids = [];
                 this.all = {};
@@ -277,6 +288,8 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 this.update_cur_setpoint();
                 this.editing_setpoint = false;
                 this.edited_setpoint = {};
+                this.cur_error = {};
+                this.update_cur_errors();
             },
             edit_setpoint: function () {
                 if (this.editing_setpoint) {

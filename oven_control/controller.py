@@ -51,8 +51,8 @@ class Controller(WithHelper):
         WithHelper.stop(self)
         del self.__mgr
     def get_errors(self):
-        return dict((name, err['msg']) for name, err in self.__errors.items()
-                    if err['error'])
+        return [{'name': name, 'msg': err['msg']}
+                for name, err in self.__errors.items() if err['error']]
     def clear_error(self, name):
         cur_time = int(time.time())
         err_obj = self.__errors.get(name, {'time': None, 'error': False,

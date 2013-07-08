@@ -231,7 +231,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
   <div cond-disp="home_tabs.active == 'oven-action-log'"
        style="overflow: auto; width: 100%;">
     <table class="table table-bordered"
-           style="width: auto !important; white-space: nowrap;">
+           style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
       <thead>
         <th>Time</th>
         <th>User</th>
@@ -272,6 +272,32 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
         {[ {true: 'Errors', false: 'Messages'}[message_has_error()] ]}
       </div>
     </button>
+    <br/>
+    <table class="table table-bordered"
+           cond-disp="TProfile.cur_error"
+           collapse="log_collapsed"
+           style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto; overflow: auto;">
+      <thead class="text-warning">
+        <th>Controller</th>
+        <th>Error</th>
+        <th>Message</th>
+      </thead>
+      <tbody ng-repeat="errors in TProfile.cur_error">
+        <tr class="text-error warning">
+          <td rowspan="{[ errors.errors.length ]}"
+              style="vertical-align: middle; text-align: center;">
+            <b>{[ errors.name ]}</b>
+          </td>
+          <td><b>{[ errors.errors[0].name ]}</b></td>
+          <td><b>{[ errors.errors[0].msg ]}</b></td>
+        </tr>
+        <tr class="text-error warning"
+            ng-repeat="error in errors.errors.slice(1)">
+          <td><b>{[ error.name ]}</b></td>
+          <td><b>{[ error.msg ]}</b></td>
+        </tr>
+      </tbody>
+    </table>
     <div collapse="log_collapsed">
       <alert ng-repeat="msg in messages | orderBy:'id':true" type="msg.type"
              close="close_message(msg.id)" class="text-left"

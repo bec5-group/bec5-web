@@ -4,6 +4,7 @@ import time
 
 from becv_utils import printr, printg, printy, printb
 from becv_utils.thread_helper import WithHelper
+from logger.error_logger import ErrorLogger
 from becv import settings
 from logger import TimeLogger, open_append_gzip
 import gzip
@@ -23,7 +24,7 @@ def repeat_call(func, args=(), kwargs={}, n=1, wait_time=0, wait_first=True):
             break
     return res
 
-class Controller(WithHelper):
+class Controller(WithHelper, ErrorLogger):
     def ctrl_cmd(cmd_func):
         def cmd_method(self, *args, **kwargs):
             res = cmd_func(self.__addr, *args, **kwargs)
@@ -41,43 +42,22 @@ class Controller(WithHelper):
     del ctrl_cmd
     def __init__(self, addr, mgr):
         WithHelper.__init__(self)
+        ErrorLogger.__init__(self)
         self.__addr = addr
         self.__mgr = mgr
         self.__disp_set_temp = None
         self.start()
         self.__need_reset = False
-        self.__errors = {}
+    def _error_logger_handle(self, is_error, name, msg):
+        if is_error:
+            ctrl_logger.error(name=name, msg=msg, addr=self.__addr,
+                              ctrl=self.__mgr.ctrl.name)
+        else:
+            ctrl_logger.info(name=name, msg=msg, addr=self.__addr,
+                             ctrl=self.__mgr.ctrl.name)
     def stop(self):
         WithHelper.stop(self)
         del self.__mgr
-    def get_errors(self):
-        return [{'name': name, 'msg': err['msg']}
-                for name, err in self.__errors.items() if err['error']]
-    def clear_error(self, name):
-        cur_time = int(time.time())
-        err_obj = self.__errors.get(name, {'time': None, 'error': False,
-                                           'msg': ''})
-        if err_obj['error']:
-            ctrl_logger.info(name=name, msg='error cleared.',
-                             addr=self.__addr, ctrl=self.__mgr.ctrl.name)
-            err_obj['error'] = False
-        err_obj['time'] = cur_time
-        self.__errors[name] = err_obj
-    def set_error(self, name, msg):
-        err_obj = self.__errors.get(name, {'time': None, 'error': True,
-                                           'msg': ''})
-        last_t = err_obj['time']
-        cur_time = int(time.time())
-        if last_t is not None and (last_t > cur_time - 100 or
-                                   (last_t > cur_time - 600 and
-                                    err_obj['error'])):
-            return
-        err_obj['time'] = cur_time
-        err_obj['error'] = True
-        err_obj['msg'] = msg
-        self.__errors[name] = err_obj
-        ctrl_logger.error(name=name, msg=msg, addr=self.__addr,
-                          ctrl=self.__mgr.ctrl.name)
     @property
     def addr(self):
         return self.__addr

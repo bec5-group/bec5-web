@@ -312,7 +312,5 @@ class ControllerManager(object):
                           in self.__ctrls.items())
         }
 
-try:
+if not getattr(__import__('__main__'), '_django_syncdb', False):
     controller_manager = ControllerManager()
-except DatabaseError:
-    pass

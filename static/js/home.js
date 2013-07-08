@@ -4,12 +4,13 @@ becv_app
     })
     .directive('titleBtn', ['titleBtnConfig', '$parse', function (titleBtnConfig,
                                                                   $parse) {
-        var activeClass = titleBtnConfig.activeClass || 'active';
+        var _activeClass = titleBtnConfig.activeClass || 'active';
         return {
             link: function ($scope, $ele, $attrs) {
                 var name = $scope.$eval($attrs.titleBtn);
                 var model_name = $attrs.titleBtnModel;
                 var on_click = $scope.$eval($attrs.titleBtnClicked);
+                var activeClass = $attrs.titleBtnActive || _activeClass;
 
                 $scope.$watch(function () {
                     return $scope.$eval(model_name);
@@ -66,7 +67,7 @@ Array.prototype.remove = function(from, to) {
     return this.push.apply(this, rest);
 };
 
-becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($scope, $http, $dialog) {
+becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', function ($scope, $http, $dialog, $location) {
     $scope.init = function (permissions, user) {
         $scope.show_advanced_actions = false;
         $scope.condVar = function (cond, t, f) {
@@ -87,7 +88,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                     return;
                 permission_alert_count[name] = 1;
                 alert('Sorry your account ' + $scope.user.username +
-                      'is not allowed to preform this action.');
+                      ' is not allowed to preform this action.');
                 // Some how doesn't work properly.
                 // var msgbox = $dialog.messageBox(
                 //     'Sorry',
@@ -108,15 +109,29 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                 id: 'oven-control',
                 name: 'Oven Control'
             }],
+            log: [{
+                id: 'oven-temp-log',
+                name: 'Oven Temperature Log'
+            }, {
+                id: 'oven-action-log',
+                name: 'Oven Action Log'
+            }, {
+                id: 'room-temp-log',
+                name: 'Room Temperature Log'
+            }],
             active: 'oven-temp'
         }
-        function is_tab(perm) {
-            for (var i in $scope.home_tabs.all) {
-                if (perm == $scope.home_tabs.all[i].id) {
+        function is_in_tabs(perm, tabs) {
+            for (var i in tabs) {
+                if (perm == tabs[i].id) {
                     return true;
                 }
             }
             return false;
+        }
+        function is_tab(perm) {
+            return (is_in_tabs(perm, $scope.home_tabs.all) ||
+                    is_in_tabs(perm, $scope.home_tabs.log));
         }
         $scope.has_advanced_actions = false;
         for (var perm in permissions) {
@@ -125,17 +140,17 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
             $scope.has_advanced_actions = true;
             break;
         }
-        if (window.location.hash) {
-            var hash_tab = window.location.hash.substring(1);
-            var all_tabs = $scope.home_tabs.all;
+        if ($location.path()) {
+            var hash_tab = $location.path().substring(1);
+            var all_tabs = $scope.home_tabs.all.concat($scope.home_tabs.log);
             for (var i in all_tabs) {
                 if (all_tabs[i].id == hash_tab) {
                     if ($scope.permissions[hash_tab]) {
                         $scope.home_tabs.active = hash_tab;
                     } else if ($scope.user.username) {
-                        window.location.hash = '';
+                        $location.path('/');
                     } else {
-                        $scope.redirect_to_login(hash_tab);
+                        $scope.redirect_to_login('/' + hash_tab);
                     }
                     break;
                 }
@@ -458,5 +473,29 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', function ($sc
                 }, 'Delete controller');
             });
         };
+
+        $scope.timestamp_to_string = function (t) {
+            var d = new Date(t * 1000);
+            return d.toLocaleString();
+        };
+        var log_classes = {
+            'INFO': 'info',
+            'ERROR': 'error',
+            'FATAL': 'error',
+            'CRITICAL': 'error',
+            'WARNING': 'warning',
+        };
+        $scope.log_type_to_class = function (t) {
+            return log_classes[t] || '';
+        };
+        $scope.disp_obj = function (o) {
+            if (!o)
+                return '';
+            return JSON.stringify(o, null, ' ');
+        };
+        $scope.TActionLog = {
+            cur: []
+        };
+        // end of init()
     }
 }]);

@@ -46,7 +46,10 @@ def home(request):
             'oven-settemp': user.has_perm('oven_control.set_temp'),
             'oven-setprofile-temp': user.has_perm(
                 'oven_control.set_profile_temp'),
-            'oven-setcontroller': user.has_perm('oven_control.set_controller')
+            'oven-setcontroller': user.has_perm('oven_control.set_controller'),
+            'oven-temp-log': logged_in,
+            'oven-action-log': logged_in,
+            'room-temp-log': logged_in,
         },
         'user_obj': to_user_obj(user)
     })

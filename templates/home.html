@@ -33,6 +33,21 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
               <i class="icon-lock" cond-disp="!permissions[tab.id]"></i> {[tab.name]}
             </a>
           </li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              Log <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li ng-repeat="tab in home_tabs.log" title-btn="tab.id"
+                  title-btn-clicked="{false: false, true: redirect_or_message}[!permissions[tab.id]]"
+                  title-btn-model="home_tabs.active">
+                <a href="#{[{false: '', true: tab.id}[!!permissions[tab.id]]]}">
+                  <i class="icon-lock" cond-disp="!permissions[tab.id]"></i>
+                  {[tab.name]}
+                </a>
+              </li>
+            </ul>
+          </li>
         </ul>
         <div style="display: inline-block; float: right;">
           {% if user.is_authenticated %}
@@ -209,6 +224,37 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
         </button>
       </div>
     </div>
+  </div>
+  <div cond-disp="home_tabs.active == 'oven-temp-log'">
+    <!-- TODO -->
+  </div>
+  <div cond-disp="home_tabs.active == 'oven-action-log'"
+       style="overflow: auto; width: 100%;">
+    <table class="table table-bordered"
+           style="width: auto !important; white-space: nowrap;">
+      <thead>
+        <th>Time</th>
+        <th>User</th>
+        <th>Action</th>
+        <th>Args</th>
+        <th>Keyword Args</th>
+        <th>GET</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="action in TActionLog.cur"
+            ng-class="log_type_to_class(action.l)">
+          <td>{[ timestamp_to_string(action.t) ]}</td>
+          <td>{[ action.c.u || '(unknown)' ]}</td>
+          <td>{[ action.c.a || '' ]}</td>
+          <td>{[ action.c.arg || '' ]}</td>
+          <td>{[ disp_obj(action.c.kw) ]}</td>
+          <td>{[ disp_obj(action.c.GET) || '' ]}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div cond-disp="home_tabs.active == 'room-temp-log'">
+    <!-- TODO -->
   </div>
   <div style="margin: 10px;" cond-disp="has_advanced_actions"
        cond-disp-type="block">

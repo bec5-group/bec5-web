@@ -44,16 +44,6 @@ class DateFileStream(DateFileBase):
         self.__get_stream()
         return self.__cur_stream
 
-class RecordCache(object):
-    def __init__(self, record_num):
-        pass
-    def records_reader(self, name):
-        pass
-    def get_records(self, name):
-        pass
-    def put_cache(self, name, records):
-        pass
-
 class TimeLog(DateFileBase):
     def __init__(self, filename_fmt, dirname, binary=False):
         self.__date_strm = DateFileStream(filename_fmt, dirname,

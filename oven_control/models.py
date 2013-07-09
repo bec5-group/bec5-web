@@ -227,7 +227,7 @@ class ControllerWrapper(object):
     def temp(self, value):
         value = to_finite(value)
         self.__temp = value
-        self.__logger.write_struct(int(time.time()), value)
+        self.__logger.info(value)
     def remove(self):
         self.__ctrl.stop()
     def check(self):

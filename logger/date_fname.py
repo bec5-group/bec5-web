@@ -2,7 +2,11 @@ import os
 from os import path as _path
 import datetime
 import time
-from becv_utils import ObjSignal
+from becv_utils import ObjSignal, bind_signal
+from .logger import BaseLogger
+from .record_cache import RecordCache
+import json
+import threading
 
 class DateFileBase(object):
     changed = ObjSignal(providing_args=['old_name', 'new_name'])
@@ -19,7 +23,14 @@ class DateFileStream(DateFileBase):
         self.__mode = mode
         self.__file_open = file_open
         self.__read_mode = read_mode
+        self.__read_open = read_open
+    def open_read(self, fname):
+        return self.__read_open(fname, self.__read_mode)
     def calc_name(self, d):
+        try:
+            d = datetime.datetime.fromtimestamp(int(d))
+        except:
+            pass
         d = d.replace(microsecond=0)
         fname = d.strftime(self.__fname_fmt)
         return _path.join(self.__dirname, fname)
@@ -44,17 +55,110 @@ class DateFileStream(DateFileBase):
         self.__get_stream()
         return self.__cur_stream
 
-class TimeLog(DateFileBase):
-    def __init__(self, filename_fmt, dirname, binary=False):
-        self.__date_strm = DateFileStream(filename_fmt, dirname,
-                                          mode='ba' if binary else 'a')
-        bind_signal(self.__date_strm.opened, self.opened)
-        bind_signal(self.__date_strm.changed, self.changed)
-        bind_signal(self.__date_strm.closed, self.closed)
-    def write(self, data):
-        return self.write_record(self.__date_strm.stream, time.time(),
-                                 datetime.datetime.now().replace(microsecond=0))
-    def write_record(self, strm, timestamp, d, data):
-        pass
-    def read_records(self, strm):
-        pass
+def _json_reader(stm):
+    while True:
+        line = stm.readline()
+        if not line:
+            return
+        try:
+            yield json.loads(line)
+        except:
+            pass
+
+def find_next_fname(calc_name, t, name, max_t):
+    if t >= max_t:
+        return
+    l_t = int(t)
+    l_n = name
+    r_t = int(max_t)
+    r_n = calc_name(r_t)
+    if l_n == r_n:
+        return None, None
+    while r_t - l_t >= 2:
+        m_t = (l_t + r_t) // 2
+        m_n = calc_name(m_t)
+        if m_n == l_n:
+            l_t = m_t
+        else:
+            r_t = m_t
+            r_n = m_n
+    return r_t, r_n
+
+class TimeLogger(BaseLogger, DateFileBase, RecordCache):
+    def __init__(self, filename_fmt='%Y-%m-%d.log', dirname='',
+                 record_num=20000, **kwargs):
+        BaseLogger.__init__(self)
+        DateFileBase.__init__(self)
+        RecordCache.__init__(self, record_num)
+
+        self.__stm_factory = DateFileStream(filename_fmt, dirname, **kwargs)
+        bind_signal(self.__stm_factory.opened, self.opened)
+        bind_signal(self.__stm_factory.changed, self.changed)
+        bind_signal(self.__stm_factory.closed, self.closed)
+
+        self.__lock = threading.Lock()
+        self.__cur_record = None
+        self.__cur_fname = None
+        self.opened.connect(self.__on_file_open)
+
+    def __on_file_open(self, name=''):
+        if self.__cur_fname == name:
+            return
+        if self.__cur_fname is not None:
+            self._put_cache(self.__cur_fname, self.__cur_record)
+        self.__cur_fname = name
+        self.__cur_record = []
+
+    @property
+    def stream(self):
+        return self.__stm_factory.stream
+
+    def _record_getter(self, key):
+        try:
+            with self.__stm_factory.open_read(key) as stm:
+                return self._read_record_objs(stm)
+        except:
+            # from becv_utils import print_except
+            # print_except()
+            return []
+    def _log_handler(self, level, *args, **kwargs):
+        obj = self._to_record_obj(level, int(time.time()), *args, **kwargs)
+        stm = self.stream
+        with self.__lock:
+            self.__cur_record.append(obj)
+            self._write_record_obj(stm, obj)
+            stm.flush()
+    def get_records(self, _from, _to=None):
+        if _to is None:
+            _to = time.time()
+        calc_name = self.__stm_factory.calc_name
+        cur_time = _from
+        cur_name = calc_name(_from)
+        while True:
+            cur_recs = self.get(cur_name)
+            for rec in cur_recs:
+                t = self._get_record_obj_time(rec)
+                if t > _to:
+                    return
+                if t > cur_time:
+                    cur_time = t
+                if t < _from:
+                    continue
+                yield t, rec
+            cur_time, cur_name = find_next_fname(calc_name, cur_time,
+                                                 cur_name, _to)
+            if cur_name is None:
+                return
+
+    # To be override
+    def _to_record_obj(self, l, t, **kwargs):
+        content = dict((k, v) for (k, v) in kwargs.items()
+                       if (v or v == False))
+        return {'l': level, 't': int(time.time()), 'c': content}
+    def _write_record_obj(self, stm, obj):
+        json.dump(obj, stm, separators=(',', ':'))
+        stm.write('\n')
+    def _get_record_obj_time(self, obj):
+        return obj['t']
+    def _read_record_objs(self, stm):
+        return list(_json_reader(stm))

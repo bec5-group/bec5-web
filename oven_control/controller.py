@@ -45,7 +45,7 @@ class Controller(WithHelper, ErrorLogger):
         self.__disp_set_temp = None
         self.start()
         self.__need_reset = False
-    def _error_logger_handle(self, is_error, name, msg):
+    def _error_logger_handle(self, name, is_error, msg):
         if is_error:
             ctrl_logger.error(name=name, msg=msg, addr=self.__addr,
                               ctrl=self.__mgr.ctrl.name)

@@ -49,6 +49,7 @@ def home(request):
             'oven-temp-log': logged_in,
             'oven-action-log': logged_in,
             'room-temp-log': logged_in,
+            'oven-ctrl-log': logged_in,
         },
         'user_obj': to_user_obj(user)
     })

@@ -3,7 +3,7 @@ import time
 class ErrorLogger(object):
     def __init__(self):
         self.__errors = {}
-    def _error_logger_handle(self, is_error, name, msg):
+    def _error_logger_handle(self, name, is_error, msg):
         pass
     def get_errors(self):
         return [{'name': name, 'msg': err['msg']}

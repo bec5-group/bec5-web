@@ -230,6 +230,54 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
   <div cond-disp="home_tabs.active == 'oven-temp-log'">
     <!-- TODO -->
   </div>
+  <div cond-disp="home_tabs.active == 'oven-ctrl-log'"
+       style="overflow: auto; width: 100%;">
+    <form>
+      <div>
+        <div class="input-prepend input-append becv-date-time-picker"
+             id="ctrl-log-from">
+          <span class="add-on">From:</span>
+          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"></input>
+          <span class="add-on">
+            <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+            </i>
+          </span>
+        </div>
+      </div>
+      <div>
+        <div class="input-prepend input-append becv-date-time-picker"
+             id="ctrl-log-to">
+          <span class="add-on">To:</span>
+          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"></input>
+          <span class="add-on">
+            <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+            </i>
+          </span>
+        </div>
+      </div>
+      <button class="btn" ng-click="update_ctrl_logs()">Get Logs</button>
+    </form>
+    <table class="table table-bordered"
+           style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
+      <thead>
+        <th>Time</th>
+        <th>Controller</th>
+        <th>Action</th>
+        <th>Address</th>
+        <th>Message</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="clog in ControllerLog.cur"
+            ng-class="log_type_to_class(clog[1].l)">
+          <td>{[ timestamp_to_string(clog[1].t) ]}</td>
+          <td>{[ clog[1].c.ctrl || '(unknown)' ]}</td>
+          <td>{[ clog[1].c.name || '' ]}</td>
+          <td>{[ addr_to_str(clog[1].c.addr) ]}</td>
+          <td>{[ clog[1].c.msg || '' ]}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div cond-disp="home_tabs.active == 'oven-action-log'"
        style="overflow: auto; width: 100%;">
     <form>

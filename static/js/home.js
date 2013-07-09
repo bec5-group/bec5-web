@@ -112,11 +112,14 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 name: 'Oven Control'
             }],
             log: [{
-                id: 'oven-temp-log',
-                name: 'Oven Temperature Log'
-            }, {
                 id: 'oven-action-log',
                 name: 'Oven Action Log'
+            }, {
+                id: 'oven-ctrl-log',
+                name: 'Oven Controller Log'
+            }, {
+                id: 'oven-temp-log',
+                name: 'Oven Temperature Log'
             }, {
                 id: 'room-temp-log',
                 name: 'Room Temperature Log'
@@ -537,6 +540,11 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             }
         };
 
+        $scope.TActionLog = new LogManager('/action/get-auth-logs/',
+                                           "Action");
+        $scope.ControllerLog = new LogManager('/action/get-ctrl-logs/',
+                                              "Controller");
+
         $('.becv-date-time-picker').datetimepicker();
         var auth_log_from_picker = $('#action-log-from').data('datetimepicker');
         var auth_log_to_picker = $('#action-log-to').data('datetimepicker');
@@ -546,10 +554,19 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             $scope.TActionLog.update_logs(_from, _to);
         };
 
-        $scope.TActionLog = new LogManager('/action/get-auth-logs/',
-                                           "Action");
-        $scope.ControllerLog = new LogManager('/action/get-ctrl-logs/',
-                                              "Controller");
+        var ctrl_log_from_picker = $('#ctrl-log-from').data('datetimepicker');
+        var ctrl_log_to_picker = $('#ctrl-log-to').data('datetimepicker');
+        $scope.update_ctrl_logs = function () {
+            var _from = +(ctrl_log_from_picker.getLocalDate()) / 1000;
+            var _to = +(ctrl_log_to_picker.getLocalDate()) / 1000;
+            $scope.ControllerLog.update_logs(_from, _to);
+        };
+
+        $scope.addr_to_str = function (addr) {
+            if (!$.isArray(addr))
+                return addr;
+            return addr.join(':');
+        };
         // end of init()
     }
 }]);

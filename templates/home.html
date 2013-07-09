@@ -4,6 +4,8 @@
 
 {% block head %}
 <link href="/static/css/home.css" rel="stylesheet"/>
+<link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
 <title>BEC 5</title>
 {% endblock %}
 
@@ -230,6 +232,31 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
   </div>
   <div cond-disp="home_tabs.active == 'oven-action-log'"
        style="overflow: auto; width: 100%;">
+    <form>
+      <div>
+        <div class="input-prepend input-append becv-date-time-picker"
+             id="action-log-from">
+          <span class="add-on">From:</span>
+          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"></input>
+          <span class="add-on">
+            <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+            </i>
+          </span>
+        </div>
+      </div>
+      <div>
+        <div class="input-prepend input-append becv-date-time-picker"
+             id="action-log-to">
+          <span class="add-on">To:</span>
+          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"></input>
+          <span class="add-on">
+            <i data-time-icon="icon-time" data-date-icon="icon-calendar">
+            </i>
+          </span>
+        </div>
+      </div>
+      <button class="btn" ng-click="update_auth_logs()">Get Logs</button>
+    </form>
     <table class="table table-bordered"
            style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
       <thead>
@@ -242,13 +269,13 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
       </thead>
       <tbody>
         <tr ng-repeat="action in TActionLog.cur"
-            ng-class="log_type_to_class(action.l)">
-          <td>{[ timestamp_to_string(action.t) ]}</td>
-          <td>{[ action.c.u || '(unknown)' ]}</td>
-          <td>{[ action.c.a || '' ]}</td>
-          <td>{[ action.c.arg || '' ]}</td>
-          <td>{[ disp_obj(action.c.kw) ]}</td>
-          <td>{[ disp_obj(action.c.GET) || '' ]}</td>
+            ng-class="log_type_to_class(action[1].l)">
+          <td>{[ timestamp_to_string(action[1].t) ]}</td>
+          <td>{[ action[1].c.u || '(unknown)' ]}</td>
+          <td>{[ action[1].c.a || '' ]}</td>
+          <td>{[ action[1].c.arg || '' ]}</td>
+          <td>{[ disp_obj(action[1].c.kw) ]}</td>
+          <td>{[ disp_obj(action[1].c.GET) || '' ]}</td>
         </tr>
       </tbody>
     </table>

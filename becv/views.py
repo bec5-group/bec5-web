@@ -9,14 +9,11 @@ import oven_control.models as oven_models
 from oven_control.controller import ctrl_logger
 
 from becv_utils import print_except
-from logger import TimeLogger, open_append_gzip
+from logger import TimeLogger
 import settings
-import gzip
 
-auth_logger = TimeLogger(filename_fmt='auth_action_log-%Y-%m-%d.json.gz',
-                         dirname=settings.LOGGING_DIR,
-                         file_open=open_append_gzip,
-                         read_open=gzip.open)
+auth_logger = TimeLogger(filename_fmt='auth_action_log-%Y-%m-%d.json',
+                         dirname=settings.LOGGING_DIR)
 
 import json
 
@@ -58,7 +55,7 @@ def home(request):
 
 def tojson(obj, cb):
     try:
-        jsonstr = json.dumps(obj)
+        jsonstr = json.dumps(obj, separators=(',', ':'))
     except:
         jsonstr = '{}'
     if cb is None:
@@ -101,7 +98,8 @@ def arg_deco(func):
     return _func
 
 @arg_deco
-def auth_jsonp(func, *perms):
+def auth_jsonp(func, *perms, **_kw):
+    log = _kw.get('log', True)
     def _func(request, *args, **kwargs):
         user = request.user
         if not user.is_authenticated():
@@ -115,9 +113,11 @@ def auth_jsonp(func, *perms):
         }
         for perm in perms:
             if not user.has_perm(perm):
-                auth_logger.error(**log_obj)
+                if log:
+                    auth_logger.error(**log_obj)
                 raise JSONPError(403)
-        auth_logger.info(**log_obj)
+        if log:
+            auth_logger.info(**log_obj)
         return func(request, *args, **kwargs)
     _func.__name__ = func.__name__
     return _func
@@ -135,7 +135,7 @@ def add_controller(request):
     }
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp(log=False)
 def get_controller_setting(request, cid=None):
     ctrl = oven_models.get_controller(cid)
     return dict((key, getattr(ctrl, key))
@@ -199,7 +199,7 @@ def add_profile(request, name=None, **kwargs):
     }
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp(log=False)
 def get_profile_setting(request, pid=None):
     profile = oven_models.get_profile(pid)
     return {
@@ -236,12 +236,12 @@ def get_setpoint(request):
     return oven_models.controller_manager.get_setpoint()
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp(log=False)
 def get_ctrl_errors(request):
     return oven_models.controller_manager.get_errors()
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp(log=False)
 def get_auth_logs(request):
     max_count = 1000
     GET = request.GET
@@ -258,7 +258,7 @@ def get_auth_logs(request):
     }
 
 @return_jsonp
-@auth_jsonp
+@auth_jsonp(log=False)
 def get_ctrl_logs(request):
     max_count = 1000
     GET = request.GET

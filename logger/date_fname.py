@@ -45,8 +45,8 @@ class DateFileStream(DateFileBase):
                 self.__cur_stream.close()
         except:
             pass
-        self.__cur_stream = self.__file_open(full_name, self.__mode)
         self.opened.send_robust(name=full_name)
+        self.__cur_stream = self.__file_open(full_name, self.__mode)
         if old_fname is not None:
             self.changed.send_robust(new_name=full_name, old_name=old_fname)
         self.__cur_fname = full_name
@@ -57,7 +57,10 @@ class DateFileStream(DateFileBase):
 
 def _json_reader(stm):
     while True:
-        line = stm.readline()
+        try:
+            line = stm.readline()
+        except:
+            return
         if not line:
             return
         try:
@@ -100,6 +103,7 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
         self.__cur_record = None
         self.__cur_fname = None
         self.opened.connect(self.__on_file_open)
+        stm = self.stream
 
     def __on_file_open(self, name='', **kwargs):
         if self.__cur_fname == name:
@@ -107,7 +111,13 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
         if self.__cur_fname is not None:
             self._put_cache(self.__cur_fname, self.__cur_record)
         self.__cur_fname = name
-        self.__cur_record = []
+        try:
+            with self.__stm_factory.open_read(name) as stm:
+                self.__cur_record = list(self._read_record_objs(stm))
+        except:
+            # from becv_utils import print_except
+            # print_except()
+            self.__cur_record = []
 
     @property
     def stream(self):
@@ -137,11 +147,11 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
     def get_records(self, _from, to=None, max_count=None):
         return list(self.get_records_it(_from, to=to, max_count=max_count))
     def get_records_it(self, _from, to=None, max_count=None):
-        _from = int(_from)
-        if to is None:
+        _from = int(float(_from))
+        try:
+            to = int(float(to))
+        except:
             to = time.time()
-        else:
-            to = int(to)
         calc_name = self.__stm_factory.calc_name
         cur_time = _from
         cur_name = calc_name(_from)

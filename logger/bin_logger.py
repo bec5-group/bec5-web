@@ -30,9 +30,9 @@ def load_struct(fname, fmt):
 
 class BinDateLogger(TimeLogger):
     def __init__(self, filename_fmt, dirname, fmt, **kwargs):
+        self.__fmt = fmt
         TimeLogger.__init__(self, filename_fmt, dirname, mode='ab',
                             read_mode='rb', **kwargs)
-        self.__fmt = fmt
     def _to_record_obj(self, l, t, *args):
         return (t,) + args
     def _write_record_obj(self, stm, obj):

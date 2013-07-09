@@ -506,9 +506,50 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 return '';
             return JSON.stringify(o, null, ' ');
         };
-        $scope.TActionLog = {
-            cur: []
+
+
+        function LogManager() {
+            this._init.apply(this, arguments);
+        }
+
+        LogManager.prototype = {
+            update_logs: function (from, to) {
+                var that = this;
+                this._cur_id++;
+                var cur_id = this._cur_id;
+                var _url = this._url + '?' + $.param({
+                    from: from,
+                    to: to
+                });
+                json_request(_url, function (data, status) {
+                    if (that._cur_id != cur_id)
+                        return
+                    that.cur = data.logs;
+                    that.is_all = data.is_all;
+                }, "Get " + this._name + " Logs.");
+            },
+            _init: function (_url, _name) {
+                this._url = _url;
+                this._name = _name;
+                this.cur = [];
+                this.is_all = true;
+                this._cur_id = 0;
+            }
         };
+
+        $('.becv-date-time-picker').datetimepicker();
+        var auth_log_from_picker = $('#action-log-from').data('datetimepicker');
+        var auth_log_to_picker = $('#action-log-to').data('datetimepicker');
+        $scope.update_auth_logs = function () {
+            var _from = +(auth_log_from_picker.getLocalDate()) / 1000;
+            var _to = +(auth_log_to_picker.getLocalDate()) / 1000;
+            $scope.TActionLog.update_logs(_from, _to);
+        };
+
+        $scope.TActionLog = new LogManager('/action/get-auth-logs/',
+                                           "Action");
+        $scope.ControllerLog = new LogManager('/action/get-ctrl-logs/',
+                                              "Controller");
         // end of init()
     }
 }]);

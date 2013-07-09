@@ -6,13 +6,10 @@ from becv_utils import printr, printg, printy, printb
 from becv_utils.thread_helper import WithHelper
 from logger.error_logger import ErrorLogger
 from becv import settings
-from logger import TimeLogger, open_append_gzip
-import gzip
+from logger import TimeLogger
 
-ctrl_logger = TimeLogger(filename_fmt='controller_action-%Y-%m-%d.json.gz',
-                         dirname=settings.LOGGING_DIR,
-                         file_open=open_append_gzip,
-                         read_open=gzip.open)
+ctrl_logger = TimeLogger(filename_fmt='controller_action-%Y-%m-%d.json',
+                         dirname=settings.LOGGING_DIR)
 
 def repeat_call(func, args=(), kwargs={}, n=1, wait_time=0, wait_first=True):
     res = None

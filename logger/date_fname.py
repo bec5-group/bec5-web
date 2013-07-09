@@ -67,7 +67,7 @@ def _json_reader(stm):
 
 def find_next_fname(calc_name, t, name, max_t):
     if t >= max_t:
-        return
+        return None, None
     l_t = int(t)
     l_n = name
     r_t = int(max_t)
@@ -101,7 +101,7 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
         self.__cur_fname = None
         self.opened.connect(self.__on_file_open)
 
-    def __on_file_open(self, name=''):
+    def __on_file_open(self, name='', **kwargs):
         if self.__cur_fname == name:
             return
         if self.__cur_fname is not None:
@@ -128,25 +128,34 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
             self.__cur_record.append(obj)
             self._write_record_obj(stm, obj)
             stm.flush()
-    def get_records(self, _from, _to=None):
-        if _to is None:
-            _to = time.time()
+    def get_records(self, _from, to=None, max_count=None):
+        return list(self.get_records_it(_from, to=to, max_count=max_count))
+    def get_records_it(self, _from, to=None, max_count=None):
+        _from = int(_from)
+        if to is None:
+            to = time.time()
+        else:
+            to = int(to)
         calc_name = self.__stm_factory.calc_name
         cur_time = _from
         cur_name = calc_name(_from)
+        count = 0
         while True:
             cur_recs = self.get(cur_name)
             for rec in cur_recs:
                 t = self._get_record_obj_time(rec)
-                if t > _to:
+                if t > to:
                     return
                 if t > cur_time:
                     cur_time = t
                 if t < _from:
                     continue
+                count += 1
                 yield t, rec
+                if max_count is not None and count >= max_count:
+                    return
             cur_time, cur_name = find_next_fname(calc_name, cur_time,
-                                                 cur_name, _to)
+                                                 cur_name, to)
             if cur_name is None:
                 return
 

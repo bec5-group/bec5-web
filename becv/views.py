@@ -6,6 +6,8 @@ from django.shortcuts import render
 from django.contrib.auth import views as auth_views
 
 import oven_control.models as oven_models
+from oven_control.controller import ctrl_logger
+
 from becv_utils import print_except
 from logger import TimeLogger, open_append_gzip
 import settings
@@ -237,3 +239,37 @@ def get_setpoint(request):
 @auth_jsonp
 def get_ctrl_errors(request):
     return oven_models.controller_manager.get_errors()
+
+@return_jsonp
+@auth_jsonp
+def get_auth_logs(request):
+    max_count = 1000
+    GET = request.GET
+    logs = auth_logger.get_records(GET.get('from'), GET.get('to'),
+                                   max_count + 1)
+    if len(logs) > max_count:
+        return {
+            'logs': logs[:max_count],
+            'is_all': False
+        }
+    return {
+        'logs': logs,
+        'is_all': True
+    }
+
+@return_jsonp
+@auth_jsonp
+def get_ctrl_logs(request):
+    max_count = 1000
+    GET = request.GET
+    logs = ctrl_logger.get_records(GET.get('from'), GET.get('to'),
+                                   max_count + 1)
+    if len(logs) > max_count:
+        return {
+            'logs': logs[:max_count],
+            'is_all': False
+        }
+    return {
+        'logs': logs,
+        'is_all': True
+    }

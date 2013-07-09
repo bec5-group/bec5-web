@@ -7,6 +7,8 @@ class BaseLogger(object):
         try:
             self._log_handler(level, *arg, **kwargs)
         except:
+            # from becv_utils import print_except
+            # print_except()
             pass
     def info(self, *args, **kwargs):
         self.log('INFO', *args, **kwargs)

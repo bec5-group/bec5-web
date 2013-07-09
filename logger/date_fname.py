@@ -92,9 +92,9 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
         RecordCache.__init__(self, record_num)
 
         self.__stm_factory = DateFileStream(filename_fmt, dirname, **kwargs)
-        bind_signal(self.__stm_factory.opened, self.opened)
-        bind_signal(self.__stm_factory.changed, self.changed)
-        bind_signal(self.__stm_factory.closed, self.closed)
+        self.__opened = bind_signal(self.__stm_factory.opened, self.opened)
+        self.__changed = bind_signal(self.__stm_factory.changed, self.changed)
+        self.__closed = bind_signal(self.__stm_factory.closed, self.closed)
 
         self.__lock = threading.Lock()
         self.__cur_record = None
@@ -113,7 +113,13 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
     def stream(self):
         return self.__stm_factory.stream
 
+    def get(self, key):
+        if key == self.__cur_fname:
+            return self.__cur_record
+        return RecordCache.get(self, key)
     def _record_getter(self, key):
+        if key == self.__cur_fname:
+            return self.__cur_record
         try:
             with self.__stm_factory.open_read(key) as stm:
                 return self._read_record_objs(stm)
@@ -163,7 +169,7 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
     def _to_record_obj(self, l, t, **kwargs):
         content = dict((k, v) for (k, v) in kwargs.items()
                        if (v or v == False))
-        return {'l': level, 't': int(time.time()), 'c': content}
+        return {'l': l, 't': t, 'c': content}
     def _write_record_obj(self, stm, obj):
         json.dump(obj, stm, separators=(',', ':'))
         stm.write('\n')

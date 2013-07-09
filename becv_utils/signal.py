@@ -29,4 +29,7 @@ class ObjSignal(Signal):
         return SignalWrapper(self, obj)
 
 def bind_signal(src, dst):
-    src.connect(lambda sender=None, **kwargs: dst.send_robust(sender, **kwargs))
+    def _resender(sender=None, signal=None, **kwargs):
+        dst.send_robust(**kwargs)
+    src.connect(_resender)
+    return _resender

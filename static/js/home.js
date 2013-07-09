@@ -548,17 +548,25 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
         $('.becv-date-time-picker').datetimepicker();
         var auth_log_from_picker = $('#action-log-from').data('datetimepicker');
         var auth_log_to_picker = $('#action-log-to').data('datetimepicker');
+        auth_log_from_picker.setLocalDate(null);
+        auth_log_to_picker.setLocalDate(null);
         $scope.update_auth_logs = function () {
-            var _from = +(auth_log_from_picker.getLocalDate()) / 1000;
-            var _to = +(auth_log_to_picker.getLocalDate()) / 1000;
+            var _from = +(auth_log_from_picker.getLocalDate() ||
+                          new Date()) / 1000;
+            var _to = +(auth_log_to_picker.getLocalDate() ||
+                        new Date()) / 1000;
             $scope.TActionLog.update_logs(_from, _to);
         };
 
         var ctrl_log_from_picker = $('#ctrl-log-from').data('datetimepicker');
         var ctrl_log_to_picker = $('#ctrl-log-to').data('datetimepicker');
+        ctrl_log_from_picker.setLocalDate(null);
+        ctrl_log_to_picker.setLocalDate(null);
         $scope.update_ctrl_logs = function () {
-            var _from = +(ctrl_log_from_picker.getLocalDate()) / 1000;
-            var _to = +(ctrl_log_to_picker.getLocalDate()) / 1000;
+            var _from = +(ctrl_log_from_picker.getLocalDate() ||
+                          new Date()) / 1000;
+            var _to = +(ctrl_log_to_picker.getLocalDate() ||
+                        new Date()) / 1000;
             $scope.ControllerLog.update_logs(_from, _to);
         };
 

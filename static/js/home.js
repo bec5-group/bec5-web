@@ -218,19 +218,19 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
         $scope.TValues = {};
 
         function get_ovens() {
-            json_request('/action/get-ovens/', function (data, status) {
+            json_request('/oven-control/get-ovens/', function (data, status) {
                 $scope.TControls = data;
             }, "Get ovens list");
         }
 
         function get_profiles() {
-            json_request('/action/get-profiles/', function (data, status) {
+            json_request('/oven-control/get-profiles/', function (data, status) {
                 $scope.TProfile.set_profiles(data);
             }, "Get profile list");
         }
 
         function update_temps() {
-            json_request('/action/get-temps/', function (data, status) {
+            json_request('/oven-control/get-temps/', function (data, status) {
                 $scope.TValues = data;
             }, "Get temperatures");
         }
@@ -266,7 +266,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             },
             update_cur_setpoint: function () {
                 var that = this;
-                json_request('/action/get-setpoint/', function (data, status) {
+                json_request('/oven-control/get-setpoint/', function (data, status) {
                     that.cur_setpoint = data;
                     if (!that.cur_changed || !that.cur) {
                         that.cur = data.id;
@@ -277,7 +277,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 if (!$scope.user.username)
                     return;
                 var that = this;
-                json_request('/action/get-ctrl-errors/', function (data, status) {
+                json_request('/oven-control/get-errors/', function (data, status) {
                     that.cur_error = data;
                 }, "Get current error.");
             },
@@ -297,7 +297,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             edit_setpoint: function () {
                 if (this.editing_setpoint) {
                     var that = this;
-                    var url = ('/action/set-temps/?' +
+                    var url = ('/oven-control/set-temps/?' +
                                $.param(this.edited_setpoint));
                     json_request(url, function (data, status) {
                         add_message('Successfully changed setpoint', 'success');
@@ -327,7 +327,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 var that = this;
                 var cur = this.all[this.cur].name;
                 this.cur_changed = false;
-                var url = '/action/set-profile/' + this.cur + '/';
+                var url = '/oven-control/set-profile/' + this.cur + '/';
                 json_request(url, function (data, status) {
                     that.status = 2;
                     add_message('Successfully set profile to "' +
@@ -356,7 +356,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 }, function (res) {
                     if (!res)
                         return;
-                    var url = '/action/add-profile/' + res.name;
+                    var url = '/oven-control/add-profile/' + res.name;
                     if (!(res.order === undefined))
                         url += '/' + res.order;
                     url += '/?' + $.param(res.temps);
@@ -368,14 +368,14 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 });
             },
             edit_profile: function (id) {
-                var url = '/action/get-profile-setting/' + id + '/';
+                var url = '/oven-control/get-profile-setting/' + id + '/';
                 var that = this;
                 json_request(url, function (data, status) {
                     data.ctrls = $scope.TControls;
                     that.show_profile_dialog(data, function (res) {
                         if (!res)
                             return;
-                        var url = '/action/edit-profile/' + id + '/' + res.name;
+                        var url = '/oven-control/edit-profile/' + id + '/' + res.name;
                         if (!(res.order === undefined))
                             url += '/' + res.order;
                         url += '/?' + $.param(res.temps);
@@ -404,7 +404,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 msgbox.open().then(function (result) {
                     if (!(result === 'yes'))
                         return;
-                    var url = ('/action/del-profile/' + profile.id + '/');
+                    var url = ('/oven-control/del-profile/' + profile.id + '/');
                     json_request(url, function (data, status) {
                         add_message('Successfully deleted profile "' +
                                     profile.name + '".', 'success');
@@ -430,12 +430,12 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
         }
 
         $scope.setController = function (id) {
-            var url = '/action/get-ctrl-setting/' + id + '/';
+            var url = '/oven-control/get-ctrl-setting/' + id + '/';
             json_request(url, function (data, status) {
                 showControllerDialog(data, function (res) {
                     if (!res)
                         return;
-                    var url = ('/action/set-controller/' + id + '/?' +
+                    var url = ('/oven-control/set-controller/' + id + '/?' +
                                $.param(res));
                     json_request(url, function (data, status) {
                         add_message('Successfully changed controller "' +
@@ -456,7 +456,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             }, function (res) {
                 if (!res)
                     return;
-                var url = '/action/add-controller/?' + $.param(res);
+                var url = '/oven-control/add-controller/?' + $.param(res);
                 json_request(url, function (data, status) {
                     add_message('Successfully added controller "' +
                                 data.name + '".', 'success');
@@ -480,7 +480,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             msgbox.open().then(function (result) {
                 if (!(result === 'yes'))
                     return;
-                var url = ('/action/del-controller/' + ctrl.id + '/');
+                var url = ('/oven-control/del-controller/' + ctrl.id + '/');
                 json_request(url, function (data, status) {
                     add_message('Successfully deleted controller "' +
                                 ctrl.name + '".', 'success');
@@ -540,9 +540,8 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             }
         };
 
-        $scope.TActionLog = new LogManager('/action/get-auth-logs/',
-                                           "Action");
-        $scope.ControllerLog = new LogManager('/action/get-ctrl-logs/',
+        $scope.TActionLog = new LogManager('/json-view/get-logs/', "Action");
+        $scope.ControllerLog = new LogManager('/oven-control/get-logs/',
                                               "Controller");
 
         $('.becv-date-time-picker').datetimepicker();

@@ -5,7 +5,7 @@ import weakref
 from becv_utils import printr, printg, printy, printb
 from becv_utils.thread_helper import WithHelper, repeat_call
 from logger.error_logger import ErrorLogger
-from becv import settings
+from django.conf import settings
 from logger import TimeLogger
 
 server_logger = TimeLogger(filename_fmt='room_temp_actoin-%Y-%m-%d.json',

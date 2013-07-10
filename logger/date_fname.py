@@ -56,7 +56,7 @@ class DateFileStream(DateFileBase):
         return self.__cur_stream
     def close(self):
         if self.__cur_stream is not None:
-            self.closed.send_robust(name=old_fname)
+            self.closed.send_robust(name=self.__cur_fname)
             self.__cur_stream.close()
             self.__cur_stream = None
         self.__cur_fname = None

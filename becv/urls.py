@@ -10,46 +10,19 @@ from django.contrib.auth.views import logout
 urlpatterns = patterns('',
     url(r'^$', 'becv.views.home', name='home'),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/login/$', 'becv.views.login'),
     url(r'^accounts/logout/$', logout),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/')),
     url(r'^favicon.ico$', RedirectView.as_view(url='/static/img/favicon.png')),
 
-    url(r'^action/add-controller/$', 'becv.views.add_controller'),
-    url(r'^action/get-ctrl-setting/(?P<cid>[^/]*)/$',
-        'becv.views.get_controller_setting'),
-    url(r'^action/set-controller/(?P<cid>[^/]*)/$',
-        'becv.views.set_controller'),
-    url(r'^action/del-controller/(?P<cid>[^/]*)/$',
-        'becv.views.del_controller'),
+    # admin
+    url(r'^admin/', include(admin.site.urls)),
+    # admin documentation
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    url(r'^action/get-profiles/$', 'becv.views.get_profiles'),
-    url(r'^action/get-ovens/$', 'becv.views.get_ovens'),
+    # action log
+    url(r'^json-view/', include('json_view.urls')),
 
-    url(r'^action/add-profile/(?P<name>[^/]*)/$', 'becv.views.add_profile'),
-    url(r'^action/add-profile/(?P<name>[^/]*)/(?P<order>[^/]*)/$',
-        'becv.views.add_profile'),
-
-    url(r'^action/get-profile-setting/(?P<pid>[^/]*)/$',
-        'becv.views.get_profile_setting'),
-
-    url(r'^action/edit-profile/(?P<profile>[^/]*)/$', 'becv.views.edit_profile'),
-    url(r'^action/edit-profile/(?P<profile>[^/]*)/(?P<name>[^/]*)/$',
-        'becv.views.edit_profile'),
-    url(r'^action/edit-profile/(?P<profile>[^/]*)/(?P<name>[^/]*)/(?P<order>[^/]*)/$', 'becv.views.edit_profile'),
-    url(r'^action/del-profile/(?P<pid>[^/]*)/$', 'becv.views.del_profile'),
-
-    url(r'^action/set-profile/(?P<profile>[^/]*)/', 'becv.views.set_profile'),
-    url(r'^action/set-temps/$', 'becv.views.set_temps'),
-    url(r'^action/get-temps/$', 'becv.views.get_temps'),
-    url(r'^action/get-setpoint/$', 'becv.views.get_setpoint'),
-
-    url(r'^action/get-ctrl-errors/$', 'becv.views.get_ctrl_errors'),
-    url(r'^action/get-auth-logs/$', 'becv.views.get_auth_logs'),
-    url(r'^action/get-ctrl-logs/$', 'becv.views.get_ctrl_logs'),
+    # oven controller
+    url(r'^oven-control/', include('oven_control.urls')),
 )

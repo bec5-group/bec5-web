@@ -5,7 +5,7 @@ import time
 from becv_utils import printr, printg, printy, printb
 from becv_utils.thread_helper import WithHelper, repeat_call
 from logger.error_logger import ErrorLogger
-from becv import settings
+from django.conf import settings
 from logger import TimeLogger
 
 ctrl_logger = TimeLogger(filename_fmt='controller_action-%Y-%m-%d.json',

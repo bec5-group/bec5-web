@@ -1,0 +1,31 @@
+angular.module('data-plot')
+    .directive('plotData', [function () {
+        return {
+            restrict: "EAC",
+            link: function (scope, elm, attrs) {
+                // by default the values will come in as undefined so we
+                // need to setup a watch to notify us when the value changes
+                scope.$watch(attrs.email, function (value) {
+                    if (value === null || value === undefined ||
+                        (value !== '' &&
+                         (null == value.match(/.*@.*\..{2}/))))
+                        return;
+                    // convert the value to lower case and then to a md5 hash
+                    var hash = md5.createHash(value.toLowerCase());
+                    // parse the size attribute
+                    // default to 40 pixels if not set
+                    var size = attrs.size || 40;
+                    // parse the ratings attribute
+                    // default to g if not set
+                    var rating = attrs.rating || 'g';
+                    // parse the default image url
+                    var defaultUrl = attrs.default || '';
+                    // construct the tag to insert into the element
+                    var tag = '<img class="gravatar-icon img-rounded" src="' + (attrs.secure ? 'https://secure' : 'http://www' ) + '.gravatar.com/avatar/' + hash + '?s=' + size + '&r=' + rating + '&d=' + defaultUrl + '" >'
+                    //remove any existing imgs
+                    $(elm).find(".gravatar-icon").remove();
+                    // insert the tag into the element
+                    elm.append(tag);
+                });
+            }};
+    }]);

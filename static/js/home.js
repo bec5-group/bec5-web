@@ -113,7 +113,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             }],
             log: [{
                 id: 'oven-action-log',
-                name: 'Oven Action Log'
+                name: 'User Action Log'
             }, {
                 id: 'oven-ctrl-log',
                 name: 'Oven Controller Log'

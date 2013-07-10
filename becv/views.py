@@ -100,18 +100,20 @@ def arg_deco(func):
 
 @arg_deco
 def auth_jsonp(func, *perms, **_kw):
-    log = _kw.get('log', True)
+    log = _kw.get('log')
     def _func(request, *args, **kwargs):
         user = request.user
         if not user.is_authenticated():
             raise JSONPError(401)
-        log_obj = {
-            'arg': args,
-            'kw': kwargs,
-            'GET': request.GET,
-            'a': func.__name__,
-            'u': user.username,
-        }
+        if log:
+            log_obj = {
+                'arg': args,
+                'kw': kwargs,
+                'GET': request.GET,
+                'a': func.__name__,
+                'u': user.username,
+                'msg': log(request, *args, **kwargs)
+            }
         for perm in perms:
             if not user.has_perm(perm):
                 if log:
@@ -123,8 +125,15 @@ def auth_jsonp(func, *perms, **_kw):
     _func.__name__ = func.__name__
     return _func
 
+def _add_controller_logger(request):
+    GET = request.GET.get
+    return ('Name: %s, Address: %s:%s, NO: %s, Order: %s, '
+            'Default Temperature: %s' %
+            (GET('name'), GET('addr'), GET('port'), GET('number'),
+             GET('order'), GET('default_temp')))
+
 @return_jsonp
-@auth_jsonp('oven_control.set_controller')
+@auth_jsonp('oven_control.set_controller', log=_add_controller_logger)
 def add_controller(request):
     ctrl = oven_models.add_controller(
         request.GET['name'], request.GET['addr'], request.GET['port'],
@@ -136,15 +145,30 @@ def add_controller(request):
     }
 
 @return_jsonp
-@auth_jsonp(log=False)
+@auth_jsonp
 def get_controller_setting(request, cid=None):
     ctrl = oven_models.get_controller(cid)
     return dict((key, getattr(ctrl, key))
                 for key in ('id', 'name', 'addr', 'port', 'number', 'order',
                             'default_temp'))
 
+def _set_controller_logger(request, cid=None):
+    GET = request.GET.get
+    ctrl = oven_models.get_controller(cid)
+    old_name = ctrl.name
+    name = GET('name')
+    if name == old_name:
+        return ('Name: %s, Address: %s:%s, NO: %s, Order: %s, '
+                'Default Temperature: %s' %
+                (name, GET('addr'), GET('port'), GET('number'),
+                 GET('order'), GET('default_temp')))
+    return ('Name: %s, New Name: %s, Address: %s:%s, NO: %s, Order: %s, '
+            'Default Temperature: %s' %
+            (old_name, name, GET('addr'), GET('port'), GET('number'),
+             GET('order'), GET('default_temp')))
+
 @return_jsonp
-@auth_jsonp('oven_control.set_controller')
+@auth_jsonp('oven_control.set_controller', log=_set_controller_logger)
 def set_controller(request, cid=None):
     ctrl = oven_models.get_controller(cid)
     for key in ('name', 'addr', 'port', 'number', 'order', 'default_temp'):
@@ -156,8 +180,12 @@ def set_controller(request, cid=None):
         'name': ctrl.name,
     }
 
+def _del_controller_logger(request, cid=None):
+    ctrl = oven_models.get_controller(cid)
+    return 'Name: %s' % ctrl.name
+
 @return_jsonp
-@auth_jsonp('oven_control.set_controller')
+@auth_jsonp('oven_control.set_controller', log=_del_controller_logger)
 def del_controller(request, cid=None):
     return oven_models.remove_controller(cid)
 
@@ -174,8 +202,26 @@ def get_ovens(request):
              'name': controller.name}
              for controller in oven_models.get_controllers()]
 
+def _edit_profile_logger(request, profile=None, name=None, order=None):
+    profile = oven_models.get_profile(profile)
+    res = 'Name: ' + profile.name
+    if name and name != profile.name:
+        res = res + ', New Name: ' + name
+    if order is not None:
+        res = res + ', Order: ' + order
+    if len(request.GET):
+        res = res + ', Temperatures: { '
+        for cid, temp in request.GET.items():
+            try:
+                ctrl = oven_models.get_controller(cid)
+                res += ctrl.name + ': ' + temp + ', '
+            except:
+                pass
+        res = res + '}'
+    return res
+
 @return_jsonp
-@auth_jsonp('oven_control.set_profile_temp')
+@auth_jsonp('oven_control.set_profile_temp', log=_edit_profile_logger)
 def edit_profile(request, profile=None, name=None, order=None):
     profile = oven_models.get_profile(profile)
     if name:
@@ -189,8 +235,23 @@ def edit_profile(request, profile=None, name=None, order=None):
         'name': profile.name
     }
 
+def _add_profile_logger(request, name=None, order=None):
+    res = 'Name: ' + name
+    if order is not None:
+        res = res + ', Order: ' + order
+    if len(request.GET):
+        res = res + ', Temperatures: { '
+        for cid, temp in request.GET.items():
+            try:
+                ctrl = oven_models.get_controller(cid)
+                res += ctrl.name + ': ' + temp + ', '
+            except:
+                pass
+        res = res + '}'
+    return res
+
 @return_jsonp
-@auth_jsonp('oven_control.set_profile_temp')
+@auth_jsonp('oven_control.set_profile_temp', log=_add_profile_logger)
 def add_profile(request, name=None, **kwargs):
     profile = oven_models.add_profile(name, **kwargs)
     oven_models.set_profile_temps(profile, request.GET, True)
@@ -200,7 +261,7 @@ def add_profile(request, name=None, **kwargs):
     }
 
 @return_jsonp
-@auth_jsonp(log=False)
+@auth_jsonp
 def get_profile_setting(request, pid=None):
     profile = oven_models.get_profile(pid)
     return {
@@ -210,8 +271,12 @@ def get_profile_setting(request, pid=None):
         'temps': oven_models.get_profile_temps(profile, False)
     }
 
+def _del_profile_logger(request, pid=None):
+    profile = oven_models.get_profile(pid)
+    return 'Name: ' + profile.name
+
 @return_jsonp
-@auth_jsonp('oven_control.set_profile_temp')
+@auth_jsonp('oven_control.set_profile_temp', log=_del_profile_logger)
 def del_profile(request, pid=None):
     return oven_models.remove_profile(pid)
 
@@ -219,13 +284,27 @@ def del_profile(request, pid=None):
 def get_temps(request):
     return oven_models.controller_manager.get_temps()
 
+def _set_temps_logger(request):
+    res = ''
+    for cid, temp in request.GET.items():
+        try:
+            ctrl = oven_models.get_controller(cid)
+            res += ctrl.name + ': ' + temp + ', '
+        except:
+            pass
+    return res
+
 @return_jsonp
-@auth_jsonp('oven_control.set_temp')
+@auth_jsonp('oven_control.set_temp', log=_set_temps_logger)
 def set_temps(request):
     return oven_models.controller_manager.set_temps(request.GET)
 
+def _set_profile_logger(request, profile=None):
+    profile = oven_models.get_profile(profile)
+    return 'Name: ' + profile.name
+
 @return_jsonp
-@auth_jsonp('oven_control.set_profile')
+@auth_jsonp('oven_control.set_profile', log=_set_profile_logger)
 def set_profile(request, profile=None):
     res = oven_models.controller_manager.set_profile(profile)
     if not res:
@@ -237,12 +316,12 @@ def get_setpoint(request):
     return oven_models.controller_manager.get_setpoint()
 
 @return_jsonp
-@auth_jsonp(log=False)
+@auth_jsonp
 def get_ctrl_errors(request):
     return oven_models.controller_manager.get_errors()
 
 @return_jsonp
-@auth_jsonp(log=False)
+@auth_jsonp
 def get_auth_logs(request):
     max_count = 1000
     GET = request.GET
@@ -259,7 +338,7 @@ def get_auth_logs(request):
     }
 
 @return_jsonp
-@auth_jsonp(log=False)
+@auth_jsonp
 def get_ctrl_logs(request):
     max_count = 1000
     GET = request.GET

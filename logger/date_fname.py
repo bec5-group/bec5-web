@@ -167,7 +167,7 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
                 if t < _from:
                     continue
                 count += 1
-                yield t, rec
+                yield rec
                 if max_count is not None and count >= max_count:
                     return
             cur_time, cur_name = find_next_fname(calc_name, cur_time,

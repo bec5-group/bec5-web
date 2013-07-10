@@ -268,12 +268,12 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
       </thead>
       <tbody>
         <tr ng-repeat="clog in ControllerLog.cur"
-            ng-class="log_type_to_class(clog[1].l)">
-          <td>{[ timestamp_to_string(clog[1].t) ]}</td>
-          <td>{[ clog[1].c.ctrl || '(unknown)' ]}</td>
-          <td>{[ clog[1].c.name || '' ]}</td>
-          <td>{[ addr_to_str(clog[1].c.addr) ]}</td>
-          <td>{[ clog[1].c.msg || '' ]}</td>
+            ng-class="log_type_to_class(clog.l)">
+          <td>{[ timestamp_to_string(clog.t) ]}</td>
+          <td>{[ clog.c.ctrl || '(unknown)' ]}</td>
+          <td>{[ clog.c.name || '' ]}</td>
+          <td>{[ addr_to_str(clog.c.addr) ]}</td>
+          <td>{[ clog.c.msg || '' ]}</td>
         </tr>
       </tbody>
     </table>
@@ -311,19 +311,15 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
         <th>Time</th>
         <th>User</th>
         <th>Action</th>
-        <th>Args</th>
-        <th>Keyword Args</th>
-        <th>GET</th>
+        <th>Message</th>
       </thead>
       <tbody>
         <tr ng-repeat="action in TActionLog.cur"
-            ng-class="log_type_to_class(action[1].l)">
-          <td>{[ timestamp_to_string(action[1].t) ]}</td>
-          <td>{[ action[1].c.u || '(unknown)' ]}</td>
-          <td>{[ action[1].c.a || '' ]}</td>
-          <td>{[ action[1].c.arg || '' ]}</td>
-          <td>{[ disp_obj(action[1].c.kw) ]}</td>
-          <td>{[ disp_obj(action[1].c.GET) || '' ]}</td>
+            ng-class="log_type_to_class(action.l)">
+          <td>{[ timestamp_to_string(action.t) ]}</td>
+          <td>{[ action.c.u || '(unknown)' ]}</td>
+          <td>{[ action.c.a || '' ]}</td>
+          <td>{[ action.c.msg || '' ]}</td>
         </tr>
       </tbody>
     </table>

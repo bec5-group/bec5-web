@@ -8,6 +8,9 @@ from django.contrib.auth import views as auth_views
 import oven_control.models as oven_models
 from oven_control.controller import ctrl_logger
 
+import room_temp.models as room_models
+from room_temp.server import server_logger
+
 from becv_utils import print_except
 from logger import TimeLogger
 import settings

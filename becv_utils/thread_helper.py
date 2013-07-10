@@ -1,6 +1,7 @@
 import weakref
 import threading
 from . import print_except
+from time import sleep
 
 def repeat_call(func, args=(), kwargs={}, n=1, wait_time=0, wait_first=True):
     res = None

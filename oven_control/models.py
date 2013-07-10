@@ -230,6 +230,7 @@ class ControllerWrapper(object):
         self.__logger.info(value)
     def remove(self):
         self.__ctrl.stop()
+        self.__logger.close()
     def check(self):
         self.__ctrl.addr = self.ctrl.addr, self.ctrl.port
         if self.__json_fname is not None:

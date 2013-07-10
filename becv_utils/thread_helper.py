@@ -2,6 +2,16 @@ import weakref
 import threading
 from . import print_except
 
+def repeat_call(func, args=(), kwargs={}, n=1, wait_time=0, wait_first=True):
+    res = None
+    for i in range(n):
+        if (i or wait_first) and wait_time > 0:
+            sleep(wait_time)
+        res = func(*args, **kwargs)
+        if res is not None:
+            break
+    return res
+
 # Run parent's .run() periodically or when activated in a separate thread.
 class ThreadHelper(object):
     def __init__(self, parent):

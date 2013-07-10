@@ -3,23 +3,13 @@ from time import sleep
 import time
 
 from becv_utils import printr, printg, printy, printb
-from becv_utils.thread_helper import WithHelper
+from becv_utils.thread_helper import WithHelper, repeat_call
 from logger.error_logger import ErrorLogger
 from becv import settings
 from logger import TimeLogger
 
 ctrl_logger = TimeLogger(filename_fmt='controller_action-%Y-%m-%d.json',
                          dirname=settings.LOGGING_DIR)
-
-def repeat_call(func, args=(), kwargs={}, n=1, wait_time=0, wait_first=True):
-    res = None
-    for i in range(n):
-        if (i or wait_first) and wait_time > 0:
-            sleep(wait_time)
-        res = func(*args, **kwargs)
-        if res is not None:
-            break
-    return res
 
 class Controller(WithHelper, ErrorLogger):
     def ctrl_cmd(cmd_func):

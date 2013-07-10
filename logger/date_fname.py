@@ -54,6 +54,12 @@ class DateFileStream(DateFileBase):
     def stream(self):
         self.__get_stream()
         return self.__cur_stream
+    def close(self):
+        if self.__cur_stream is not None:
+            self.closed.send_robust(name=old_fname)
+            self.__cur_stream.close()
+            self.__cur_stream = None
+        self.__cur_fname = None
 
 def _json_reader(stm):
     while True:
@@ -187,3 +193,5 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
         return obj['t']
     def _read_record_objs(self, stm):
         return list(_json_reader(stm))
+    def close(self):
+        self.__stm_factory.close()

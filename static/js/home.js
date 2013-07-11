@@ -574,6 +574,115 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 return addr;
             return addr.join(':');
         };
+
+        function RoomTempMgr() {
+            this._init.apply(this, arguments);
+        }
+
+        RoomTempMgr.prototype = {
+            _init: function () {
+                this.server_ids = [];
+                this.servers = {};
+                this.update_servers();
+                this.cur_server = null;
+            },
+            update_servers: function () {
+                var that = this;
+                json_request('/room-temp/get-servers/', function (data, status) {
+                    that.server_ids = [];
+                    that.servers = {};
+                    for (var i in data) {
+                        if (!data.hasOwnProperty(i))
+                            continue;
+                        var server = data[i];
+                        that.server_ids.push(server.id);
+                        that.servers[server.id] = server;
+                        if (!(that.cur_server in that.servers)) {
+                            that.cur_server = null;
+                        }
+                    }
+                }, "Get servers list.");
+            },
+            set_current_server: function (id) {
+                that.cur_server = id;
+            },
+            update_devices: function () {
+                // TODO
+            },
+            show_server_dialog: function (values, cb) {
+                var d = $dialog.dialog({
+                    resolve: {
+                        value: function () {
+                            return values;
+                        }
+                    }
+                });
+                d.open('/static/html/room_server_edit.html',
+                       'RoomServerEditCtrl').then(cb);
+            },
+            add_server: function () {
+                var that = this;
+                this.show_server_dialog({
+                    order: 0.0,
+                    port: 23,
+                }, function (res) {
+                    if (!res)
+                        return;
+                    var url = '/room-temp/add-server/?' + $.param(res);
+                    json_request(url, function (data, status) {
+                        add_message('Successfully added server "' +
+                                    data.name + '".', 'success');
+                        that.update_servers();
+                    }, 'Add Server');
+                });
+            },
+            edit_server: function (id) {
+                var url = '/room-temp/get-server-setting/' + id + '/';
+                var that = this;
+                json_request(url, function (data, status) {
+                    that.show_server_dialog(data, function (res) {
+                        if (!res)
+                            return;
+                        if ('id' in res)
+                            delete res.id;
+                        var url = '/room-temp/edit-server/' + id;
+                        url += '/?' + $.param(res);
+                        json_request(url, function (data, status) {
+                            add_message('Successfully edited server "' +
+                                        data.name + '".', 'success');
+                            that.update_servers();
+                        }, 'Edit server');
+                    });
+                }, "Get server setting.");
+            },
+            remove_server: function (id) {
+                var that = this;
+                var server = this.servers[id];
+                var msgbox = $dialog.messageBox(
+                    'Delete Server',
+                    'Do you REALLY want to delete server' + server.name + '?',
+                    [{
+                        label: "Yes, I'm sure",
+                        result: 'yes',
+                        cssClass: 'btn-danger'
+                    }, {
+                        label: "Nope",
+                        result: 'no'
+                    }]);
+                msgbox.open().then(function (result) {
+                    if (!(result === 'yes'))
+                        return;
+                    var url = ('/room-temp/del-server/' + id + '/');
+                    json_request(url, function (data, status) {
+                        add_message('Successfully deleted server "' +
+                                    server.name + '".', 'success');
+                        that.update_servers();
+                    }, 'Delete server');
+                });
+            },
+        };
+
+        $scope.room_temp_mgr = new RoomTempMgr();
         // end of init()
     }
 }]);

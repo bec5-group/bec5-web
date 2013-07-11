@@ -46,6 +46,7 @@ def home(request):
             'oven-action-log': logged_in,
             'room-temp-log': logged_in,
             'oven-ctrl-log': logged_in,
+            'room-temp-edit-server': user.has_perm('room_temp.edit_server'),
         },
         'user_obj': to_user_obj(user)
     })

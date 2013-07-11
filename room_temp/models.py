@@ -1,10 +1,11 @@
 from __future__ import print_function
 from django.db import models
 from django.db.models.signals import post_save, post_delete
-from . import server
+from . import server as _server
 from threading import Lock
 from logger import bin_logger
 from django.conf import settings
+import threading
 
 class ControllerServer(models.Model):
     name = models.CharField(unique=True, max_length=1000)
@@ -93,8 +94,8 @@ def remove_server(device):
 class ServerWrapper(object):
     def __init__(self, server):
         self.server = server
-        self.__server = server.RoomTempServer((self.ctrl.addr, self.ctrl.port),
-                                              self)
+        self.__server = _server.RoomTempServer((server.addr, server.port),
+                                               self)
         self.__server.timeout = 10
         self.__values = {}
         self.__lock = threading.Lock()

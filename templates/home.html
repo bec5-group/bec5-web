@@ -132,7 +132,12 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
             {[ ctrl.name ]}
           </th>
           <th cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
-              cond-disp-type="table-cell"></th>
+              cond-disp-type="table-cell">
+            <button class="btn btn-mini"
+                    ng-click="TProfile.add_profile()">
+              <i class="icon-plus"></i> Add Profile
+            </button>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -163,10 +168,6 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
       </tbody>
     </table>
     <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon"/>
-    <button class="btn" cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
-            ng-click="TProfile.add_profile()">
-      <i class="icon-plus"></i> Add Profile
-    </button>
     <button class="btn btn-info"
             ng-class="{false: '', true: 'disabled'}[!TProfile.all[TProfile.cur]]"
             ng-click="TProfile.do_apply()">
@@ -191,8 +192,12 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
       <thead>
         <th>Controller</th>
         <th>Temperature</th>
-        <th cond-disp="permissions['oven-setconroller'] && show_advanced_actions"
-            cond-disp-type="table-cell"></th>
+        <th cond-disp="permissions['oven-setcontroller'] && show_advanced_actions"
+            cond-disp-type="table-cell">
+          <button class="btn btn-mini" ng-click="addController()">
+            <i class="icon-plus"></i> Add Controller
+          </button>
+        </th>
       </thead>
       <tbody>
         <tr ng-repeat="ctrl in TControls">
@@ -217,13 +222,6 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
       <div class="checkbox"
            style="display: inline-block;">
         <input type="checkbox" ng-model="auto_temp">Automatic Update</input>
-      </div>
-      <br/>
-      <div collapse="!show_advanced_actions">
-        <button class="btn" cond-disp="permissions['oven-setcontroller']"
-                ng-click="addController()">
-          <i class="icon-plus"></i> Add Controller
-        </button>
       </div>
     </div>
   </div>
@@ -326,6 +324,47 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
   </div>
   <div cond-disp="home_tabs.active == 'room-temp-log'">
     <!-- TODO -->
+    <div collapse="!show_advanced_actions"
+         cond-disp="permissions['room-temp-edit-server']">
+      <table class="table table-hover table-bordered">
+        <thead>
+          <tr class="text-info">
+            <th style="text-align: center;">
+              Servers Names
+            </th>
+            <th>
+              <button class="btn btn-mini"
+                      ng-click="room_temp_mgr.add_server()">
+                <i class="icon-plus"></i> Add Server
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="id in room_temp_mgr.server_ids">
+            <td>
+              <b>{[ room_temp_mgr.servers[id].name ]}</b>
+            </td>
+            <td>
+              <div>
+                <button class="btn btn-mini"
+                        ng-click="room_temp_mgr.set_cur_server(id)">
+                  <i class="icon-list"></i> List Devices
+                </button>
+                <button class="btn btn-mini"
+                        ng-click="room_temp_mgr.edit_server(id)">
+                  <i class="icon-edit"></i> Edit
+                </button>
+                <button class="btn btn-mini btn-danger cancel-button"
+                        ng-click="room_temp_mgr.remove_server(id)">
+                  <i class="icon-remove icon-white"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div style="margin: 10px;" cond-disp="has_advanced_actions"
        cond-disp-type="block">
@@ -384,4 +423,5 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
 <script src="/static/js/home.js"></script>
 <script src="/static/js/controller_edit.js"></script>
 <script src="/static/js/profile_edit.js"></script>
+<script src="/static/js/room_server_edit.js"></script>
 {% endblock %}

@@ -25,4 +25,7 @@ urlpatterns = patterns('',
 
     # oven controller
     url(r'^oven-control/', include('oven_control.urls')),
+
+    # room temperature
+    url(r'^room-temp/', include('room_temp.urls')),
 )

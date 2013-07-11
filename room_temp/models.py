@@ -68,7 +68,8 @@ def server_get_devices(server):
 
 @with_room_temp_lock
 def add_device(server, name, **kw):
-    return ControllerDevice.objects.create(server=server, name=name, **kw)
+    return ControllerDevice.objects.create(server=get_server.no_lock(server),
+                                           name=name, **kw)
 
 @with_room_temp_lock
 def get_devices():

@@ -326,11 +326,12 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
     <!-- TODO -->
     <div collapse="!show_advanced_actions"
          cond-disp="permissions['room-temp-edit-server']">
-      <table class="table table-hover table-bordered">
+      <table class="table table-hover table-bordered"
+             style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
         <thead>
           <tr class="text-info">
             <th style="text-align: center;">
-              Servers Names
+              Server Name
             </th>
             <th>
               <button class="btn btn-mini"
@@ -348,7 +349,7 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
             <td>
               <div>
                 <button class="btn btn-mini"
-                        ng-click="room_temp_mgr.set_cur_server(id)">
+                        ng-click="room_temp_mgr.set_current_server(id)">
                   <i class="icon-list"></i> List Devices
                 </button>
                 <button class="btn btn-mini"
@@ -357,6 +358,45 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
                 </button>
                 <button class="btn btn-mini btn-danger cancel-button"
                         ng-click="room_temp_mgr.remove_server(id)">
+                  <i class="icon-remove icon-white"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-hover table-bordered"
+             cond-disp="room_temp_mgr.cur_server != null"
+             style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
+        <thead>
+          <tr class="text-info">
+            <th style="text-align: center;">
+              Device Name
+            </th>
+            <th>
+              <button
+                 class="btn btn-mini"
+                 ng-click="room_temp_mgr.add_device(room_temp_mgr.cur_server)">
+                <i class="icon-plus"></i> Add Device
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="id in room_temp_mgr.server_devices[room_temp_mgr.cur_server]">
+            <td>
+              <b>
+                {[ room_temp_mgr.all_devices[id].name ]}
+              </b>
+            </td>
+            <td>
+              <div>
+                <button class="btn btn-mini"
+                        ng-click="room_temp_mgr.edit_device(id)">
+                  <i class="icon-edit"></i> Edit
+                </button>
+                <button class="btn btn-mini btn-danger cancel-button"
+                        ng-click="room_temp_mgr.remove_device(id)">
                   <i class="icon-remove icon-white"></i>
                 </button>
               </div>
@@ -424,4 +464,5 @@ ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
 <script src="/static/js/controller_edit.js"></script>
 <script src="/static/js/profile_edit.js"></script>
 <script src="/static/js/room_server_edit.js"></script>
+<script src="/static/js/room_device_edit.js"></script>
 {% endblock %}

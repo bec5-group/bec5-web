@@ -70,9 +70,12 @@ def get_devices(request):
     res = {}
     for device in models.get_devices.no_lock():
         sid = device.server.id
-        sobj = res.get(sid, {})
-        sobj[device.id] = device.name
-        res[sid] = sobj
+        slist = res.get(sid, [])
+        slist.append({
+            'id': device.id,
+            'name': device.name
+        })
+        res[sid] = slist
     return res
 
 @return_jsonp
@@ -137,7 +140,7 @@ def edit_device(request, did=None):
     for key in ('name', 'unit', 'order'):
         if key in request.GET:
             setattr(device, key, request.GET[key])
-    server.save()
+    device.save()
     return {
         'id': device.id,
         'name': device.name,

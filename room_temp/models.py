@@ -79,11 +79,11 @@ def get_devices():
 @with_room_temp_lock
 def get_device(device):
     if not isinstance(device, ControllerDevice):
-        return ControllerServer.objects.get(id=device)
+        return ControllerDevice.objects.get(id=device)
     return device
 
 @with_room_temp_lock
-def remove_server(device):
+def remove_device(device):
     try:
         device = get_device.no_lock(device)
     except:

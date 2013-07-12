@@ -585,6 +585,110 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 this.servers = {};
                 this.update_servers();
                 this.cur_server = null;
+                this.server_devices = {};
+                this.all_devices = {};
+                this.update_devices();
+            },
+            show_device_dialog: function (values, cb) {
+                values.server_ids = this.server_ids;
+                values.servers = this.servers;
+                var d = $dialog.dialog({
+                    resolve: {
+                        value: function () {
+                            return values;
+                        }
+                    }
+                });
+                d.open('/static/html/room_device_edit.html',
+                       'RoomDeviceEditCtrl').then(function (res) {
+                           if (res) {
+                               for (var key in ['server_ids', 'servers']) {
+                                   delete res[key];
+                               }
+                           }
+                           cb(res);
+                       });
+            },
+            add_device: function () {
+                var that = this;
+                this.show_device_dialog({
+                    order: 0.0,
+                    unit: "\xB0C",
+                    server: this.cur_server
+                }, function (res) {
+                    if (!res)
+                        return;
+                    var url = '/room-temp/add-device/?' + $.param(res);
+                    json_request(url, function (data, status) {
+                        add_message('Successfully added device "' +
+                                    data.name + '".', 'success');
+                        that.update_devices();
+                    }, 'Add Server');
+                });
+            },
+            edit_device: function (id) {
+                var url = '/room-temp/get-device-setting/' + id + '/';
+                var that = this;
+                json_request(url, function (data, status) {
+                    that.show_device_dialog(data, function (res) {
+                        if (!res)
+                            return;
+                        if ('id' in res)
+                            delete res.id;
+                        var url = '/room-temp/edit-device/' + id;
+                        url += '/?' + $.param(res);
+                        json_request(url, function (data, status) {
+                            add_message('Successfully edited device "' +
+                                        data.name + '".', 'success');
+                            that.update_devices();
+                        }, 'Edit device');
+                    });
+                }, "Get device setting.");
+            },
+            remove_device: function (id) {
+                var that = this;
+                var server = this.all_devices[id];
+                var msgbox = $dialog.messageBox(
+                    'Delete Device',
+                    'Do you REALLY want to delete device' + server.name + '?',
+                    [{
+                        label: "Yes, I'm sure",
+                        result: 'yes',
+                        cssClass: 'btn-danger'
+                    }, {
+                        label: "Nope",
+                        result: 'no'
+                    }]);
+                msgbox.open().then(function (result) {
+                    if (!(result === 'yes'))
+                        return;
+                    var url = ('/room-temp/del-device/' + id + '/');
+                    json_request(url, function (data, status) {
+                        add_message('Successfully deleted device "' +
+                                    server.name + '".', 'success');
+                        that.update_devices();
+                    }, 'Delete device');
+                });
+            },
+            update_devices: function () {
+                var that = this;
+                json_request('/room-temp/get-devices/', function (data, status) {
+                    that.server_devices = {};
+                    for (var id in data) {
+                        if (!data.hasOwnProperty(id))
+                            continue;
+                        var devices = data[id];
+                        var ids = [];
+                        that.server_devices[id] = ids;
+                        for (var j in devices) {
+                            if (!devices.hasOwnProperty(j))
+                                continue;
+                            var device = devices[j];
+                            ids.push(device.id);
+                            that.all_devices[device.id] = device;
+                        }
+                    }
+                }, "Get devices list.");
             },
             update_servers: function () {
                 var that = this;
@@ -604,10 +708,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 }, "Get servers list.");
             },
             set_current_server: function (id) {
-                that.cur_server = id;
-            },
-            update_devices: function () {
-                // TODO
+                this.cur_server = id;
             },
             show_server_dialog: function (values, cb) {
                 var d = $dialog.dialog({
@@ -633,6 +734,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                         add_message('Successfully added server "' +
                                     data.name + '".', 'success');
                         that.update_servers();
+                        that.update_devices();
                     }, 'Add Server');
                 });
             },
@@ -651,6 +753,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                             add_message('Successfully edited server "' +
                                         data.name + '".', 'success');
                             that.update_servers();
+                            that.update_devices();
                         }, 'Edit server');
                     });
                 }, "Get server setting.");
@@ -677,6 +780,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                         add_message('Successfully deleted server "' +
                                     server.name + '".', 'success');
                         that.update_servers();
+                        that.update_devices();
                     }, 'Delete server');
                 });
             },

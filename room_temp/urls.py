@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     url(r'^del-server/(?P<sid>[^/]*)/$', views.del_server),
 
     url(r'^get-devices/$', views.get_devices),
-    url(r'^get-device-setting/(?P<did>[^/]*)/$', views.get_server_setting),
+    url(r'^get-device-setting/(?P<did>[^/]*)/$', views.get_device_setting),
 
     url(r'^add-device/$', views.add_device),
     url(r'^edit-device/(?P<did>[^/]*)/$', views.edit_device),

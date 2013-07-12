@@ -50,13 +50,14 @@ class FloatDateLogger(BinDateLogger):
     def __get_range_it_limited(self, _from, to, max_count):
         if _from >= to:
             return
-        dt = (to - _from) * 0.8 / max_count
         base_it = self.get_records_it(_from, to)
         try:
             last_t, v = next(base_it)
         except:
             return
+        _from = max(last_t, _from)
         yield last_t, v
+        dt = (to - _from) * 0.8 / max_count
         cur_ts = []
         cur_vs = []
         for t, v in base_it:

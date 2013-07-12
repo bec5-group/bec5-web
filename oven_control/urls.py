@@ -29,4 +29,5 @@ urlpatterns = patterns('',
 
     url(r'^get-errors/$', views.get_errors),
     url(r'^get-logs/$', views.get_logs),
+    url(r'^get-temp-logs/$', views.get_temp_logs),
 )

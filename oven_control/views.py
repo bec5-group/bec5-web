@@ -1,6 +1,7 @@
 from json_view import JSONPError, return_jsonp, auth_jsonp
 from . import models
 from .controller import ctrl_logger
+import time
 
 @return_jsonp
 def get_ovens(request):
@@ -203,7 +204,7 @@ def get_logs(request):
     max_count = 1000
     GET = request.GET
     logs = ctrl_logger.get_records(GET.get('from'), GET.get('to'),
-                              max_count + 1)
+                                   max_count + 1)
     if len(logs) > max_count:
         return {
             'logs': logs[:max_count],
@@ -213,3 +214,17 @@ def get_logs(request):
         'logs': logs,
         'is_all': True
     }
+
+@return_jsonp
+@auth_jsonp
+def get_temp_logs(request):
+    max_count = 1000
+    GET = request.GET
+    loggers = models.controller_manager.get_loggers()
+    try:
+        _to = int(float(GET['to']))
+    except:
+        _to = time.time()
+    _from = max(int(float(GET['from'])), _to - 31622400) # one year
+    return dict((ctrl, loggers[int(ctrl)].get_range(_from, _to, max_count))
+                for ctrl in GET.getlist('ctrl[]'))

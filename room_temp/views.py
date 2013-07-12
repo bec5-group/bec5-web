@@ -154,3 +154,21 @@ def _del_device_logger(request, did=None):
 @auth_jsonp('room_temp.edit_server', log=_del_device_logger)
 def del_device(request, did=None):
     return models.remove_device(did)
+
+def _get_logger(loggers, name):
+    sid, did = name.split('.')
+    return loggers[sid][did]
+
+@return_jsonp
+@auth_jsonp
+def get_value_logs(request):
+    max_count = 1000
+    GET = request.GET
+    loggers = models.server_manager.get_loggers()
+    try:
+        _to = int(float(GET['to']))
+    except:
+        _to = time.time()
+    _from = max(int(float(GET['from'])), _to - 31622400) # one year
+    return dict((dev, _get_logger(loggers, dev).get_range(_from, _to, max_count))
+                for dev in GET.getlist('dev[]'))

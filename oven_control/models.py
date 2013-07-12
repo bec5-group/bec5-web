@@ -170,8 +170,8 @@ class ControllerWrapper(object):
                                             self)
         self.__ctrl.timeout = 10
         log_name_fmt = ('temp_log_%s' % self.ctrl.id) + '-%Y-%m-%d.log'
-        self.__logger = bin_logger.BinDateLogger(log_name_fmt,
-                                                 settings.DATA_LOG_DIR, '<Qd')
+        self.__logger = bin_logger.FloatDateLogger(log_name_fmt,
+                                                   settings.DATA_LOG_DIR)
         self.__logger.opened.connect(self.__on_log_open)
     def get_errors(self):
         return self.__ctrl.get_errors()
@@ -245,6 +245,9 @@ class ControllerWrapper(object):
     def set_temp(self, value):
         self.__set_temp = to_finite(value)
         self.__ctrl.activate()
+    @property
+    def logger(self):
+        return self.__logger
 
 class ControllerManager(object):
     def __init__(self):
@@ -312,6 +315,8 @@ class ControllerManager(object):
             'temps': dict((cid, fix_non_finite(ctrl.set_temp)) for (cid, ctrl)
                           in self.__ctrls.items())
         }
+    def get_loggers(self):
+        return dict((cid, ctrl.logger) for (cid, ctrl) in self.__ctrls.items())
 
 if not getattr(__import__('__main__'), '_django_syncdb', False):
     controller_manager = ControllerManager()

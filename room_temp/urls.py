@@ -15,4 +15,6 @@ urlpatterns = patterns('',
     url(r'^add-device/$', views.add_device),
     url(r'^edit-device/(?P<did>[^/]*)/$', views.edit_device),
     url(r'^del-device/(?P<did>[^/]*)/$', views.del_device),
+
+    url(r'^get-value-logs/$', views.get_value_logs),
 )

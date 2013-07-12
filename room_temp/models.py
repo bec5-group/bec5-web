@@ -115,9 +115,8 @@ class ServerWrapper(object):
                     log_name_fmt = self.__get_dev_log_fmt(dev_id)
                     v = {
                         'v': value,
-                        'l': bin_logger.BinDateLogger(log_name_fmt,
-                                                      settings.DATA_LOG_DIR,
-                                                      '<Qd')
+                        'l': bin_logger.FloatDateLogger(log_name_fmt,
+                                                        settings.DATA_LOG_DIR)
                     }
                 new_values[dev_id] = v
                 if value is None:

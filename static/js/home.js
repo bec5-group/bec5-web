@@ -75,18 +75,8 @@ becv_app.directive('condDisp', function () {
         }
     };
 });
-// Array Remove - By John Resig (MIT Licensed)
-Array.prototype.remove = function(from, to) {
-    if (from)
-        from = parseInt(from);
-    if (to)
-        to = parseInt(to);
-    var rest = this.slice((to || from) + 1 || this.length);
-    this.length = from < 0 ? this.length + from : from;
-    return this.push.apply(this, rest);
-};
 
-becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', function ($scope, $http, $dialog, $location) {
+becv_app.controller('HomePageCtrl', ['$scope', '$dialog', '$location', 'msgMgr', 'jsonReq', 'roomTempMgr', 'logMgr', 'popupForm', function ($scope, $dialog, $location, msgMgr, jsonReq, roomTempMgr, logMgr, popupForm) {
     $scope.init = function (permissions, user) {
         $scope.show_advanced_actions = false;
         $scope.condVar = function (cond, t, f) {
@@ -179,55 +169,12 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             }
         }
 
-        $scope.messages = [];
-        $scope.close_message = function (id) {
-            for (var i in $scope.messages) {
-                if (!$scope.messages.hasOwnProperty(i))
-                    continue;
-                if ($scope.messages[i].id == id) {
-                    $scope.messages.remove(i);
-                    break;
-                }
-            }
+        // message
+        $scope.msgMgr = msgMgr;
+        $scope.has_error = function () {
+            return (!$.isEmptyObject($scope.TProfile.cur_error) ||
+                    msgMgr.has_error());
         };
-        var message_id_cnt = 0;
-        function add_message(msg, type) {
-            if (!msg)
-                return;
-            type = type || "";
-            if ($scope.messages.length >= 5)
-                $scope.messages.length = 4;
-            var id = message_id_cnt++;
-            $scope.messages.unshift({
-                id: id,
-                message: msg,
-                type: type,
-                date: new Date()
-            });
-            return id;
-        };
-        $scope.message_has_error = function () {
-            for (var i in $scope.messages) {
-                if (!$scope.messages.hasOwnProperty(i))
-                    continue;
-                if ($scope.messages[i].type == 'error') {
-                    return true;
-                }
-            }
-            return !$.isEmptyObject($scope.TProfile.cur_error);
-        };
-
-        function json_request(url, callback, error_name, err_cb) {
-            $http.get(url, {
-                cache: false,
-                timeout: 10000
-            }).success(callback).error(function (data, status) {
-                add_message(error_name + " error: " + status, 'error');
-                if (err_cb) {
-                    err_cb(data, status);
-                }
-            });
-        }
 
         $scope.TControls = [];
         $scope.auto_temp = false;
@@ -235,19 +182,19 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
         $scope.TValues = {};
 
         function get_ovens() {
-            json_request('/oven-control/get-ovens/', function (data, status) {
+            jsonReq('/oven-control/get-ovens/', function (data, status) {
                 $scope.TControls = data;
             }, "Get ovens list");
         }
 
         function get_profiles() {
-            json_request('/oven-control/get-profiles/', function (data, status) {
+            jsonReq('/oven-control/get-profiles/', function (data, status) {
                 $scope.TProfile.set_profiles(data);
             }, "Get profile list");
         }
 
         function update_temps() {
-            json_request('/oven-control/get-temps/', function (data, status) {
+            jsonReq('/oven-control/get-temps/', function (data, status) {
                 $scope.TValues = data;
             }, "Get temperatures");
         }
@@ -283,7 +230,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             },
             update_cur_setpoint: function () {
                 var that = this;
-                json_request('/oven-control/get-setpoint/', function (data, status) {
+                jsonReq('/oven-control/get-setpoint/', function (data, status) {
                     that.cur_setpoint = data;
                     if (!that.cur_changed || !that.cur) {
                         that.cur = data.id;
@@ -294,7 +241,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 if (!$scope.user.username)
                     return;
                 var that = this;
-                json_request('/oven-control/get-errors/', function (data, status) {
+                jsonReq('/oven-control/get-errors/', function (data, status) {
                     that.cur_error = data;
                 }, "Get current error.");
             },
@@ -316,8 +263,8 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                     var that = this;
                     var url = ('/oven-control/set-temps/?' +
                                $.param(this.edited_setpoint));
-                    json_request(url, function (data, status) {
-                        add_message('Successfully changed setpoint', 'success');
+                    jsonReq(url, function (data, status) {
+                        msgMgr.add('Successfully changed setpoint', 'success');
                         that.update_cur_setpoint();
                         that.editing_setpoint = false;
                     }, 'Change Setpoint');
@@ -345,31 +292,47 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 var cur = this.all[this.cur].name;
                 this.cur_changed = false;
                 var url = '/oven-control/set-profile/' + this.cur + '/';
-                json_request(url, function (data, status) {
+                jsonReq(url, function (data, status) {
                     that.status = 2;
-                    add_message('Successfully set profile to "' +
-                                cur + '".', 'success');
+                    msgMgr.add('Successfully set profile to "' +
+                               cur + '".', 'success');
                     that.update_cur_setpoint();
                 }, 'Set profile to "' + cur + '"', function (data, status) {
                     that.status = 3;
                 });
             },
             show_profile_dialog: function (values, cb) {
-                var d = $dialog.dialog({
-                    resolve: {
-                        value: function () {
-                            return values;
-                        }
-                    }
+                var inputs = [{
+                    id: 'name',
+                    name: 'Name',
+                    longname: 'Profile Name',
+                    required: true
+                }];
+                for (var i in $scope.TControls) {
+                    if (!$scope.TControls.hasOwnProperty(i))
+                        continue;
+                    var ctrl = $scope.TControls[i];
+                    inputs.push({
+                        id: 'temps.' + ctrl.id,
+                        name: ctrl.name,
+                        longname: 'Temperature for ' + ctrl.name,
+                        type: 'number',
+                    });
+                }
+                inputs.push({
+                    id: 'order',
+                    name: 'Order',
+                    longname: 'Profile Order',
+                    type: 'number',
+                    advanced: true
                 });
-                d.open('/static/html/profile_edit.html',
-                       'ProfileEditCtrl').then(cb);
+
+                var f = new popupForm('Profile Setting', inputs, values);
+                f.open().then(cb);
             },
             add_profile: function () {
                 this.show_profile_dialog({
                     order: 0.0,
-                    ctrls: $scope.TControls,
-                    temps: {}
                 }, function (res) {
                     if (!res)
                         return;
@@ -377,9 +340,9 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                     if (!(res.order === undefined))
                         url += '/' + res.order;
                     url += '/?' + $.param(res.temps);
-                    json_request(url, function (data, status) {
-                        add_message('Successfully added profile "' +
-                                    data.name + '".', 'success');
+                    jsonReq(url, function (data, status) {
+                        msgMgr.add('Successfully added profile "' +
+                                   data.name + '".', 'success');
                         get_profiles();
                     }, 'Add Profile');
                 });
@@ -387,8 +350,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             edit_profile: function (id) {
                 var url = '/oven-control/get-profile-setting/' + id + '/';
                 var that = this;
-                json_request(url, function (data, status) {
-                    data.ctrls = $scope.TControls;
+                jsonReq(url, function (data, status) {
                     that.show_profile_dialog(data, function (res) {
                         if (!res)
                             return;
@@ -396,9 +358,9 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                         if (!(res.order === undefined))
                             url += '/' + res.order;
                         url += '/?' + $.param(res.temps);
-                        json_request(url, function (data, status) {
-                            add_message('Successfully changed profile "' +
-                                        data.name + '".', 'success');
+                        jsonReq(url, function (data, status) {
+                            msgMgr.add('Successfully changed profile "' +
+                                       data.name + '".', 'success');
                             get_profiles();
                         }, 'Edit profile');
                     });
@@ -422,9 +384,9 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                     if (!(result === 'yes'))
                         return;
                     var url = ('/oven-control/del-profile/' + profile.id + '/');
-                    json_request(url, function (data, status) {
-                        add_message('Successfully deleted profile "' +
-                                    profile.name + '".', 'success');
+                    jsonReq(url, function (data, status) {
+                        msgMgr.add('Successfully deleted profile "' +
+                                   profile.name + '".', 'success');
                         get_profiles();
                     }, 'Delete profile');
                 });
@@ -435,28 +397,61 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
         $scope.log_collapsed = false;
 
         function showControllerDialog(values, cb) {
-            var d = $dialog.dialog({
-                resolve: {
-                    value: function () {
-                        return values;
-                    }
-                }
-            });
-            d.open('/static/html/controller_edit.html',
-                   'CtrlEditCtrl').then(cb);
+            var inputs = [{
+                id: 'name',
+                name: 'Name',
+                longname: 'Controller Name',
+                required: true
+            }, {
+                id: 'addr',
+                name: 'Address',
+                longname: 'Controller Address',
+                required: true
+            }, {
+                type: 'number',
+                id: 'port',
+                name: 'Port',
+                longname: 'Controller Port',
+                min: 1,
+                step: 1,
+                max: 65535,
+                required: true
+            }, {
+                type: 'number',
+                id: 'number',
+                name: 'No.',
+                longname: 'Controller No.',
+                min: 1,
+                step: 1,
+                required: true
+            }, {
+                type: 'number',
+                id: 'order',
+                name: 'Order',
+                longname: 'Controller Order',
+                advanced: true
+            }, {
+                type: 'number',
+                id: 'default_temp',
+                name: 'Default Temperature',
+                longname: 'Controller Default Temperature',
+                advanced: true
+            }];
+            var f = new popupForm('Controller Setting', inputs, values);
+            f.open().then(cb);
         }
 
         $scope.setController = function (id) {
             var url = '/oven-control/get-ctrl-setting/' + id + '/';
-            json_request(url, function (data, status) {
+            jsonReq(url, function (data, status) {
                 showControllerDialog(data, function (res) {
                     if (!res)
                         return;
                     var url = ('/oven-control/set-controller/' + id + '/?' +
                                $.param(res));
-                    json_request(url, function (data, status) {
-                        add_message('Successfully changed controller "' +
-                                    data.name + '".', 'success');
+                    jsonReq(url, function (data, status) {
+                        msgMgr.add('Successfully changed controller "' +
+                                   data.name + '".', 'success');
                         get_ovens();
                         update_temps();
                     }, 'Change controller Settings');
@@ -474,9 +469,9 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 if (!res)
                     return;
                 var url = '/oven-control/add-controller/?' + $.param(res);
-                json_request(url, function (data, status) {
-                    add_message('Successfully added controller "' +
-                                data.name + '".', 'success');
+                jsonReq(url, function (data, status) {
+                    msgMgr.add('Successfully added controller "' +
+                               data.name + '".', 'success');
                     get_ovens();
                     update_temps();
                 }, 'Add Controller');
@@ -498,9 +493,9 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                 if (!(result === 'yes'))
                     return;
                 var url = ('/oven-control/del-controller/' + ctrl.id + '/');
-                json_request(url, function (data, status) {
-                    add_message('Successfully deleted controller "' +
-                                ctrl.name + '".', 'success');
+                jsonReq(url, function (data, status) {
+                    msgMgr.add('Successfully deleted controller "' +
+                               ctrl.name + '".', 'success');
                     get_ovens();
                     update_temps();
                 }, 'Delete controller');
@@ -527,39 +522,9 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             return JSON.stringify(o, null, ' ');
         };
 
-
-        function LogManager() {
-            this._init.apply(this, arguments);
-        }
-
-        LogManager.prototype = {
-            update_logs: function (from, to) {
-                var that = this;
-                this._cur_id++;
-                var cur_id = this._cur_id;
-                var _url = this._url + '?' + $.param({
-                    from: from,
-                    to: to
-                });
-                json_request(_url, function (data, status) {
-                    if (that._cur_id != cur_id)
-                        return
-                    that.cur = data.logs;
-                    that.is_all = data.is_all;
-                }, "Get " + this._name + " Logs.");
-            },
-            _init: function (_url, _name) {
-                this._url = _url;
-                this._name = _name;
-                this.cur = [];
-                this.is_all = true;
-                this._cur_id = 0;
-            }
-        };
-
-        $scope.TActionLog = new LogManager('/json-view/get-logs/', "Action");
-        $scope.ControllerLog = new LogManager('/oven-control/get-logs/',
-                                              "Controller");
+        $scope.TActionLog = new logMgr('/json-view/get-logs/', "Action");
+        $scope.ControllerLog = new logMgr('/oven-control/get-logs/',
+                                          "Controller");
 
         $('.becv-date-time-picker').datetimepicker();
         var auth_log_from_picker = $('#action-log-from').data('datetimepicker');
@@ -571,7 +536,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                           new Date()) / 1000;
             var _to = +(auth_log_to_picker.getLocalDate() ||
                         new Date()) / 1000;
-            $scope.TActionLog.update_logs(_from, _to);
+            $scope.TActionLog.update(_from, _to);
         };
 
         var ctrl_log_from_picker = $('#ctrl-log-from').data('datetimepicker');
@@ -583,7 +548,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
                           new Date()) / 1000;
             var _to = +(ctrl_log_to_picker.getLocalDate() ||
                         new Date()) / 1000;
-            $scope.ControllerLog.update_logs(_from, _to);
+            $scope.ControllerLog.update(_from, _to);
         };
 
         $scope.addr_to_str = function (addr) {
@@ -592,218 +557,7 @@ becv_app.controller('HomePageCtrl', ['$scope', '$http', '$dialog', '$location', 
             return addr.join(':');
         };
 
-        function RoomTempMgr() {
-            this._init.apply(this, arguments);
-        }
-
-        RoomTempMgr.prototype = {
-            _init: function () {
-                this.server_ids = [];
-                this.servers = {};
-                this.update_servers();
-                this.cur_server = null;
-                this.server_devices = {};
-                this.all_devices = {};
-                this.update_devices();
-            },
-            show_device_dialog: function (values, cb) {
-                values.server_ids = this.server_ids;
-                values.servers = this.servers;
-                var d = $dialog.dialog({
-                    resolve: {
-                        value: function () {
-                            return values;
-                        }
-                    }
-                });
-                d.open('/static/html/room_device_edit.html',
-                       'RoomDeviceEditCtrl').then(function (res) {
-                           if (res) {
-                               for (var key in ['server_ids', 'servers']) {
-                                   delete res[key];
-                               }
-                           }
-                           cb(res);
-                       });
-            },
-            add_device: function () {
-                var that = this;
-                this.show_device_dialog({
-                    order: 0.0,
-                    unit: "\xB0C",
-                    server: this.cur_server
-                }, function (res) {
-                    if (!res)
-                        return;
-                    var url = '/room-temp/add-device/?' + $.param(res);
-                    json_request(url, function (data, status) {
-                        add_message('Successfully added device "' +
-                                    data.name + '".', 'success');
-                        that.update_devices();
-                    }, 'Add Server');
-                });
-            },
-            edit_device: function (id) {
-                var url = '/room-temp/get-device-setting/' + id + '/';
-                var that = this;
-                json_request(url, function (data, status) {
-                    that.show_device_dialog(data, function (res) {
-                        if (!res)
-                            return;
-                        if ('id' in res)
-                            delete res.id;
-                        var url = '/room-temp/edit-device/' + id;
-                        url += '/?' + $.param(res);
-                        json_request(url, function (data, status) {
-                            add_message('Successfully edited device "' +
-                                        data.name + '".', 'success');
-                            that.update_devices();
-                        }, 'Edit device');
-                    });
-                }, "Get device setting.");
-            },
-            remove_device: function (id) {
-                var that = this;
-                var server = this.all_devices[id];
-                var msgbox = $dialog.messageBox(
-                    'Delete Device',
-                    'Do you REALLY want to delete device' + server.name + '?',
-                    [{
-                        label: "Yes, I'm sure",
-                        result: 'yes',
-                        cssClass: 'btn-danger'
-                    }, {
-                        label: "Nope",
-                        result: 'no'
-                    }]);
-                msgbox.open().then(function (result) {
-                    if (!(result === 'yes'))
-                        return;
-                    var url = ('/room-temp/del-device/' + id + '/');
-                    json_request(url, function (data, status) {
-                        add_message('Successfully deleted device "' +
-                                    server.name + '".', 'success');
-                        that.update_devices();
-                    }, 'Delete device');
-                });
-            },
-            update_devices: function () {
-                var that = this;
-                json_request('/room-temp/get-devices/', function (data, status) {
-                    that.server_devices = {};
-                    for (var id in data) {
-                        if (!data.hasOwnProperty(id))
-                            continue;
-                        var devices = data[id];
-                        var ids = [];
-                        that.server_devices[id] = ids;
-                        for (var j in devices) {
-                            if (!devices.hasOwnProperty(j))
-                                continue;
-                            var device = devices[j];
-                            ids.push(device.id);
-                            that.all_devices[device.id] = device;
-                        }
-                    }
-                }, "Get devices list.");
-            },
-            update_servers: function () {
-                var that = this;
-                json_request('/room-temp/get-servers/', function (data, status) {
-                    that.server_ids = [];
-                    that.servers = {};
-                    for (var i in data) {
-                        if (!data.hasOwnProperty(i))
-                            continue;
-                        var server = data[i];
-                        that.server_ids.push(server.id);
-                        that.servers[server.id] = server;
-                        if (!(that.cur_server in that.servers)) {
-                            that.cur_server = null;
-                        }
-                    }
-                }, "Get servers list.");
-            },
-            set_current_server: function (id) {
-                this.cur_server = id;
-            },
-            show_server_dialog: function (values, cb) {
-                var d = $dialog.dialog({
-                    resolve: {
-                        value: function () {
-                            return values;
-                        }
-                    }
-                });
-                d.open('/static/html/room_server_edit.html',
-                       'RoomServerEditCtrl').then(cb);
-            },
-            add_server: function () {
-                var that = this;
-                this.show_server_dialog({
-                    order: 0.0,
-                    port: 23,
-                }, function (res) {
-                    if (!res)
-                        return;
-                    var url = '/room-temp/add-server/?' + $.param(res);
-                    json_request(url, function (data, status) {
-                        add_message('Successfully added server "' +
-                                    data.name + '".', 'success');
-                        that.update_servers();
-                        that.update_devices();
-                    }, 'Add Server');
-                });
-            },
-            edit_server: function (id) {
-                var url = '/room-temp/get-server-setting/' + id + '/';
-                var that = this;
-                json_request(url, function (data, status) {
-                    that.show_server_dialog(data, function (res) {
-                        if (!res)
-                            return;
-                        if ('id' in res)
-                            delete res.id;
-                        var url = '/room-temp/edit-server/' + id;
-                        url += '/?' + $.param(res);
-                        json_request(url, function (data, status) {
-                            add_message('Successfully edited server "' +
-                                        data.name + '".', 'success');
-                            that.update_servers();
-                            that.update_devices();
-                        }, 'Edit server');
-                    });
-                }, "Get server setting.");
-            },
-            remove_server: function (id) {
-                var that = this;
-                var server = this.servers[id];
-                var msgbox = $dialog.messageBox(
-                    'Delete Server',
-                    'Do you REALLY want to delete server' + server.name + '?',
-                    [{
-                        label: "Yes, I'm sure",
-                        result: 'yes',
-                        cssClass: 'btn-danger'
-                    }, {
-                        label: "Nope",
-                        result: 'no'
-                    }]);
-                msgbox.open().then(function (result) {
-                    if (!(result === 'yes'))
-                        return;
-                    var url = ('/room-temp/del-server/' + id + '/');
-                    json_request(url, function (data, status) {
-                        add_message('Successfully deleted server "' +
-                                    server.name + '".', 'success');
-                        that.update_servers();
-                        that.update_devices();
-                    }, 'Delete server');
-                });
-            },
-        };
-
-        $scope.room_temp_mgr = new RoomTempMgr();
+        $scope.room_temp_mgr = roomTempMgr;
         // end of init()
     }
 }]);

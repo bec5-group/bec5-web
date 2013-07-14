@@ -1,0 +1,48 @@
+<form class="form-horizontal text-center" name="popup_form">
+  <legend class="text-center">
+    {[ form.name ]}
+    <button class="close" style="padding: 10px; float: right;"
+            ng-click="form.close()" formnovalidate>
+      &times;
+    </button>
+  </legend>
+  <div style="display: inline-block; margin-left: -100px">
+    <div ng-repeat="input in form.inputs" class="control-group"
+         collapse="input.advanced && !form.show_advanced"
+         style="{[ {false: 'margin: 0'}[!(input.advanced && !form.show_advanced)] ]}">
+      <label class="control-label" for="ctrl-name">{[ input.name ]}</label>
+      <div class="controls" ng-switch="input.type"
+           ng-hide="input.advanced && !form.show_advanced">
+        <input ng-switch-when="number"
+               ng-model="form.value[input.id]" type="number"
+               placeholder="{[ input.longname || input.name ]}"
+               name="{[ input.id ]}" ng-required="input.required"
+               class="input-medium" step="{[ input.step || 'any' ]}"
+               min="{[ input.min || '-Infinity' ]}"
+               max="{[ input.max || 'Infinity' ]}"/>
+        <select ng-switch-when="select" class="input-medium"
+                ng-model="form.value[input.id]" ng-required="input.required"
+                name="{[ input.id ]}"
+                ng-options="opt.id as opt.name for opt in input.opts">
+        </select>
+        <input ng-switch-default type="text" class="input-medium"
+               name="{[ input.id ]}"
+               placeholder="{[ input.longname || input.name ]}"
+               ng-required="input.required" ng-model="form.value[input.id]"/>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="controls">
+        <button class="btn btn-small btn-primary" ng-click="form.submit()">
+          <i class="icon-ok icon-white"></i> OK
+        </button>
+        <button class="btn btn-small" ng-show="form.has_advanced"
+                formnovalidate
+                ng-click="form.show_advanced = !form.show_advanced">
+          {[ {true: 'Show Advanced', false: 'Hide Advanced'}[!form.show_advanced] ]}
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

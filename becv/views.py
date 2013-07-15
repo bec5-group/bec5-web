@@ -16,18 +16,10 @@
 
 from __future__ import print_function, division
 
-from django.http import HttpResponse
-from django.contrib.auth.views import redirect_to_login
 from django.shortcuts import render
 from django.contrib.auth import views as auth_views
 
-import room_temp.models as room_models
-from room_temp.server import server_logger
-
 from becv_utils import print_except
-import json
-
-from json_view import return_jsonp, auth_jsonp
 
 _login = auth_views.login
 

@@ -34,7 +34,7 @@ class ThreadHelper(object):
     def __init__(self, parent):
         self.__parent = weakref.ref(parent)
         self.__event = threading.Event()
-        self.__thread = threading.Thread(target=self.__run)
+        self.__thread = threading.Thread(target=self.__run, daemon=True)
         self.__timeout = 1
         self.__running = False
     def activate(self):

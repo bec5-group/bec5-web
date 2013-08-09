@@ -14,29 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-from django.db import models, DatabaseError
-from django.db.models.signals import post_save, post_delete
-from . import controller
-from logger import bin_logger
-from django.conf import settings
-from django.utils import timezone as dj_tz
-import datetime
-import time
+from django.db import models
+from threading import Lock
 import json
-import math
 
-def to_finite(s):
-    val = float(s)
-    if math.isnan(val) or math.isinf(val):
-        raise ValueError(val)
-    return val
-
-def fix_non_finite(s):
-    try:
-        return to_finite(s)
-    except:
-        return 0.0
+from becv_utils.math import to_finite
 
 class TempController(models.Model):
     name = models.CharField(unique=True, max_length=1000)
@@ -76,7 +58,6 @@ class TempSetPoint(models.Model):
     class Meta:
         ordering = ['control__order', 'control__default_temp', 'control__name']
 
-from threading import Lock
 __oven_control_model_lock = Lock()
 
 def with_oven_control_lock(func):
@@ -168,171 +149,3 @@ def remove_profile(profile):
         return False
     profile.delete()
     return True
-
-class ControllerWrapper(object):
-    def __init__(self, ctrl):
-        self.ctrl = ctrl
-        self.__temp = None
-        self.__set_temp = None
-        self.real_set_temp = None
-        self.__json_fname = None
-        # create a controller for every wrapper
-        # this is probably not the most elegant way but I'm too lazy to
-        # write a better one (create a controller for every address/ip).
-        # It will also be better to handle device number etc in wrapper
-        # and use the controller object just for sending and recieving
-        # messages
-        self.__ctrl = controller.Controller((self.ctrl.addr, self.ctrl.port),
-                                            self)
-        self.__ctrl.timeout = 10
-        log_name_fmt = ('temp_log_%s' % self.ctrl.id) + '-%Y-%m-%d.log'
-        self.__logger = bin_logger.FloatDateLogger(log_name_fmt,
-                                                   settings.DATA_LOG_DIR)
-        self.__logger.opened.connect(self.__on_log_open)
-    def get_errors(self):
-        return self.__ctrl.get_errors()
-    def __on_log_open(self, sender=None, name=None, **kwargs):
-        if name.endswith('.log'):
-            name = name[:-4]
-        name = name + '.json'
-        self.__json_fname = name
-        try:
-            self.__write_setting()
-        except:
-            pass
-    def __get_old_setting(self, fname, setting):
-        try:
-            with open(fname) as fh:
-                saved_settings = json.load(fh)
-            last_setting = saved_settings[-1]
-            for k, v in setting.items():
-                if last_setting[k] != v:
-                    return saved_settings
-            return
-        except:
-            return []
-    def __write_setting(self):
-        fname = self.__json_fname
-        ctrl = self.ctrl
-        setting = {
-            'name': ctrl.name,
-            'addr': ctrl.addr,
-            'port': ctrl.port,
-            'number': ctrl.number
-        }
-        old_setting = self.__get_old_setting(fname, setting)
-        if old_setting is None:
-            return
-        if settings.USE_TZ:
-            cur_tz = dj_tz.get_current_timezone()
-            timestr = dj_tz.now().astimezone(cur_tz).strftime(
-                '%Y-%m-%d_%H:%M:%S@%z')
-        else:
-            timestr = dj_tz.now().strftime('%Y-%m-%d_%H:%M:%S')
-        setting['time'] = timestr
-        setting['time_stamp'] = time.time()
-        old_setting.append(setting)
-        with open(fname, 'w') as fh:
-            ctrl = self.ctrl
-            content = json.dumps(old_setting, indent=2)
-            fh.write(content)
-    @property
-    def temp(self):
-        return self.__temp
-    @temp.setter
-    def temp(self, value):
-        value = to_finite(value)
-        self.__temp = value
-        self.__logger.info(value)
-    def remove(self):
-        self.__ctrl.stop()
-        self.__logger.close()
-    def check(self):
-        self.__ctrl.addr = self.ctrl.addr, self.ctrl.port
-        if self.__json_fname is not None:
-            self.__write_setting()
-    @property
-    def dev_no(self):
-        return self.ctrl.number
-    @property
-    def set_temp(self):
-        return self.__set_temp
-    @set_temp.setter
-    def set_temp(self, value):
-        self.__set_temp = to_finite(value)
-        self.__ctrl.activate()
-    @property
-    def logger(self):
-        return self.__logger
-
-class ControllerManager(object):
-    def __init__(self):
-        self.__ctrls = {}
-        self.__profile_id = None
-        self.__update_ctrl_list()
-        post_save.connect(self.__post_save_cb, sender=TempController)
-        post_delete.connect(self.__post_del_cb, sender=TempController)
-    def __post_save_cb(self, sender, **kwargs):
-        self.__update_ctrl_list()
-    def __post_del_cb(self, sender, **kwargs):
-        self.__update_ctrl_list()
-    def __update_ctrl_list(self):
-        ctrls = {}
-        for ctrl in get_controllers.no_lock():
-            cid = int(ctrl.id)
-            try:
-                ctrls[cid] = self.__ctrls[cid]
-                ctrls[cid].ctrl = ctrl
-                ctrls[cid].check()
-                del self.__ctrls[cid]
-            except:
-                ctrls[cid] = ControllerWrapper(ctrl)
-        for cid, ctrl in self.__ctrls.items():
-            self.__ctrls[cid].remove()
-            del self.__ctrls[cid]
-        self.__ctrls = ctrls
-    def get_errors(self):
-        errors = {}
-        for cid, ctrl in self.__ctrls.items():
-            ctrl_errors = ctrl.get_errors()
-            if ctrl_errors:
-                errors[cid] = {'name': ctrl.ctrl.name,
-                               'errors': ctrl_errors}
-        return errors
-    def get_temps(self):
-        return dict((cid, fix_non_finite(ctrl.temp)) for (cid, ctrl)
-                    in self.__ctrls.items())
-    def set_temps(self, temps):
-        self.__profile_id = None
-        return self.__set_temps(temps)
-    def __set_temps(self, temps):
-        for cid, temp in temps.items():
-            cid = int(cid)
-            try:
-                self.__ctrls[cid].set_temp = to_finite(temp)
-            except:
-                pass
-        return True
-    def set_profile(self, profile):
-        if not profile:
-            return
-        self.__profile_id = profile
-        self.__set_temps(get_profile_temps(profile))
-        return True
-    @with_oven_control_lock
-    def get_setpoint(self):
-        try:
-            profile_name = get_profile.no_lock(self.__profile_id).name
-        except:
-            profile_name = None
-        return {
-            'id': self.__profile_id,
-            'name': profile_name,
-            'temps': dict((cid, fix_non_finite(ctrl.set_temp)) for (cid, ctrl)
-                          in self.__ctrls.items())
-        }
-    def get_loggers(self):
-        return dict((cid, ctrl.logger) for (cid, ctrl) in self.__ctrls.items())
-
-if not getattr(__import__('__main__'), '_django_syncdb', False):
-    controller_manager = ControllerManager()

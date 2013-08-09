@@ -14,5 +14,16 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import models
-from . import controller
+import math
+
+def to_finite(s):
+    val = float(s)
+    if math.isnan(val) or math.isinf(val):
+        raise ValueError(val)
+    return val
+
+def fix_non_finite(s):
+    try:
+        return to_finite(s)
+    except:
+        return 0.0

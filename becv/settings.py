@@ -19,12 +19,17 @@ import os, os.path
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 def becv_dir(*arg):
+    """
+    Construct absolute directory name from base directory.
+    """
     return os.path.join(BASE_DIR, *arg)
 
+# Use DEBUG=True for master branch
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
+    ('BEC 5', 'bec5five@gmail.com'),
     ('Yichao Yu', 'yyc1992@gmail.com'),
 )
 
@@ -152,8 +157,6 @@ INSTALLED_APPS = (
     'jsonify'
 )
 
-LOGGING_DIR = becv_dir('log')
-
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -185,4 +188,6 @@ LOGGING = {
     }
 }
 
+# directory for logging data, read by the logger module
+LOGGING_DIR = becv_dir('log')
 DATA_LOG_DIR = becv_dir('log')

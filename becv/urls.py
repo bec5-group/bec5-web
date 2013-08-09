@@ -14,6 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Main url configure file. Please keep this file as small as possible and
+put anything (e.g. jsonp api requests/views/urls) to a separate app.
+See below for examples.
+"""
+
 from django.conf.urls import patterns, include, url
 from django.views.generic.base import RedirectView
 
@@ -22,13 +28,16 @@ from django.contrib import admin
 admin.autodiscover()
 
 from django.contrib.auth.views import logout
+from . import views as main_views
 
 urlpatterns = patterns('',
-    url(r'^$', 'becv.views.home', name='home'),
+    url(r'^$', main_views.home, name='home'),
 
-    url(r'^accounts/login/$', 'becv.views.login'),
+    url(r'^accounts/login/$', main_views.login),
     url(r'^accounts/logout/$', logout),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/')),
+
+    # Probably non-standard but modern browers seems to be happy with this.
     url(r'^favicon.ico$', RedirectView.as_view(url='/static/img/favicon.png')),
 
     # admin

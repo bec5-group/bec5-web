@@ -14,12 +14,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function, division
+"""
+Main view. Please keep this file as small as possible and
+put anything (e.g. jsonp api requests/views/urls) to a separate app.
+See below for examples.
+"""
 
 from django.shortcuts import render
 from django.contrib.auth import views as auth_views
-
-from becv_utils import print_except
 
 _login = auth_views.login
 

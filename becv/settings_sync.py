@@ -14,6 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+This is the setting file for local operation. Use this setting to run commands
+like sync db (i.e. --settings=becv.settings_sync) to prevent helpper threads
+from running.
+"""
+
 from .settings import *
 import __main__
 

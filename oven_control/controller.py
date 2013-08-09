@@ -357,4 +357,4 @@ class ControllerManager(object):
         return dict((cid, ctrl.logger) for (cid, ctrl) in self.__ctrls.items())
 
 if not getattr(__import__('__main__'), '_django_syncdb', False):
-    controller_manager = ControllerManager()
+    manager = ControllerManager()

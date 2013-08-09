@@ -15,7 +15,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from json_view import JSONPError, return_jsonp, auth_jsonp
-from . import models
+from . import models, controller as _controller
 from .controller import ctrl_logger
 import time
 
@@ -176,11 +176,11 @@ def del_profile(request, pid=None):
 
 @return_jsonp
 def get_temps(request):
-    return models.controller_manager.get_temps()
+    return _controller.manager.get_temps()
 
 @return_jsonp
 def get_setpoint(request):
-    return models.controller_manager.get_setpoint()
+    return _controller.manager.get_setpoint()
 
 def _set_profile_logger(request, profile=None):
     profile = models.get_profile(profile)
@@ -189,7 +189,7 @@ def _set_profile_logger(request, profile=None):
 @return_jsonp
 @auth_jsonp('oven_control.set_profile', log=_set_profile_logger)
 def set_profile(request, profile=None):
-    res = models.controller_manager.set_profile(profile)
+    res = _controller.manager.set_profile(profile)
     if not res:
         raise JSONPError(400)
     return res
@@ -207,12 +207,12 @@ def _set_temps_logger(request):
 @return_jsonp
 @auth_jsonp('oven_control.set_temp', log=_set_temps_logger)
 def set_temps(request):
-    return models.controller_manager.set_temps(request.GET)
+    return _controller.manager.set_temps(request.GET)
 
 @return_jsonp
 @auth_jsonp
 def get_errors(request):
-    return models.controller_manager.get_errors()
+    return _controller.manager.get_errors()
 
 @return_jsonp
 @auth_jsonp
@@ -236,7 +236,7 @@ def get_logs(request):
 def get_temp_logs(request):
     max_count = 1000
     GET = request.GET
-    loggers = models.controller_manager.get_loggers()
+    loggers = _controller.manager.get_loggers()
     try:
         _to = int(float(GET['to']))
     except:

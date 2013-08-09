@@ -16,7 +16,6 @@
 
 from __future__ import print_function
 from django.db import models
-from django.db.models.signals import post_save, post_delete
 from threading import Lock
 
 class ControllerServer(models.Model):

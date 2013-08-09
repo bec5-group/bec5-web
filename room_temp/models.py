@@ -18,9 +18,6 @@ from __future__ import print_function
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from threading import Lock
-from logger import bin_logger
-from django.conf import settings
-import threading
 
 class ControllerServer(models.Model):
     name = models.CharField(unique=True, max_length=1000)

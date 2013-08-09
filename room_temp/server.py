@@ -23,7 +23,8 @@ from becv_utils import printr, printg, printy, printb
 from becv_utils.thread_helper import WithHelper, repeat_call
 from logger.error_logger import ErrorLogger
 from django.conf import settings
-from logger import TimeLogger
+from logger import TimeLogger, bin_logger
+import threading
 
 server_logger = TimeLogger(filename_fmt='room_temp_actoin-%Y-%m-%d.json',
                            dirname=settings.LOGGING_DIR)

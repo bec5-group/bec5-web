@@ -16,6 +16,7 @@
 
 from json_view import JSONPError, return_jsonp, auth_jsonp
 from . import models
+from . import server as _server
 from .models import with_room_temp_lock
 import time
 
@@ -181,7 +182,7 @@ def _get_logger(loggers, name):
 def get_value_logs(request):
     max_count = 1000
     GET = request.GET
-    loggers = models.server_manager.get_loggers()
+    loggers = _server.manager.get_loggers()
     try:
         _to = int(float(GET['to']))
     except:

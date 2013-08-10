@@ -14,7 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .manager import script_manager
+from .manage import script_manager
 
 _google_cdn = '//ajax.googleapis.com/ajax/libs/'
 _bootstrap_cdn = '//netdna.bootstrapcdn.com/'
@@ -93,8 +93,8 @@ _builtin_scripts = {
         'static': True,
         'sync_deps': ('jquery',),
     },
-    'becv_app': {
-        'url': "js/becv-app.js",
+    'home_app': {
+        'url': "js/home.js",
         'static': True,
         'deps': ('angular', 'angular.ui.bootstrap', 'angular.gravatar',
                  'angular.md5', 'becv.logging', 'becv.request',

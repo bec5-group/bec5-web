@@ -20,4 +20,5 @@ import json
 
 def module_info(request):
     return (HttpResponse('ScriptLoader.register(%s)' %
-                         json.dumps(script_manager.get_info())))
+                         json.dumps(script_manager.get_info()),
+                         content_type="application/javascript"))

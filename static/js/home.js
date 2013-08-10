@@ -15,6 +15,18 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
+var becv_app = angular.module(
+    'becv', ['ui.bootstrap', 'ui-gravatar', 'md5', 'logging', 'request',
+             'room_temp', 'log_mgr', 'popup_form'],
+    ['$interpolateProvider', '$dialogProvider', function(interpolate, dlg) {
+        interpolate.startSymbol('{[');
+        interpolate.endSymbol(']}');
+        dlg.options({
+            backdropFade: true,
+            dialogFade: true
+        });
+    }]
+);
 becv_app
     .constant("titleBtnConfig", {
         activeClass: "active"

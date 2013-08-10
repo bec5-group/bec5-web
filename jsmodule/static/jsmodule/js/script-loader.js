@@ -162,6 +162,8 @@ var ScriptLoader = (function () {
             this.__check_deps();
         },
         load: function (names) {
+            if (Utils.is_string(names))
+                names = [names];
             Utils.for_each(names, function (i, name) {
                 this.__try_load(name);
             }, this);

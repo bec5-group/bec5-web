@@ -34,7 +34,7 @@ class Script:
         if self.__static:
             url = staticfiles_storage.url(url)
         return {
-            'name': name,
+            'name': self.__name,
             'url': url,
             'sync_deps': self.__sync_deps,
             'deps': self.__deps,
@@ -47,7 +47,7 @@ class ScriptManager:
     def register(self, name, **info):
         if name in self.__scripts:
             raise ValueError("Script %s already registered." % name)
-        self.__scripts = self.script_class(name, **info)
+        self.__scripts[name] = self.script_class(name, **info)
     def get_info(self):
         return dict((name, script.to_obj()) for (name, script)
                     in self.__scripts.items())

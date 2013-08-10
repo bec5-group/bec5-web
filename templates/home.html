@@ -6,7 +6,7 @@
 <link href="/static/css/home.css" rel="stylesheet"/>
 <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
 <script>
-    ScriptLoader.load('becv_app');
+    ScriptLoader.load('home_app');
 </script>
 <title>BEC 5</title>
 {% endblock %}
@@ -463,9 +463,6 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
     </div>
   </div>
 </div>
-{% endblock %}
-{% block script %}
-<script src="/static/js/home.js"></script>
 {% endblock %}
 {% comment %}
 Copyright (C) 2013~2013 by Yichao Yu

@@ -40,6 +40,9 @@ urlpatterns = patterns('',
     # Probably non-standard but modern browers seems to be happy with this.
     url(r'^favicon.ico$', RedirectView.as_view(url='/static/img/favicon.png')),
 
+    # jsmodule
+    url(r'^jsmodule/', include('jsmodule.urls')),
+
     # admin
     url(r'^admin/', include(admin.site.urls)),
     # admin documentation

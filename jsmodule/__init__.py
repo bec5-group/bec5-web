@@ -14,6 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .manager import script_manager
+from .manage import script_manager
 from . import builtins
 register_script = script_manager.register

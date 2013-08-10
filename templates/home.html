@@ -8,6 +8,7 @@
 <script>
     ScriptLoader.load('home_app').then(function () {
         angular.bootstrap(document, ['becv']);
+        $('body').css('display', 'block');
     });
 </script>
 <title>BEC 5</title>
@@ -15,7 +16,7 @@
 
 {% block body_attr %}
 data-ng-controller="HomePageCtrl"
-style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]};"
+style="cursor: {[ {true: 'wait', false: 'auto'}[TProfile.busy] ]}; display: none;"
 data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})"
 {% endblock %}
 

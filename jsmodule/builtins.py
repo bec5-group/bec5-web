@@ -82,7 +82,7 @@ _builtin_scripts = {
                  'becv.popup_form', 'angular.ui.bootstrap'),
         'sync_deps': ('angular.loader',),
     },
-    'popup_form': {
+    'becv.popup_form': {
         'url': "js/popup-form.js",
         'static': True,
         'deps': ('angular', 'angular.ui.bootstrap'),

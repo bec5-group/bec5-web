@@ -140,6 +140,8 @@ var ScriptLoader = (function () {
                         this.__check_deps();
                     }));
                     this.del_pending(name);
+                } else {
+                    this.add_pending(name);
                 }
             } catch (e) {
                 return -1;

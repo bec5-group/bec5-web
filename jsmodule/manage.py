@@ -34,6 +34,7 @@ class Script:
         if self.__static:
             url = staticfiles_storage.url(url)
         return {
+            'name': name,
             'url': url,
             'sync_deps': self.__sync_deps,
             'deps': self.__deps,

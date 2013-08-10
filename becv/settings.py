@@ -154,7 +154,8 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'oven_control',
     'room_temp',
-    'jsonify'
+    'jsonify',
+    'jsmodule',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -35,7 +35,8 @@ _builtin_scripts = {
         'url': _google_cdn + 'jquery/2.0.2/jquery.min.js'
     },
     'bootstrap': {
-        'url': _bootstrap_cdn + 'twitter-bootstrap/2.3.2/js/bootstrap.min.js'
+        'url': _bootstrap_cdn + 'twitter-bootstrap/2.3.2/js/bootstrap.min.js',
+        'sync_deps': ('jquery',),
     },
     'angular.ui.bootstrap': {
         'url': "jsmodule/js/ui-bootstrap-tpls-0.3.0.min.js",
@@ -91,15 +92,16 @@ _builtin_scripts = {
     'bootstrap.datetimepicker': {
         'url': "jsmodule/js/bootstrap-datetimepicker.min.js",
         'static': True,
-        'sync_deps': ('jquery',),
+        'sync_deps': ('jquery', 'bootstrap'),
     },
     'home_app': {
         'url': "js/home.js",
         'static': True,
         'deps': ('angular', 'angular.ui.bootstrap', 'angular.gravatar',
                  'angular.md5', 'becv.logging', 'becv.request',
-                 'becv.room_temp', 'becv.log_mgr', 'becv.popup_form'),
-        'sync_deps': ('angular.loader', 'bootstrap.datetimepicker'),
+                 'becv.room_temp', 'becv.log_mgr', 'becv.popup_form',
+                 'bootstrap', 'bootstrap.datetimepicker'),
+        'sync_deps': ('angular.loader'),
     },
 }
 

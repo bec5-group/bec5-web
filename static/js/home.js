@@ -573,3 +573,4 @@ becv_app.controller('HomePageCtrl', ['$scope', '$dialog', '$location', 'msgMgr',
         // end of init()
     }
 }]);
+angular.bootstrap(document, ['becv']);

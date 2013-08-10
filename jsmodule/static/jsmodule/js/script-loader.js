@@ -95,6 +95,7 @@ var ScriptLoader = (function () {
             this.__scripts_info = {};
             this.__deps_pending = {};
             this.__checking = {};
+            this.__hooks = {};
         },
         get_info: function (name) {
             if (this.__scripts_info.hasOwnProperty(name)) {
@@ -106,6 +107,40 @@ var ScriptLoader = (function () {
         },
         del_pending: function (name) {
             delete this.__deps_pending[name];
+        },
+        __check_finished: function (name) {
+            var info = this.get_info(name);
+            if (!info || !info.loaded)
+                return false;
+            try {
+                Utils.for_each(info.sync_deps, function (i, dep_name) {
+                    if (!this.__check_finished(dep_name)) {
+                        throw dep_name;
+                    }
+                }, this);
+                Utils.for_each(info.deps, function (i, dep_name) {
+                    if (!this.__check_finished(dep_name)) {
+                        throw dep_name;
+                    }
+                }, this);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        },
+        __check_hooks: function () {
+            Utils.for_each(this.__hooks, function (name, hooks) {
+                if (this.__check_finished(name)) {
+                    Utils.for_each(hooks, function (i, hook) {
+                        try {
+                            hook(name);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    });
+                    delete this.__hooks[name];
+                }
+            }, this);
         },
         __try_load: function (name) {
             var info = this.get_info(name);
@@ -166,9 +201,21 @@ var ScriptLoader = (function () {
         load: function (names) {
             if (Utils.is_string(names))
                 names = [names];
+            var _names = {};
             Utils.for_each(names, function (i, name) {
                 this.__try_load(name);
+                _names[name] = name;
             }, this);
+            return {
+                then: function (cb) {
+                    Utils.for_each(_names, function (name) {
+                        var hook = this.__hooks[name] || [];
+                        hook.push(cb);
+                        this.__hooks[name] = hook;
+                    }, this);
+                    this.__check_hooks();
+                }
+            };
         },
     };
 

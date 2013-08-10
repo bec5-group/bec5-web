@@ -173,6 +173,7 @@ var ScriptLoader = (function () {
                 if (sync_deps_loaded) {
                     info.load(Utils.bind(this, function () {
                         this.__check_deps();
+                        this.__check_hooks();
                     }));
                     this.del_pending(name);
                 } else {
@@ -207,14 +208,14 @@ var ScriptLoader = (function () {
                 _names[name] = name;
             }, this);
             return {
-                then: function (cb) {
+                then: Utils.bind(this, function (cb) {
                     Utils.for_each(_names, function (name) {
                         var hook = this.__hooks[name] || [];
                         hook.push(cb);
                         this.__hooks[name] = hook;
                     }, this);
                     this.__check_hooks();
-                }
+                }),
             };
         },
     };

@@ -18,10 +18,17 @@ from .static_loader import load_static
 from .manage import script_manager, static_url
 import json
 from urllib.parse import urljoin
+from django.conf import settings
+
+def _script_info():
+    return 'ScriptLoader.register(%s);' % json.dumps(script_manager.get_info())
+
+def _static_info():
+    return ('ScriptLoader._set_static_prefix(%s);' %
+            json.dumps(settings.STATIC_URL))
 
 def module_info(request):
-    return (HttpResponse('ScriptLoader.register(%s)' %
-                         json.dumps(script_manager.get_info()),
+    return (HttpResponse(_script_info() + _static_info(),
                          content_type="application/javascript"))
 
 def _write_load_script(url):

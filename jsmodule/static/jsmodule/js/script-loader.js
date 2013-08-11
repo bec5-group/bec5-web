@@ -141,6 +141,14 @@ var ScriptLoader = (function () {
             this.__checking = {};
             this.__hooks = {};
         },
+        _set_static_prefix: function (prefix) {
+            if (prefix.substr(-1) == '/')
+                prefix = prefix.slice(0, -1);
+            this.__static_prefix = prefix;
+        },
+        static_url: function (url) {
+            return this.__static_prefix + '/' + url;
+        },
         get_info: function (name) {
             if (this.__scripts_info.hasOwnProperty(name)) {
                 return this.__scripts_info[name];

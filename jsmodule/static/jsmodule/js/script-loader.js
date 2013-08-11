@@ -117,7 +117,7 @@ var ScriptLoader = (function () {
             }, this);
         },
         prepare: function () {
-            if (this.__prepared)
+            if (this.__prepared || this.no_cache)
                 return;
             Utils.prepare_script(this.url);
             this.__prepared = true;

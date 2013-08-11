@@ -34,7 +34,7 @@ class Script:
     def name(self):
         return self.__name
     def __init__(self, name, url='', sync_deps=(), deps=(), static=False,
-                 jsmodule=False):
+                 jsmodule=False, no_cache=False):
         self.__name = name
         if not url:
             raise ValueError('Url of script cannot be empty.')
@@ -43,6 +43,7 @@ class Script:
         self.__deps = _fix_deps(deps)
         self.__static = bool(static)
         self.__jsmodule = bool(jsmodule)
+        self.__no_cache = bool(no_cache)
         if self.__static and self.__jsmodule:
             raise ValueError('Properties static and jsmodule '
                              'cannot both be true.')
@@ -57,6 +58,7 @@ class Script:
             'url': url,
             'sync_deps': self.__sync_deps,
             'deps': self.__deps,
+            'no_cache': self.__no_cache,
         }
 
 class ScriptManager:

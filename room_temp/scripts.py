@@ -22,4 +22,5 @@ register_script('becv.room_temp', url="room_temp/js/room-temp.js", static=True,
                 sync_deps=('angular.loader', 'becv.room_temp_context',),
                 deps=('angular', 'becv.request', 'becv.logging',
                       'becv.popup_form', 'angular.ui.bootstrap'),)
-register_script('becv.room_temp_context', url=reverse(set_context))
+register_script('becv.room_temp_context', url=reverse(set_context),
+                no_cache=True)

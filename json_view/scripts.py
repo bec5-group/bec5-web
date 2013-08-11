@@ -21,4 +21,5 @@ from .views import set_context
 register_script('becv.log_mgr', url="json_view/js/log-mgr.js", static=True,
                 sync_deps=('angular.loader',),
                 deps=('angular', 'becv.request',),)
-register_script('becv.json_view_context', url=reverse(set_context))
+register_script('becv.json_view_context', url=reverse(set_context),
+                no_cache=True)

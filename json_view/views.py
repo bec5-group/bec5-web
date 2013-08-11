@@ -16,6 +16,7 @@
 
 from .utils import return_jsonp, auth_jsonp, auth_logger
 from jsmodule import set_context as set_js_context
+from urllib.parse import urljoin
 
 def set_context(request):
     return set_js_context({

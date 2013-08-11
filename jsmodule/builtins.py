@@ -79,14 +79,6 @@ _builtin_scripts = {
         'static': True,
         'sync_deps': ('jquery', 'bootstrap'),
     },
-
-    # TODO
-    'becv.popup_form': {
-        'url': "js/popup-form.js",
-        'static': True,
-        'deps': ('angular', 'angular.ui.bootstrap'),
-        'sync_deps': ('angular.loader',),
-    },
 }
 
 for name, info in _builtin_scripts.items():

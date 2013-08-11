@@ -156,6 +156,7 @@ INSTALLED_APPS = (
     'room_temp',
     'jsonify',
     'jsmodule',
+    'popup_form',
 )
 
 # A sample logging configuration. The only tangible logging

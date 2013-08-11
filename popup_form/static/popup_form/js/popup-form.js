@@ -20,6 +20,8 @@
 // value
 angular.module('popup_form', ['ui.bootstrap'], ['$provide', function(p) {
     p.factory('popupForm', ['$dialog', function(dlg) {
+        var template_url =
+            ScriptLoader.static_url('popup_form/html/popup_form.html');
         function PopupForm() {
             this._init.apply(this, arguments);
         }
@@ -65,7 +67,7 @@ angular.module('popup_form', ['ui.bootstrap'], ['$provide', function(p) {
                 var that = this;
                 this.dialog = dlg.dialog({
                     controller: 'PopupFormCtrl',
-                    templateUrl: '/static/html/popup_form.html',
+                    templateUrl: template_url,
                     resolve: {
                         popupForm: function () {
                             return that;

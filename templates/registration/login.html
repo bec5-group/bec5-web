@@ -16,7 +16,8 @@
   {% if user.is_authenticated %}
   <alert type="'success'">
     You have already logged in. Redirect to
-    <a href-hash href="{{ next | default:'/' | escape }}">previous page</a> in
+    <a data-href-hash
+       href="{{ next | default:'/' | escape }}">previous page</a> in
     <b redirect-cnt="{{ next|escape }}" timeout="5"></b> seconds.
     Click <a href="/accounts/logout/">here</a> to logout.
   </alert>
@@ -37,7 +38,7 @@
         <label class="checkbox">
           <input type="checkbox" name="remember" checked/> Remember Me
         </label>
-        <input type="hidden" name="next" href-hash="value"
+        <input type="hidden" name="next" data-href-hash="value"
                value="{{ next|escape }}"/>
         <button type="submit" class="btn"
                 style="display: inline-block;">

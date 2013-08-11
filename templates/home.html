@@ -104,8 +104,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
                    style="margin: 0; height: 100%; display: inline-block;"
                    data-ng-model="TProfile.cur_setpoint.temps[ctrl.id]"/>
           </td>
-          <td cond-disp="permissions['oven-settemp'] && show_advanced_actions"
-              cond-disp-type="table-cell">
+          <td data-cond-disp="permissions['oven-settemp'] && show_advanced_actions"
+              data-cond-disp-type="table-cell">
             <div style="min-width: 90px;"
                  data-ng-switch="!TProfile.editing_setpoint">
               <span data-ng-switch-when="true">
@@ -198,14 +198,16 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
   <div data-cond-disp="home_tabs.active == 'oven-temp'">
     <table class="table">
       <thead>
-        <th>Controller</th>
-        <th>Temperature</th>
-        <th data-cond-disp="permissions['oven-setcontroller'] && show_advanced_actions"
-            data-cond-disp-type="table-cell">
-          <button class="btn btn-mini" data-ng-click="addController()">
-            <i class="icon-plus"></i> Add Controller
-          </button>
-        </th>
+        <tr>
+          <th>Controller</th>
+          <th>Temperature</th>
+          <th data-cond-disp="permissions['oven-setcontroller'] && show_advanced_actions"
+              data-cond-disp-type="table-cell">
+            <button class="btn btn-mini" data-ng-click="addController()">
+              <i class="icon-plus"></i> Add Controller
+            </button>
+          </th>
+        </tr>
       </thead>
       <tbody>
         <tr data-ng-repeat="ctrl in TControls">
@@ -271,11 +273,13 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
     <table class="table table-bordered"
            style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
       <thead>
-        <th>Time</th>
-        <th>Controller</th>
-        <th>Action</th>
-        <th>Address</th>
-        <th>Message</th>
+        <tr>
+          <th>Time</th>
+          <th>Controller</th>
+          <th>Action</th>
+          <th>Address</th>
+          <th>Message</th>
+        </tr>
       </thead>
       <tbody>
         <tr data-ng-repeat="clog in ControllerLog.cur"
@@ -319,10 +323,12 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
     <table class="table table-bordered"
            style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
       <thead>
-        <th>Time</th>
-        <th>User</th>
-        <th>Action</th>
-        <th>Message</th>
+        <tr>
+          <th>Time</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Message</th>
+        </tr>
       </thead>
       <tbody>
         <tr data-ng-repeat="action in TActionLog.cur"
@@ -441,9 +447,11 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
            data-collapse="log_collapsed"
            style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto; overflow: auto;">
       <thead class="text-warning">
-        <th>Controller</th>
-        <th>Error</th>
-        <th>Message</th>
+        <tr>
+          <th>Controller</th>
+          <th>Error</th>
+          <th>Message</th>
+        </tr>
       </thead>
       <tbody data-ng-repeat="errors in TProfile.cur_error">
         <tr class="text-error warning">

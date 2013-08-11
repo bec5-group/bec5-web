@@ -14,7 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.http import HttpResponse
-from .static_loader import load_static
 from .manage import script_manager, static_url
 import json
 from urllib.parse import urljoin

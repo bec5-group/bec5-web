@@ -102,8 +102,7 @@ angular.module('popup_form', ['ui.bootstrap'], ['$provide', function(p) {
 
         return PopupForm;
     }]);
-}]).controller(
-    'PopupFormCtrl', ['$scope', 'popupForm', function ($scope, form) {
-        $scope.form = form;
-        form._set_scope($scope);
-    }]);
+}]).controller('PopupFormCtrl', ['$scope', 'popupForm', function ($s, form) {
+    $s.form = form;
+    form._set_scope($s);
+}]);

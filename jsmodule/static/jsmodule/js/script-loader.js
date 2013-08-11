@@ -62,9 +62,14 @@ var ScriptUtils = (function () {
             head.insertBefore(ele, head.firstChild);
         },
         prepare_script: function (url) {
+            // This is the simplest hack I have found to let the browser
+            // preload js files without executing them.
+            // The <img> tags cause chromium to complain about wrong mime-type
+            // but it looks working otherwise.
             Utils.prepend_head(Utils.create_ele('img', {src: url}));
         },
         load_script: function (url, fn) {
+            // Borrowed from $script.get
             var loaded = false;
             function cb() {
                 if (loaded)

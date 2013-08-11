@@ -33,23 +33,23 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
       <div class="brand">BEC 5</div>
       <div class="nav-collapse collapse">
         <ul class="nav">
-          <li data-ng-repeat="tab in home_tabs.all" title-btn="tab.id"
-              title-btn-clicked="{false: false, true: redirect_or_message}[!permissions[tab.id]]"
-              title-btn-model="home_tabs.active">
+          <li data-ng-repeat="tab in home_tabs.all" data-title-btn="tab.id"
+              data-title-btn-clicked="{false: false, true: redirect_or_message}[!permissions[tab.id]]"
+              data-title-btn-model="home_tabs.active">
             <a href="#{[{false: '', true: tab.id}[!!permissions[tab.id]]]}">
-              <i class="icon-lock" cond-disp="!permissions[tab.id]"></i> {[tab.name]}
+              <i class="icon-lock" data-cond-disp="!permissions[tab.id]"></i> {[tab.name]}
             </a>
           </li>
           <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <a class="dropdown-toggle" data-data-toggle="dropdown" href="#">
               Log <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
-              <li data-ng-repeat="tab in home_tabs.log" title-btn="tab.id"
-                  title-btn-clicked="{false: false, true: redirect_or_message}[!permissions[tab.id]]"
-                  title-btn-model="home_tabs.active">
+              <li data-ng-repeat="tab in home_tabs.log" data-title-btn="tab.id"
+                  data-title-btn-clicked="{false: false, true: redirect_or_message}[!permissions[tab.id]]"
+                  data-title-btn-model="home_tabs.active">
                 <a href="#{[{false: '', true: tab.id}[!!permissions[tab.id]]]}">
-                  <i class="icon-lock" cond-disp="!permissions[tab.id]"></i>
+                  <i class="icon-lock" data-cond-disp="!permissions[tab.id]"></i>
                   {[tab.name]}
                 </a>
               </li>
@@ -75,7 +75,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
   </div>
 </div>
 <div class="text-center">
-  <div cond-disp="home_tabs.active == 'oven-control'">
+  <div data-cond-disp="home_tabs.active == 'oven-control'">
     <table class="table">
       <thead>
         <tr class="text-info">
@@ -83,8 +83,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
           <th data-ng-repeat="ctrl in TControls" style="text-align: center;">
             {[ ctrl.name ]}
           </th>
-          <th cond-disp="permissions['oven-settemp'] && show_advanced_actions"
-              cond-disp-type="table-cell"></th>
+          <th data-cond-disp="permissions['oven-settemp'] && show_advanced_actions"
+              data-cond-disp-type="table-cell"></th>
         </tr>
       </thead>
       <tbody>
@@ -159,8 +159,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
               data-ng-click="TProfile.set_cur(id)">
             {[ TProfile.all[id].temps[ctrl.id] | number:1 ]}
           </td>
-          <td cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
-              cond-disp-type="table-cell" style="cursor: default;">
+          <td data-cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
+              data-cond-disp-type="table-cell" style="cursor: default;">
             <div>
               <button class="btn btn-mini"
                       data-ng-click="TProfile.edit_profile(id)">
@@ -184,24 +184,24 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
     <div class="apply-status-icon" style="display: inline-block;">
       <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon" cond-disp="TProfile.status == 0"/>
       <img src="/static/img/loading.gif" class="apply-status-icon"
-           cond-disp="TProfile.status == 1"/>
-      <div cond-disp="TProfile.status == 2"
+           data-cond-disp="TProfile.status == 1"/>
+      <div data-cond-disp="TProfile.status == 2"
            style="display: inline-block; padding: 5px; height: 30px">
         <i class="icon-ok"></i>
       </div>
-      <div cond-disp="TProfile.status &gt; 2"
+      <div data-cond-disp="TProfile.status &gt; 2"
            style="display: inline-block; padding: 5px; height: 30px">
         <i class="icon-remove"></i>
       </div>
     </div>
   </div>
-  <div cond-disp="home_tabs.active == 'oven-temp'">
+  <div data-cond-disp="home_tabs.active == 'oven-temp'">
     <table class="table">
       <thead>
         <th>Controller</th>
         <th>Temperature</th>
-        <th cond-disp="permissions['oven-setcontroller'] && show_advanced_actions"
-            cond-disp-type="table-cell">
+        <th data-cond-disp="permissions['oven-setcontroller'] && show_advanced_actions"
+            data-cond-disp-type="table-cell">
           <button class="btn btn-mini" data-ng-click="addController()">
             <i class="icon-plus"></i> Add Controller
           </button>
@@ -213,8 +213,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
           <td class="big-text text-info">
             {[ TValues[ctrl.id] | number:1 ]} &deg;C
           </td>
-          <td cond-disp="permissions['oven-setcontroller'] && show_advanced_actions"
-              cond-disp-type="table-cell">
+          <td data-cond-disp="permissions['oven-setcontroller'] && show_advanced_actions"
+              data-cond-disp-type="table-cell">
             <button class="btn btn-mini" data-ng-click="setController(ctrl.id)">
               <i class="icon-edit"></i> Setting
             </button>
@@ -233,15 +233,15 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
       </div>
     </div>
   </div>
-  <div cond-disp="home_tabs.active == 'oven-temp-log'">
+  <div data-cond-disp="home_tabs.active == 'oven-temp-log'">
     <!-- TODO -->
   </div>
-  <div cond-disp="home_tabs.active == 'about'">
+  <div data-cond-disp="home_tabs.active == 'about'">
     <div>
       <script type="text/javascript" src="http://www.ohloh.net/p/643497/widgets/project_basic_stats.js"></script>
     </div>
   </div>
-  <div cond-disp="home_tabs.active == 'oven-ctrl-log'"
+  <div data-cond-disp="home_tabs.active == 'oven-ctrl-log'"
        style="overflow: auto; width: 100%;">
     <form>
       <div>
@@ -289,7 +289,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
       </tbody>
     </table>
   </div>
-  <div cond-disp="home_tabs.active == 'oven-action-log'"
+  <div data-cond-disp="home_tabs.active == 'oven-action-log'"
        style="overflow: auto; width: 100%;">
     <form>
       <div>
@@ -335,10 +335,10 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
       </tbody>
     </table>
   </div>
-  <div cond-disp="home_tabs.active == 'room-temp-log'">
+  <div data-cond-disp="home_tabs.active == 'room-temp-log'">
     <!-- TODO -->
-    <div collapse="!show_advanced_actions"
-         cond-disp="permissions['room-temp-edit-server']">
+    <div data-collapse="!show_advanced_actions"
+         data-cond-disp="permissions['room-temp-edit-server']">
       <table class="table table-hover table-bordered"
              style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
         <thead>
@@ -379,7 +379,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
         </tbody>
       </table>
       <table class="table table-hover table-bordered"
-             cond-disp="room_temp_mgr.cur_server != null"
+             data-cond-disp="room_temp_mgr.cur_server != null"
              style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
         <thead>
           <tr class="text-info">
@@ -419,8 +419,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
       </table>
     </div>
   </div>
-  <div style="margin: 10px;" cond-disp="has_advanced_actions"
-       cond-disp-type="block">
+  <div style="margin: 10px;" data-cond-disp="has_advanced_actions"
+       data-cond-disp-type="block">
     <button class="btn btn-mini"
             data-ng-click="show_advanced_actions = !show_advanced_actions">
       {[ {true: 'Show', false: 'Hide'}[!show_advanced_actions] ]}
@@ -437,8 +437,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
     </button>
     <br/>
     <table class="table table-bordered"
-           cond-disp="TProfile.cur_error"
-           collapse="log_collapsed"
+           data-cond-disp="TProfile.cur_error"
+           data-collapse="log_collapsed"
            style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto; overflow: auto;">
       <thead class="text-warning">
         <th>Controller</th>
@@ -461,9 +461,9 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
         </tr>
       </tbody>
     </table>
-    <div collapse="log_collapsed">
-      <alert data-ng-repeat="msg in msgMgr.msgs | orderBy:'id':true" type="msg.type"
-             close="msgMgr.close(msg.id)" class="text-left"
+    <div data-collapse="log_collapsed">
+      <alert data-ng-repeat="msg in msgMgr.msgs | orderBy:'id':true"
+             type="msg.type" close="msgMgr.close(msg.id)" class="text-left"
              data-ng-animate="'message-list'">
         {[ msg.date | date:'yyyy MMM d HH:mm:ss' ]}<br/>
         <b>{[ msg.msg ]}</b>

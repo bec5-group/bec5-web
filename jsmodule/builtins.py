@@ -74,25 +74,18 @@ _builtin_scripts = {
         'deps': ('angular', 'becv.request',),
         'sync_deps': ('angular.loader',),
     },
+    'bootstrap.datetimepicker': {
+        'url': "jsmodule/js/bootstrap-datetimepicker.min.js",
+        'static': True,
+        'sync_deps': ('jquery', 'bootstrap'),
+    },
 
     # TODO
-    'becv.room_temp': {
-        'url': "js/room-temp.js",
-        'static': True,
-        'deps': ('angular', 'becv.request', 'becv.logging',
-                 'becv.popup_form', 'angular.ui.bootstrap'),
-        'sync_deps': ('angular.loader',),
-    },
     'becv.popup_form': {
         'url': "js/popup-form.js",
         'static': True,
         'deps': ('angular', 'angular.ui.bootstrap'),
         'sync_deps': ('angular.loader',),
-    },
-    'bootstrap.datetimepicker': {
-        'url': "jsmodule/js/bootstrap-datetimepicker.min.js",
-        'static': True,
-        'sync_deps': ('jquery', 'bootstrap'),
     },
     'home_app': {
         'url': "js/home.js",

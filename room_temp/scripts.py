@@ -14,6 +14,9 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import models
-from . import server
-from . import scripts
+from jsmodule import register_script
+
+register_script('becv.room_temp', url="room_temp/js/room-temp.js",
+                static=True, sync_deps=('angular.loader',),
+                deps=('angular', 'becv.request', 'becv.logging',
+                      'becv.popup_form', 'angular.ui.bootstrap'),)

@@ -23,6 +23,8 @@ See below for examples.
 from django.conf.urls import patterns, include, url
 from django.views.generic.base import RedirectView
 
+from . import scripts
+
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()

@@ -87,21 +87,6 @@ _builtin_scripts = {
         'deps': ('angular', 'angular.ui.bootstrap'),
         'sync_deps': ('angular.loader',),
     },
-    'home_app': {
-        'url': "js/home.js",
-        'static': True,
-        'deps': ('angular', 'angular.ui.bootstrap', 'angular.gravatar',
-                 'angular.md5', 'becv.logging', 'becv.request',
-                 'becv.room_temp', 'becv.log_mgr', 'becv.popup_form',
-                 'bootstrap', 'bootstrap.datetimepicker'),
-        'sync_deps': ('angular.loader',),
-    },
-    'login_app': {
-        'url': "js/login.js",
-        'static': True,
-        'deps': ('angular', 'angular.ui.bootstrap',),
-        'sync_deps': ('angular.loader',),
-    },
 }
 
 for name, info in _builtin_scripts.items():

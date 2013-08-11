@@ -17,6 +17,14 @@
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 
+def _fix_deps(deps):
+    if not deps:
+        return ()
+    elif isinstance(deps, str):
+        return (deps,)
+    else:
+        return tuple(deps)
+
 class Script:
     @property
     def name(self):
@@ -26,8 +34,8 @@ class Script:
         if not url:
             raise ValueError('Url of script cannot be empty.')
         self.__url = url
-        self.__sync_deps = tuple(sync_deps if sync_deps else ())
-        self.__deps = tuple(deps if deps else ())
+        self.__sync_deps = _fix_deps(sync_deps)
+        self.__deps = _fix_deps(deps)
         self.__static = bool(static)
     def to_obj(self):
         url = self.__url

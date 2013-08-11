@@ -101,7 +101,7 @@ _builtin_scripts = {
                  'angular.md5', 'becv.logging', 'becv.request',
                  'becv.room_temp', 'becv.log_mgr', 'becv.popup_form',
                  'bootstrap', 'bootstrap.datetimepicker'),
-        'sync_deps': ('angular.loader'),
+        'sync_deps': ('angular.loader',),
     },
 }
 

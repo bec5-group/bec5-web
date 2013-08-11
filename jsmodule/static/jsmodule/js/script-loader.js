@@ -18,6 +18,8 @@
 var ScriptUtils = (function () {
     var to_string = ({}).toString;
     var has_own_property = ({}).hasOwnProperty;
+    var doc = document;
+    var head = doc.head;
     var Utils = {
         for_each: function (obj, cb, that) {
             if (that)
@@ -48,6 +50,41 @@ var ScriptUtils = (function () {
         },
         def_class: function (parent, proto) {
             return Utils.merge_obj(Object.create(parent.prototype), proto);
+        },
+        create_ele: function (name, attrs) {
+            var ele = doc.createElement(name);
+            if (attrs) {
+                Utils.merge_obj(ele, attrs);
+            }
+            return ele;
+        },
+        prepend_head: function (ele) {
+            head.insertBefore(ele, head.firstChild);
+        },
+        prepare_script: function (url) {
+            Utils.prepend_head(Utils.create_ele('img', {src: url}));
+        },
+        load_script: function (url, fn) {
+            var loaded = false;
+            function cb() {
+                if (loaded)
+                    return;
+                if ((ele.readyState && !(/^c|loade/.test(ele.readyState))))
+                    return;
+                ele.onload = ele.onreadystatechange = null;
+                loaded = true;
+                if (fn) {
+                    fn();
+                }
+            }
+            var ele = Utils.create_ele('script', {
+                onload: cb,
+                onerror: cb,
+                onreadystatechange: cb,
+                async: 1,
+                src: url
+            });
+            Utils.prepend_head(ele);
         }
     };
     return Utils;
@@ -63,6 +100,7 @@ var ScriptLoader = (function () {
             this.loaded = false;
             this.loading = false;
             this._update(info);
+            this.__prepared = false;
         },
         _update: function (info) {
             if (Utils.is_string(info)) {
@@ -73,11 +111,17 @@ var ScriptLoader = (function () {
                 this[i] = value;
             }, this);
         },
+        prepare: function () {
+            if (this.__prepared)
+                return;
+            Utils.prepare_script(this.url);
+            this.__prepared = true;
+        },
         load: function (cb) {
             if (this.loaded || this.loading)
                 return;
             this.loading = true;
-            $script.get(this.url, Utils.bind(this, function () {
+            Utils.load_script(this.url, Utils.bind(this, function () {
                 this.loaded = true;
                 this.loading = false;
                 if (cb) {
@@ -155,21 +199,26 @@ var ScriptLoader = (function () {
             // Dependency loop
             if (this.__checking.hasOwnProperty(name))
                 return 1;
+            info.prepare();
             try {
                 this.__checking[name] = name;
                 Utils.for_each(info.deps, function (i, dep_name) {
                     this.__try_load(dep_name);
                 }, this);
                 var sync_deps_loaded = true;
+                var sync_deps_found = true;
                 Utils.for_each(info.sync_deps, function (i, dep_name) {
                     switch (this.__try_load(dep_name)) {
                     case -1:
-                        throw dep_name;
+                        sync_deps_found = false;
+                        return;
                     case 0:
                         sync_deps_loaded = false;
                         return;
                     }
                 }, this);
+                if (!sync_deps_found)
+                    throw name;
                 if (sync_deps_loaded) {
                     info.load(Utils.bind(this, function () {
                         this.__check_deps();

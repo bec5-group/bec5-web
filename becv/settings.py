@@ -141,6 +141,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+# add apps here in order to make models/static files/scripts registration work.
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -165,6 +166,10 @@ INSTALLED_APPS = (
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+
+# the logger module is used instead of the python's logging module to make
+# adding features easier, e.g. log rotation, logging objects and retrieving
+# log from file.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -191,6 +196,6 @@ LOGGING = {
     }
 }
 
-# directory for logging data, read by the logger module
+# directory for logging data, read by the apps that use the logger module
 LOGGING_DIR = becv_dir('log')
 DATA_LOG_DIR = becv_dir('log')

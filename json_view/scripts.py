@@ -18,6 +18,7 @@ from jsmodule import register_script
 from django.core.urlresolvers import reverse
 from .views import set_context
 
+# script to get log as json request
 register_script('becv.log_mgr', url="json_view/js/log-mgr.js", static=True,
                 sync_deps=('angular.loader',),
                 deps=('angular', 'becv.request',),)

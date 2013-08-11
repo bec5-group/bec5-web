@@ -18,6 +18,8 @@ from django.conf.urls import patterns, include, url
 from . import views
 
 urlpatterns = patterns('',
+    # Register server side scripts info to client side js library.
     url(r'^module-info\.js$', views.module_info),
+    # Load the client side loader library as well as the info-register script.
     url(r'^loader\.js$', views.loader),
 )

@@ -20,6 +20,9 @@ from urllib.parse import urljoin
 from django.conf import settings
 
 def set_context(ctx):
+    """
+    Output a script to register context info on client side.
+    """
     return HttpResponse('ScriptLoader.set_contexts(%s);' %
                         json.dumps(ctx, separators=(',', ':')),
                         content_type="application/x-javascript")

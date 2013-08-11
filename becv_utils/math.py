@@ -14,6 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Functions to deal with infinity. Mainly because python's json module output
+Infinity and NaN which may not be recognized by javascript's JSON parser.
+"""
+
 import math
 
 def to_finite(s):

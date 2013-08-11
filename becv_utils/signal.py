@@ -14,6 +14,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+For object.signal.(dis)connect syntax.
+"""
+
 from django.dispatch import Signal
 
 class SignalWrapper(object):

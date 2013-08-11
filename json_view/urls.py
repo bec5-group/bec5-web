@@ -19,5 +19,6 @@ from . import views
 
 urlpatterns = patterns('',
     url(r'^set-context\.js$', views.set_context),
+    # get json view log
     url(r'^get-logs/$', views.get_logs),
 )

@@ -45,6 +45,9 @@ def load_struct(fname, fmt):
         return load_struct_fh(fh, fmt)
 
 class BinDateLogger(TimeLogger):
+    """
+    Class to log binary data.
+    """
     def __init__(self, filename_fmt, dirname, fmt, **kwargs):
         self.__fmt = fmt
         TimeLogger.__init__(self, filename_fmt, dirname, mode='ab',
@@ -59,6 +62,9 @@ class BinDateLogger(TimeLogger):
         return load_struct_fh(stm, self.__fmt)
 
 class FloatDateLogger(BinDateLogger):
+    """
+    Class to do averaging when retrieving logging data.
+    """
     def __init__(self, filename_fmt, dirname, **kwargs):
         BinDateLogger.__init__(self, filename_fmt, dirname, '<Qd', **kwargs)
     def __get_range_it_limited(self, _from, to, max_count):

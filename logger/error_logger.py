@@ -17,6 +17,10 @@
 import time
 
 class ErrorLogger(object):
+    """
+    Record error state. A error will not be consider real and logged
+    unless it happens continuesly without any success for a certain time.
+    """
     def __init__(self):
         self.__errors = {}
     def _error_logger_handle(self, name, is_error, msg):

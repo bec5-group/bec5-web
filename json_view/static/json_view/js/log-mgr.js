@@ -15,6 +15,9 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
+/**
+ * Provides angular service to get log data as json request from server.
+ **/
 angular.module('log_mgr', ['request'], ['$provide', function($provide) {
     $provide.factory('logMgr', ['jsonReq', function (jsonReq) {
         function LogMgr() {

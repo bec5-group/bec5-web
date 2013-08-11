@@ -25,6 +25,7 @@ from django.contrib.auth import views as auth_views
 
 _login = auth_views.login
 
+# Monkey patch login function for the remember option.
 def login(req, *args, **kwargs):
     if req.method == 'POST' and not req.POST.get('remember', None):
         req.session.set_expiry(0)

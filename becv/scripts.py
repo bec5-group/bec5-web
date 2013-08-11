@@ -14,6 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Register site level scripts. Do not put libraries (should go to jsmodule/static)
+or scripts that are related to certain apps (should go to <app>/static) here.
+"""
+
 from jsmodule import register_script
 
 _main_scripts = {

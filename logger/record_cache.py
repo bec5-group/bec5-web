@@ -17,6 +17,10 @@
 
 import threading
 
+"""
+Cache result retrieved from log.
+"""
+
 class LinkedList(object):
     __slots__ = ['prev', 'next']
     def __init__(self):

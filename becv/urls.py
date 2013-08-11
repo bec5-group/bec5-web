@@ -23,6 +23,9 @@ See below for examples.
 from django.conf.urls import patterns, include, url
 from django.views.generic.base import RedirectView
 
+# register site level scripts, not sure if there is a better place to put this
+# file or if it is possible to make the jsmodule app automatically import
+# it from the main app, maybe from the name of urls setting module (TODO)?
 from . import scripts
 
 # Uncomment the next two lines to enable the admin:

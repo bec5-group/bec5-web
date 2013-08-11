@@ -14,6 +14,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+See README.md
+"""
+
 from .manage import script_manager
 register_script = script_manager.register
 from .views import set_context

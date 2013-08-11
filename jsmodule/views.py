@@ -22,7 +22,7 @@ from django.conf import settings
 
 def set_context(ctx):
     return HttpResponse('ScriptLoader.set_contexts(%s);' % json.dumps(ctx),
-                        content_type="application/javascript")
+                        content_type="application/x-javascript")
 
 def _script_info(path):
     return ('ScriptLoader.register(%s);' %
@@ -34,7 +34,7 @@ def _static_info():
 
 def module_info(request):
     return HttpResponse(_script_info(request.path) + _static_info(),
-                        content_type="application/javascript")
+                        content_type="application/x-javascript")
 
 def _write_load_script(url):
     return "document.write('<script src=%s></script>');" % json.dumps(url)
@@ -43,4 +43,4 @@ def loader(request):
     return (HttpResponse(
         _write_load_script(static_url('jsmodule/js/script-loader.js'))
         + _write_load_script(urljoin(request.path, 'module-info.js')),
-        content_type="application/javascript"))
+        content_type="application/x-javascript"))

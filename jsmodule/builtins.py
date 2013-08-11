@@ -103,6 +103,12 @@ _builtin_scripts = {
                  'bootstrap', 'bootstrap.datetimepicker'),
         'sync_deps': ('angular.loader',),
     },
+    'login_app': {
+        'url': "js/login.js",
+        'static': True,
+        'deps': ('angular', 'angular.ui.bootstrap',),
+        'sync_deps': ('angular.loader',),
+    },
 }
 
 for name, info in _builtin_scripts.items():

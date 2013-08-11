@@ -2,6 +2,11 @@
 
 {% block head %}
 <link href="/static/css/login_out.css" rel="stylesheet"/>
+<script>
+    ScriptLoader.load('login_app').then(function () {
+        angular.bootstrap(document, ['login']);
+    });
+</script>
 <title>BEC-V Login Page</title>
 {% endblock %}
 
@@ -43,9 +48,6 @@
   </div>
 {% endif %}
 </div>
-{% endblock %}
-{% block script %}
-<script src="/static/js/login.js"></script>
 {% endblock %}
 {% comment %}
 Copyright (C) 2013~2013 by Yichao Yu

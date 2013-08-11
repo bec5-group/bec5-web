@@ -99,8 +99,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
                    class="input-mini"
                    style="margin: 0; height: 100%; display: inline-block;"
                    data-ng-model="TProfile.edited_setpoint[ctrl.id]"/>
-            <input data-ng-switch-default type="text" step="any" readonly
-                   class="input-mini"
+            <input data-ng-switch-default type="text"
+                   readonly class="input-mini"
                    style="margin: 0; height: 100%; display: inline-block;"
                    data-ng-model="TProfile.cur_setpoint.temps[ctrl.id]"/>
           </td>
@@ -138,8 +138,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
           <th data-ng-repeat="ctrl in TControls" style="text-align: center;">
             {[ ctrl.name ]}
           </th>
-          <th cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
-              cond-disp-type="table-cell">
+          <th data-cond-disp="permissions['oven-setprofile-temp'] && show_advanced_actions"
+              data-cond-disp-type="table-cell">
             <button class="btn btn-mini"
                     data-ng-click="TProfile.add_profile()">
               <i class="icon-plus"></i> Add Profile
@@ -182,7 +182,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
       <i class="icon-ok icon-white"></i> Apply
     </button>
     <div class="apply-status-icon" style="display: inline-block;">
-      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon" cond-disp="TProfile.status == 0"/>
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="apply-status-icon" data-cond-disp="TProfile.status == 0"/>
       <img src="/static/img/loading.gif" class="apply-status-icon"
            data-cond-disp="TProfile.status == 1"/>
       <div data-cond-disp="TProfile.status == 2"
@@ -229,7 +229,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
     <div>
       <div class="checkbox"
            style="display: inline-block;">
-        <input type="checkbox" data-ng-model="auto_temp">Automatic Update</input>
+        <input type="checkbox" data-ng-model="auto_temp"/>Automatic Update
       </div>
     </div>
   </div>
@@ -248,7 +248,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
         <div class="input-prepend input-append becv-date-time-picker"
              id="ctrl-log-from">
           <span class="add-on">From:</span>
-          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"></input>
+          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"/>
           <span class="add-on">
             <i data-time-icon="icon-time" data-date-icon="icon-calendar">
             </i>
@@ -259,7 +259,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
         <div class="input-prepend input-append becv-date-time-picker"
              id="ctrl-log-to">
           <span class="add-on">To:</span>
-          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"></input>
+          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"/>
           <span class="add-on">
             <i data-time-icon="icon-time" data-date-icon="icon-calendar">
             </i>
@@ -296,7 +296,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
         <div class="input-prepend input-append becv-date-time-picker"
              id="action-log-from">
           <span class="add-on">From:</span>
-          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"></input>
+          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"/>
           <span class="add-on">
             <i data-time-icon="icon-time" data-date-icon="icon-calendar">
             </i>
@@ -307,7 +307,7 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
         <div class="input-prepend input-append becv-date-time-picker"
              id="action-log-to">
           <span class="add-on">To:</span>
-          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"></input>
+          <input data-format="MM/dd/yyyy hh:mm:ss" type="text"/>
           <span class="add-on">
             <i data-time-icon="icon-time" data-date-icon="icon-calendar">
             </i>

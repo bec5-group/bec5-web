@@ -48,7 +48,7 @@ urlpatterns = patterns('',
     # admin
     url(r'^admin/', include(admin.site.urls)),
     # admin documentation
-    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin-doc/', include('django.contrib.admindocs.urls')),
 
     # action log
     url(r'^json-view/', include('json_view.urls')),

@@ -17,3 +17,4 @@
 from .manage import script_manager
 from . import builtins
 register_script = script_manager.register
+from .views import set_context

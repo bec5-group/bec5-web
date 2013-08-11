@@ -19,6 +19,13 @@ from . import models
 from . import server as _server
 from .models import with_room_temp_lock
 import time
+from jsmodule import set_context as set_js_context
+from urllib.parse import urljoin
+
+def set_context(request):
+    return set_js_context({
+        'room_temp_prefix': urljoin(request.path, '$')[:-1]
+    })
 
 @return_jsonp
 def get_servers(request):

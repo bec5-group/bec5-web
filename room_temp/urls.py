@@ -18,6 +18,8 @@ from django.conf.urls import patterns, include, url
 from . import views
 
 urlpatterns = patterns('',
+    url(r'^set-context.js$', views.set_context),
+
     url(r'^get-servers/$', views.get_servers),
     url(r'^get-server-setting/(?P<sid>[^/]*)/$', views.get_server_setting),
 

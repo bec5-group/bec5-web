@@ -20,16 +20,21 @@ import json
 from urllib.parse import urljoin
 from django.conf import settings
 
-def _script_info():
-    return 'ScriptLoader.register(%s);' % json.dumps(script_manager.get_info())
+def set_context(ctx):
+    return HttpResponse('ScriptLoader.set_contexts(%s);' % json.dumps(ctx),
+                        content_type="application/javascript")
+
+def _script_info(path):
+    return ('ScriptLoader.register(%s);' %
+            json.dumps(script_manager.get_info(path)))
 
 def _static_info():
     return ('ScriptLoader._set_static_prefix(%s);' %
             json.dumps(settings.STATIC_URL))
 
 def module_info(request):
-    return (HttpResponse(_script_info() + _static_info(),
-                         content_type="application/javascript"))
+    return HttpResponse(_script_info(request.path) + _static_info(),
+                        content_type="application/javascript")
 
 def _write_load_script(url):
     return "document.write('<script src=%s></script>');" % json.dumps(url)

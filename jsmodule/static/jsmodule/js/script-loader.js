@@ -145,6 +145,18 @@ var ScriptLoader = (function () {
             this.__deps_pending = {};
             this.__checking = {};
             this.__hooks = {};
+            this.__context = {};
+        },
+        set_contexts: function (ctx) {
+            Utils.for_each(ctx, function (name, value) {
+                this.set_context(name, value);
+            }, this);
+        },
+        set_context: function (name, value) {
+            this.__context[name] = value;
+        },
+        get_context: function (name) {
+            return this.__context[name];
         },
         _set_static_prefix: function (prefix) {
             if (prefix.substr(-1) == '/')

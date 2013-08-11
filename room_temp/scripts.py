@@ -15,8 +15,11 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from jsmodule import register_script
+from django.core.urlresolvers import reverse
+from .views import set_context
 
-register_script('becv.room_temp', url="room_temp/js/room-temp.js",
-                static=True, sync_deps=('angular.loader',),
+register_script('becv.room_temp', url="room_temp/js/room-temp.js", static=True,
+                sync_deps=('angular.loader', 'becv.room_temp_context',),
                 deps=('angular', 'becv.request', 'becv.logging',
                       'becv.popup_form', 'angular.ui.bootstrap'),)
+register_script('becv.room_temp_context', url=reverse(set_context))

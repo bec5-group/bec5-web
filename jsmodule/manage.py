@@ -16,6 +16,7 @@
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
+from urllib.parse import urljoin
 
 def static_url(url):
     return staticfiles_storage.url(url)
@@ -32,7 +33,8 @@ class Script:
     @property
     def name(self):
         return self.__name
-    def __init__(self, name, url='', sync_deps=(), deps=(), static=False):
+    def __init__(self, name, url='', sync_deps=(), deps=(), static=False,
+                 jsmodule=False):
         self.__name = name
         if not url:
             raise ValueError('Url of script cannot be empty.')
@@ -40,10 +42,16 @@ class Script:
         self.__sync_deps = _fix_deps(sync_deps)
         self.__deps = _fix_deps(deps)
         self.__static = bool(static)
-    def to_obj(self):
+        self.__jsmodule = bool(jsmodule)
+        if self.__static and self.__jsmodule:
+            raise ValueError('Properties static and jsmodule '
+                             'cannot both be true.')
+    def to_obj(self, path):
         url = self.__url
         if self.__static:
             url = static_url(url)
+        elif self.__jsmodule:
+            url = urljoin(path, url)
         return {
             'name': self.__name,
             'url': url,
@@ -59,8 +67,8 @@ class ScriptManager:
         if name in self.__scripts:
             raise ValueError("Script %s already registered." % name)
         self.__scripts[name] = self.script_class(name, **info)
-    def get_info(self):
-        return dict((name, script.to_obj()) for (name, script)
+    def get_info(self, path):
+        return dict((name, script.to_obj(path)) for (name, script)
                     in self.__scripts.items())
 
 script_manager = ScriptManager()

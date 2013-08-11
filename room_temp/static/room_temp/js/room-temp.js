@@ -17,6 +17,7 @@
  **/
 angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap'], ['$provide', function(p) {
     p.factory('roomTempMgr', ['msgMgr', 'jsonReq', '$dialog', 'popupForm', function(msgMgr, jsonReq, dlg, popupForm) {
+        var url_prefix = ScriptLoader.get_context('room_temp_prefix');
         function RoomTempMgr() {
             this._init.apply(this, arguments);
         }
@@ -71,7 +72,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
                 }, function (res) {
                     if (!res)
                         return;
-                    var url = '/room-temp/add-device/?' + $.param(res);
+                    var url = url_prefix + 'add-device/?' + $.param(res);
                     jsonReq(url, function (data, status) {
                         msgMgr.add('Successfully added device "' +
                                    data.name + '".', 'success');
@@ -80,7 +81,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
                 });
             },
             edit_device: function (id) {
-                var url = '/room-temp/get-device-setting/' + id + '/';
+                var url = url_prefix + 'get-device-setting/' + id + '/';
                 var that = this;
                 jsonReq(url, function (data, status) {
                     that._show_device_dialog(data, function (res) {
@@ -88,7 +89,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
                             return;
                         if ('id' in res)
                             delete res.id;
-                        var url = '/room-temp/edit-device/' + id;
+                        var url = url_prefix + 'edit-device/' + id;
                         url += '/?' + $.param(res);
                         jsonReq(url, function (data, status) {
                             msgMgr.add('Successfully edited device "' +
@@ -115,7 +116,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
                 msgbox.open().then(function (result) {
                     if (!(result === 'yes'))
                         return;
-                    var url = ('/room-temp/del-device/' + id + '/');
+                    var url = url_prefix + 'del-device/' + id + '/';
                     jsonReq(url, function (data, status) {
                         msgMgr.add('Successfully deleted device "' +
                                    server.name + '".', 'success');
@@ -125,7 +126,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
             },
             update_devices: function () {
                 var that = this;
-                jsonReq('/room-temp/get-devices/', function (data, status) {
+                jsonReq(url_prefix + 'get-devices/', function (data, status) {
                     that.server_devices = {};
                     for (var id in data) {
                         if (!data.hasOwnProperty(id))
@@ -145,7 +146,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
             },
             update_servers: function () {
                 var that = this;
-                jsonReq('/room-temp/get-servers/', function (data, status) {
+                jsonReq(url_prefix + 'get-servers/', function (data, status) {
                     that.server_ids = [];
                     that.servers = {};
                     for (var i in data) {
@@ -201,7 +202,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
                 }, function (res) {
                     if (!res)
                         return;
-                    var url = '/room-temp/add-server/?' + $.param(res);
+                    var url = url_prefix + 'add-server/?' + $.param(res);
                     jsonReq(url, function (data, status) {
                         msgMgr.add('Successfully added server "' +
                                    data.name + '".', 'success');
@@ -211,7 +212,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
                 });
             },
             edit_server: function (id) {
-                var url = '/room-temp/get-server-setting/' + id + '/';
+                var url = url_prefix + 'get-server-setting/' + id + '/';
                 var that = this;
                 jsonReq(url, function (data, status) {
                     that._show_server_dialog(data, function (res) {
@@ -219,7 +220,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
                             return;
                         if ('id' in res)
                             delete res.id;
-                        var url = '/room-temp/edit-server/' + id;
+                        var url = url_prefix + 'edit-server/' + id;
                         url += '/?' + $.param(res);
                         jsonReq(url, function (data, status) {
                             msgMgr.add('Successfully edited server "' +
@@ -247,7 +248,7 @@ angular.module('room_temp', ['logging', 'request', 'popup_form', 'ui.bootstrap']
                 msgbox.open().then(function (result) {
                     if (!(result === 'yes'))
                         return;
-                    var url = ('/room-temp/del-server/' + id + '/');
+                    var url = (url_prefix + 'del-server/' + id + '/');
                     jsonReq(url, function (data, status) {
                         msgMgr.add('Successfully deleted server "' +
                                    server.name + '".', 'success');

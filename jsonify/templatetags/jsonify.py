@@ -5,4 +5,4 @@ register = Library()
 
 @register.filter
 def jsonify(object):
-    return simplejson.dumps(object)
+    return simplejson.dumps(object, separators=(',', ':'))

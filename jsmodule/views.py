@@ -21,23 +21,25 @@ from urllib.parse import urljoin
 from django.conf import settings
 
 def set_context(ctx):
-    return HttpResponse('ScriptLoader.set_contexts(%s);' % json.dumps(ctx),
+    return HttpResponse('ScriptLoader.set_contexts(%s);' %
+                        json.dumps(ctx, separators=(',', ':')),
                         content_type="application/x-javascript")
 
 def _script_info(path):
     return ('ScriptLoader.register(%s);' %
-            json.dumps(script_manager.get_info(path)))
+            json.dumps(script_manager.get_info(path), separators=(',', ':')))
 
 def _static_info():
     return ('ScriptLoader._set_static_prefix(%s);' %
-            json.dumps(settings.STATIC_URL))
+            json.dumps(settings.STATIC_URL, separators=(',', ':')))
 
 def module_info(request):
     return HttpResponse(_script_info(request.path) + _static_info(),
                         content_type="application/x-javascript")
 
 def _write_load_script(url):
-    return "document.write('<script src=%s></script>');" % json.dumps(url)
+    return ("document.write('<script src=%s></script>');" %
+            json.dumps(url, separators=(',', ':')))
 
 def loader(request):
     return (HttpResponse(

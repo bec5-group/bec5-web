@@ -68,12 +68,6 @@ _builtin_scripts = {
         'deps': ('angular', 'becv.logging',),
         'sync_deps': ('angular.loader',),
     },
-    'becv.log_mgr': {
-        'url': "jsmodule/js/log-mgr.js",
-        'static': True,
-        'deps': ('angular', 'becv.request',),
-        'sync_deps': ('angular.loader',),
-    },
     'bootstrap.datetimepicker': {
         'url': "jsmodule/js/bootstrap-datetimepicker.min.js",
         'static': True,

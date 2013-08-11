@@ -16,4 +16,3 @@
 
 from . import models
 from . import server
-from . import scripts

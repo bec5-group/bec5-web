@@ -14,10 +14,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls import patterns, include, url
-from . import views
+from django.conf import settings
 
-urlpatterns = patterns('',
-    url(r'^set-context\.js$', views.set_context),
-    url(r'^get-logs/$', views.get_logs),
-)
+def find_scripts():
+    for app in settings.INSTALLED_APPS:
+        try:
+            __import__(app + '.scripts')
+        except ImportError:
+            pass
+
+find_scripts()

@@ -15,6 +15,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from json_view import JSONPError, return_jsonp, auth_jsonp
+from json_view.views import get_log_view
 from . import models, controller as _controller
 from .controller import ctrl_logger
 import time
@@ -214,22 +215,7 @@ def set_temps(request):
 def get_errors(request):
     return _controller.manager.get_errors()
 
-@return_jsonp
-@auth_jsonp
-def get_logs(request):
-    max_count = 1000
-    GET = request.GET
-    logs = ctrl_logger.get_records(GET.get('from'), GET.get('to'),
-                                   max_count + 1)
-    if len(logs) > max_count:
-        return {
-            'logs': logs[:max_count],
-            'is_all': False
-        }
-    return {
-        'logs': logs,
-        'is_all': True
-    }
+get_logs = get_log_view(ctrl_logger)
 
 @return_jsonp
 @auth_jsonp

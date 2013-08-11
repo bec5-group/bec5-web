@@ -14,10 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls import patterns, include, url
-from . import views
+from jsmodule import register_script
+from django.core.urlresolvers import reverse
+from .views import set_context
 
-urlpatterns = patterns('',
-    url(r'^set-context\.js$', views.set_context),
-    url(r'^get-logs/$', views.get_logs),
-)
+register_script('becv.log_mgr', url="json_view/js/log-mgr.js", static=True,
+                sync_deps=('angular.loader',),
+                deps=('angular', 'becv.request',),)
+register_script('becv.json_view_context', url=reverse(set_context))

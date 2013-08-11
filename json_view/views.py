@@ -15,20 +15,29 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .utils import return_jsonp, auth_jsonp, auth_logger
+from jsmodule import set_context as set_js_context
 
-@return_jsonp
-@auth_jsonp
-def get_logs(request):
-    max_count = 1000
-    GET = request.GET
-    logs = auth_logger.get_records(GET.get('from'), GET.get('to'),
-                                   max_count + 1)
-    if len(logs) > max_count:
+def set_context(request):
+    return set_js_context({
+        'json_view_prefix': urljoin(request.path, '$')[:-1]
+    })
+
+def get_log_view(logger):
+    @return_jsonp
+    @auth_jsonp
+    def get_logs(request):
+        max_count = 1000
+        GET = request.GET
+        logs = logger.get_records(GET.get('from'), GET.get('to'), max_count + 1)
+        if len(logs) > max_count:
+            return {
+                'logs': logs[:max_count],
+                'is_all': False
+            }
         return {
-            'logs': logs[:max_count],
-            'is_all': False
+            'logs': logs,
+            'is_all': True
         }
-    return {
-        'logs': logs,
-        'is_all': True
-    }
+    return get_logs
+
+get_logs = get_log_view(auth_logger)

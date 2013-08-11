@@ -157,6 +157,7 @@ INSTALLED_APPS = (
     'jsonify',
     'jsmodule',
     'popup_form',
+    'json_view',
 )
 
 # A sample logging configuration. The only tangible logging

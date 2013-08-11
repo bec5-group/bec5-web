@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="hero-unit" style="height: 100%;" class="text-center">
+<div class="hero-unit text-center" style="height: 100%;">
   <h2 style="display: block;" class="text-center">BEC-V Login Page</h2>
   {% if user.is_authenticated %}
   <alert type="'success'">
@@ -30,12 +30,12 @@
       {% endif %}
       {% csrf_token %}
       <div style="display: inline-block;" class="text-left">
-        <label for="username">User Name</label>
+        <label>User Name</label>
         <input type="text" name="username" placeholder="User Name"/>
-        <label for="password">Password</label>
+        <label>Password</label>
         <input type="password" name="password" placeholder="Password"/>
         <label class="checkbox">
-          <input type="checkbox" name="remember" checked="true"/> Remember Me
+          <input type="checkbox" name="remember" checked/> Remember Me
         </label>
         <input type="hidden" name="next" href-hash="value"
                value="{{ next|escape }}"/>

@@ -236,6 +236,11 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
   <div cond-disp="home_tabs.active == 'oven-temp-log'">
     <!-- TODO -->
   </div>
+  <div cond-disp="home_tabs.active == 'about'">
+    <div>
+      <script type="text/javascript" src="http://www.ohloh.net/p/643497/widgets/project_basic_stats.js"></script>
+    </div>
+  </div>
   <div cond-disp="home_tabs.active == 'oven-ctrl-log'"
        style="overflow: auto; width: 100%;">
     <form>

@@ -129,6 +129,9 @@ becv_app.controller('HomePageCtrl', ['$scope', '$dialog', '$location', 'msgMgr',
             }, {
                 id: 'oven-control',
                 name: 'Oven Control'
+            }, {
+                id: 'about',
+                name: 'About'
             }],
             log: [{
                 id: 'oven-action-log',

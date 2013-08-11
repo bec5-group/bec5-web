@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 #   Copyright (C) 2013~2013 by Yichao Yu
 #   yyc1992@gmail.com
 #

@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 #   Copyright (C) 2013~2013 by Yichao Yu
 #   yyc1992@gmail.com
 #
@@ -15,11 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import threading
-
 """
 Cache result retrieved from log.
 """
+
+import threading
 
 class LinkedList(object):
     __slots__ = ['prev', 'next']

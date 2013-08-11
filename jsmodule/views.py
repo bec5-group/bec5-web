@@ -15,10 +15,20 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.http import HttpResponse
 from .static_loader import load_static
-from .manage import script_manager
+from .manage import script_manager, static_url
 import json
+from urllib.parse import urljoin
 
 def module_info(request):
     return (HttpResponse('ScriptLoader.register(%s)' %
                          json.dumps(script_manager.get_info()),
                          content_type="application/javascript"))
+
+def _write_load_script(url):
+    return "document.write('<script src=%s></script>');" % json.dumps(url)
+
+def loader(request):
+    return (HttpResponse(
+        _write_load_script(static_url('jsmodule/js/script-loader.js'))
+        + _write_load_script(urljoin(request.path, 'module-info.js')),
+        content_type="application/javascript"))

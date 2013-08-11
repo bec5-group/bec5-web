@@ -17,6 +17,9 @@
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 
+def static_url(url):
+    return staticfiles_storage.url(url)
+
 def _fix_deps(deps):
     if not deps:
         return ()
@@ -40,7 +43,7 @@ class Script:
     def to_obj(self):
         url = self.__url
         if self.__static:
-            url = staticfiles_storage.url(url)
+            url = static_url(url)
         return {
             'name': self.__name,
             'url': url,

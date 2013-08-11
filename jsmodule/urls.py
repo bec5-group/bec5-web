@@ -19,4 +19,5 @@ from . import views
 
 urlpatterns = patterns('',
     url(r'^module-info\.js$', views.module_info),
+    url(r'^loader\.js$', views.loader),
 )

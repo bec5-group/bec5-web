@@ -23,7 +23,10 @@ from django.conf import settings
 from . import register_script
 
 def find_scripts():
-    for app in settings.INSTALLED_APPS:
+    main_script = settings.ROOT_URLCONF.split('.')
+    main_script[-1] = 'scripts'
+    main_script = '.'.join(main_script)
+    for app in tuple(settings.INSTALLED_APPS) + (main_script,):
         try:
             for name, info in __import__(app + '.scripts').jsmodules.items():
                 register_script(name, **info)

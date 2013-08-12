@@ -19,9 +19,7 @@ Register site level scripts. Do not put libraries (should go to jsmodule/static)
 or scripts that are related to certain apps (should go to <app>/static) here.
 """
 
-from jsmodule import register_script
-
-_main_scripts = {
+jsmodules = {
     'home_app': {
         'url': "js/home.js",
         'static': True,
@@ -38,6 +36,3 @@ _main_scripts = {
         'sync_deps': ('angular.loader',),
     },
 }
-
-for name, info in _main_scripts.items():
-    register_script(name, **info)

@@ -146,3 +146,5 @@ add_custom_target(bec5-static ALL
   COMMAND /usr/bin/python manage.py collectstatic --noinput --settings=becv.settings_sync
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   DEPENDS bec5-files)
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/static_root/"
+  DESTINATION "${BEC5_PREFIX}/static_root/" USE_SOURCE_PERMISSIONS)

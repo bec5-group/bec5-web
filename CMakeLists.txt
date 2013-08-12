@@ -15,6 +15,10 @@ if("x${SYSTEMD_UNIT_PATH}" STREQUAL "x")
   set(SYSTEMD_UNIT_PATH "${CMAKE_INSTALL_PREFIX}/lib/systemd/system/")
 endif()
 
+if("x${UWSGI_INI_PATH}" STREQUAL "x")
+  set(UWSGI_INI_PATH "/etc/uwsgi/")
+endif()
+
 function(move_file _from _to)
   cmake_utils_to_abs(_from _to)
   cmake_custom_files_to_target(target "${_to}")
@@ -149,6 +153,6 @@ add_custom_target(bec5-static ALL
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/static_root/"
   DESTINATION "${BEC5_PREFIX}/static_root/" USE_SOURCE_PERMISSIONS)
 
-configure_file(data/bec5-web.service.in data/bec5-web.service)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5-web.service"
-  DESTINATION "${SYSTEMD_UNIT_PATH}")
+configure_file(data/bec5.ini.in data/bec5.ini)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.ini"
+  DESTINATION "${UWSGI_INI_PATH}")

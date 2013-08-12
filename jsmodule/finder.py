@@ -28,4 +28,8 @@ def find_scripts():
         except ImportError:
             pass
 
-find_scripts()
+_find_done = False
+
+if not _find_done:
+    _find_done = True
+    find_scripts()

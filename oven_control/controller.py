@@ -14,6 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from time import sleep
 import time
 import json
@@ -37,10 +38,11 @@ class Controller(WithHelper, ErrorLogger):
     def ctrl_cmd(cmd_func):
         def cmd_method(self, *args, **kwargs):
             res = cmd_func(self.__addr, *args, **kwargs)
-            if res is None:
-                printr(cmd_func.__name__, self.__addr, args, res)
-            else:
-                printg(cmd_func.__name__, self.__addr, args, res)
+            if os.environ.get("BEC5_DEBUG", ''):
+                if res is None:
+                    printr(cmd_func.__name__, self.__addr, args, res)
+                else:
+                    printg(cmd_func.__name__, self.__addr, args, res)
             return res
         cmd_method.use_dev_no = getattr(cmd_func, 'use_dev_no', True)
         return cmd_method

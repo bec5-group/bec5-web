@@ -14,6 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from . import utils
 from . import models
 import time
@@ -34,10 +35,11 @@ class RoomTempServer(WithHelper, ErrorLogger):
     def server_cmd(cmd_func):
         def cmd_method(self, *args, **kwargs):
             res = cmd_func(self.__addr, *args, **kwargs)
-            if res is None:
-                printr(cmd_func.__name__, self.__addr, args, res)
-            else:
-                printg(cmd_func.__name__, self.__addr, args, res)
+            if os.environ.get("BEC5_DEBUG", ''):
+                if res is None:
+                    printr(cmd_func.__name__, self.__addr, args, res)
+                else:
+                    printg(cmd_func.__name__, self.__addr, args, res)
             return res
         cmd_method.__name__ = cmd_func.__name__
         return cmd_method

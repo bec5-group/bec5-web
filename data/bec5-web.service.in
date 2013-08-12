@@ -1,9 +1,0 @@
-[Unit]
-Description=BEC 5 Web interface
-After=network.target
-
-[Service]
-ExecStart=/usr/bin/python @BEC5_PREFIX@/manage.py runfcgi method=threaded
-
-[Install]
-WantedBy=multi-user.target

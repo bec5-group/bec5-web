@@ -1,4 +1,4 @@
-project(bec5-web)
+project(bec5-web NONE)
 cmake_minimum_required(VERSION 2.8.3)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -143,6 +143,6 @@ endforeach()
 add_custom_target(bec5-static ALL
   COMMAND rm -rf static_root
   COMMAND mkdir -p static_root
-  COMMAND /usr/bin/python manage.py collectstatic --settings=becv.settings_sync
+  COMMAND /usr/bin/python manage.py collectstatic --noinput --settings=becv.settings_sync
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   DEPENDS bec5-files)

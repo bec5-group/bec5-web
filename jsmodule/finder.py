@@ -26,7 +26,11 @@ def find_scripts():
     main_script = '.'.join(settings.ROOT_URLCONF.split('.')[:-1])
     for app in tuple(settings.INSTALLED_APPS) + (main_script,):
         try:
-            for name, info in __import__(app + '.scripts').jsmodules.items():
+            app = app + '.scripts'
+            mod = __import__(app)
+            for n in app.split('.')[1:]:
+                mod = getattr(mod, n)
+            for name, info in mod.jsmodules.items():
                 register_script(name, **info)
         except ImportError:
             pass

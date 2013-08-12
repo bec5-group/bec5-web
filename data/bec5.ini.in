@@ -7,3 +7,6 @@ processes=1
 threads=8
 socket=/run/uwsgi/bec5.sock
 plugin=python
+single-interpreter=True
+lasy-apps=False
+enable-threads=True

@@ -148,3 +148,7 @@ add_custom_target(bec5-static ALL
   DEPENDS bec5-files)
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/static_root/"
   DESTINATION "${BEC5_PREFIX}/static_root/" USE_SOURCE_PERMISSIONS)
+
+configure_file(data/bec5-web.service.in data/bec5-web.service)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5-web.service"
+  DESTINATION "${SYSTEMD_UNIT_PATH}")

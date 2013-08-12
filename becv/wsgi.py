@@ -14,12 +14,30 @@ framework.
 
 """
 import os
+import sys
 
 # We defer to a DJANGO_SETTINGS_MODULE already in the environment. This breaks
 # if running multiple sites in the same mod_wsgi process. To fix this, use
 # mod_wsgi daemon mode with each site in its own daemon process, or use
 # os.environ["DJANGO_SETTINGS_MODULE"] = "becv.settings"
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "becv.settings")
+
+settings_name = os.environ['DJANGO_SETTINGS_MODULE']
+settings = __import__(settings_name)
+for n in settings_name.split('.')[1:]:
+    settings = getattr(settings, n)
+
+import django.core.management
+django.core.management.setup_environ(settings)
+utility = django.core.management.ManagementUtility()
+command = utility.fetch_command('runserver')
+
+command.validate()
+
+import django.conf
+import django.utils
+
+django.utils.translation.activate(django.conf.settings.LANGUAGE_CODE)
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION

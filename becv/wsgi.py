@@ -23,12 +23,12 @@ import sys
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "becv.settings")
 
 settings_name = os.environ['DJANGO_SETTINGS_MODULE']
-settings = __import__(settings_name)
-for n in settings_name.split('.')[1:]:
-    settings = getattr(settings, n)
+# settings = __import__(settings_name)
+# for n in settings_name.split('.')[1:]:
+#     settings = getattr(settings, n)
 
 import django.core.management
-django.core.management.setup_environ(settings)
+# django.core.management.setup_environ(settings)
 utility = django.core.management.ManagementUtility()
 command = utility.fetch_command('runserver')
 

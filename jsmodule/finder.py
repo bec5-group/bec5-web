@@ -20,16 +20,16 @@ TODO?: also import `scripts` submodule of the main app.
 """
 
 from django.conf import settings
+from . import register_script
 
 def find_scripts():
     for app in settings.INSTALLED_APPS:
         try:
-            __import__(app + '.scripts')
+            for name, info in __import__(app + '.scripts').jsmodules.items():
+                register_script(name, **info)
         except ImportError:
             pass
+        except AttributeError:
+            pass
 
-_find_done = False
-
-if not _find_done:
-    _find_done = True
-    find_scripts()
+find_scripts()

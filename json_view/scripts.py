@@ -14,13 +14,19 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from jsmodule import register_script
 from django.core.urlresolvers import reverse
 from .views import set_context
 
 # script to get log as json request
-register_script('becv.log_mgr', url="json_view/js/log-mgr.js", static=True,
-                sync_deps=('angular.loader',),
-                deps=('angular', 'becv.request',),)
-register_script('becv.json_view_context', url=reverse(set_context),
-                no_cache=True)
+jsmodules = {
+    'becv.log_mgr': {
+        'url': "json_view/js/log-mgr.js",
+        'static': True,
+        'sync_deps': ('angular.loader',),
+        'deps': ('angular', 'becv.request',),
+    },
+    'becv.json_view_context': {
+        'url': reverse(set_context),
+        'no_cache': True,
+    },
+}

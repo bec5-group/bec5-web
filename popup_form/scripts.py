@@ -14,8 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from jsmodule import register_script
-
-register_script('becv.popup_form', url="popup_form/js/popup-form.js",
-                static=True, sync_deps=('angular.loader',),
-                deps=('angular', 'angular.ui.bootstrap'),)
+jsmodules = {
+    'becv.popup_form': {
+        'url': "popup_form/js/popup-form.js",
+        'static': True,
+        'sync_deps': ('angular.loader',),
+        'deps': ('angular', 'angular.ui.bootstrap'),
+    }
+}

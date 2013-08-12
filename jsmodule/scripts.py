@@ -14,13 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .manage import script_manager
-
 _google_cdn = '//ajax.googleapis.com/ajax/libs/'
 _bootstrap_cdn = '//netdna.bootstrapcdn.com/'
 # _cloudflare_cdn = '//cdnjs.cloudflare.com/ajax/libs/'
 
-_builtin_scripts = {
+jsmodules = {
     'array': {
         'url': 'jsmodule/js/array.js',
         'static': True
@@ -74,6 +72,3 @@ _builtin_scripts = {
         'sync_deps': ('jquery', 'bootstrap'),
     },
 }
-
-for name, info in _builtin_scripts.items():
-    script_manager.register(name, **info)

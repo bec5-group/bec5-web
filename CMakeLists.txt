@@ -24,7 +24,7 @@ if("x${SYSTEMD_UNIT_PATH}" STREQUAL "x")
 endif()
 
 if("x${SYSTEMD_TMP_PATH}" STREQUAL "x")
-  set(SYSTEMD_TMP_PATH "/etc/tmpfiles.d/")
+  set(SYSTEMD_TMP_PATH "/usr/lib/tmpfiles.d/")
 endif()
 
 if("x${UWSGI_INI_PATH}" STREQUAL "x")
@@ -32,7 +32,7 @@ if("x${UWSGI_INI_PATH}" STREQUAL "x")
 endif()
 
 if("x${UWSGI_SOCK_PATH}" STREQUAL "x")
-  set(UWSGI_SOCK_PATH "/run/uwsgi/")
+  set(UWSGI_SOCK_PATH "/run/uwsgi/bec5/")
 endif()
 
 function(move_file _from _to)

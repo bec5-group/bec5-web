@@ -176,3 +176,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.ini"
 configure_file(data/bec5.conf.in data/bec5.conf)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.conf"
   DESTINATION "${SYSTEMD_TMP_PATH}")
+
+configure_file(data/bec5.service.in data/bec5.service)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.service"
+  DESTINATION "${SYSTEMD_UNIT_PATH}")

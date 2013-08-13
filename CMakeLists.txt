@@ -7,6 +7,14 @@ include(CompressJS)
 include(CMakePathMacros)
 include(CMakeTargetMacros)
 
+if("x${BEC5_UWSGI_USER}" STREQUAL "x")
+  set(BEC5_UWSGI_USER http)
+endif()
+
+if("x${BEC5_UWSGI_GROUP}" STREQUAL "x")
+  set(BEC5_UWSGI_GROUP http)
+endif()
+
 if("x${BEC5_PREFIX}" STREQUAL "x")
   set(BEC5_PREFIX "/srv/bec5/")
 endif()
@@ -15,8 +23,16 @@ if("x${SYSTEMD_UNIT_PATH}" STREQUAL "x")
   set(SYSTEMD_UNIT_PATH "${CMAKE_INSTALL_PREFIX}/lib/systemd/system/")
 endif()
 
+if("x${SYSTEMD_TMP_PATH}" STREQUAL "x")
+  set(SYSTEMD_TMP_PATH "/etc/tmpfiles.d/")
+endif()
+
 if("x${UWSGI_INI_PATH}" STREQUAL "x")
   set(UWSGI_INI_PATH "/etc/uwsgi/")
+endif()
+
+if("x${UWSGI_SOCK_PATH}" STREQUAL "x")
+  set(UWSGI_SOCK_PATH "/run/uwsgi/")
 endif()
 
 function(move_file _from _to)
@@ -156,3 +172,7 @@ install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/static_root/"
 configure_file(data/bec5.ini.in data/bec5.ini)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.ini"
   DESTINATION "${UWSGI_INI_PATH}")
+
+configure_file(data/bec5.conf.in data/bec5.conf)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.conf"
+  DESTINATION "${SYSTEMD_TMP_PATH}")

@@ -16,7 +16,6 @@
 
 from json_view import JSONPError, return_jsonp, auth_jsonp
 from . import models
-from . import server as _server
 from .models import with_room_temp_lock
 import time
 from jsmodule import set_context as set_js_context
@@ -187,6 +186,8 @@ def _get_logger(loggers, name):
 @return_jsonp
 @auth_jsonp
 def get_value_logs(request):
+    # import within the function to avoid possible circular import
+    from . import server as _server
     max_count = 1000
     GET = request.GET
     loggers = _server.manager.get_loggers()

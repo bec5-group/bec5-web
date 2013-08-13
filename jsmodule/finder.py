@@ -16,7 +16,6 @@
 
 """
 Scan through all installed apps and import the `scripts` submodule.
-TODO?: also import `scripts` submodule of the main app.
 """
 
 from django.conf import settings

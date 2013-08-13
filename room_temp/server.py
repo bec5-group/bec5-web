@@ -75,13 +75,11 @@ class RoomTempServer(WithHelper, ErrorLogger):
         if value is not None:
             self.clear_error(dev.name)
         else:
-            self.set_error(dev.name,
-                           'Get device value failed.')
+            self.set_error(dev.name, 'Get device value failed.')
         return value
     def __update_values(self):
         devs = models.server_get_devices(self.mgr.server)
         values = dict((dev.id, self.__get_dev_value(dev)) for dev in devs)
-        # TODO
         self.mgr.set_values(values)
     def run(self):
         self.__update_values()

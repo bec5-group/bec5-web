@@ -14,4 +14,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import server
+try:
+    from . import server
+except ImportError:
+    # This import is for automatically starting the background process
+    # An ImportError on this is usually caused by import loop in which
+    # case the import is already done.
+    pass

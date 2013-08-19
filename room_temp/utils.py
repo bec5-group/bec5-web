@@ -22,3 +22,10 @@ def query_value(addr, name):
         return float(send_once(addr, cmd))
     except:
         return
+
+def enable_output(addr):
+    try:
+        send_once(addr, 'outputEnable On\n')
+        return True
+    except:
+        return

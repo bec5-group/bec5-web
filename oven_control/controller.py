@@ -98,7 +98,7 @@ class Controller(WithHelper, ErrorLogger):
         return self.__mgr.dev_no
     def __reset_set_temp(self):
         res = repeat_call(self.reset_dev, ('*', self.dev_no, 2), n=3,
-                          wait_time=0.2)
+                          wait_time=0.4)
         if not res is None:
             self.__need_reset = False
             self.clear_error('reset_set_temp')
@@ -107,7 +107,7 @@ class Controller(WithHelper, ErrorLogger):
     def __update_set_temp(self):
         res = repeat_call(self.write_set,
                           ('*', self.dev_no, 2, self.set_temp),
-                          n=3, wait_time=0.2)
+                          n=3, wait_time=0.4)
         # Always reset no matter if a valid response is received since
         # the server may have got the correct value (and therefore return
         # the right value when we ask for the set point), in such case
@@ -121,7 +121,7 @@ class Controller(WithHelper, ErrorLogger):
                            'Update Controller setpoint failed.')
     def __update_disp_temp(self):
         res = repeat_call(self.write_set, ('*', self.dev_no, 1, self.set_temp),
-                          n=3, wait_time=0.1)
+                          n=3, wait_time=0.4)
         if not res is None:
             self.clear_error('update_disp_temp')
         else:
@@ -129,7 +129,7 @@ class Controller(WithHelper, ErrorLogger):
                            'Update Controller setpoint display failed.')
     def __get_real_temp(self):
         temp = repeat_call(self.read_temp, ('*', self.dev_no, 1), n=3,
-                           wait_time=0.1)
+                           wait_time=0.4)
         # result can be 0.0 if the controller is reset
         if temp:
             self.temp = temp
@@ -140,7 +140,7 @@ class Controller(WithHelper, ErrorLogger):
                            'Get Oven Temperature failed.')
     def __get_set_temp(self):
         real_set_temp = repeat_call(self.read_set, ('*', self.dev_no, 2), n=3,
-                                    wait_time=0.1)
+                                    wait_time=0.4)
         if real_set_temp:
             self.real_set_temp = real_set_temp
             # init set point using the value from the device
@@ -155,7 +155,7 @@ class Controller(WithHelper, ErrorLogger):
                            'Get setpoint failed.')
     def __get_disp_temp(self):
         disp_set_temp = repeat_call(self.read_set, ('*', self.dev_no, 1), n=3,
-                                    wait_time=0.1)
+                                    wait_time=0.4)
         if disp_set_temp:
             self.__disp_set_temp = disp_set_temp
         if not disp_set_temp is None:
@@ -178,20 +178,23 @@ class Controller(WithHelper, ErrorLogger):
         if (self.set_temp is not None and
             (self.real_set_temp is None or not self.__set_temp_ok())):
             self.__update_set_temp()
+            sleep(.4)
         if self.__need_reset:
             reseted = True
             self.__reset_set_temp()
+            sleep(.4)
         if (self.set_temp is not None and
             (self.__disp_set_temp is None or not self.__disp_temp_ok())):
             self.__update_disp_temp()
+            sleep(0.4)
         if reseted:
-            sleep(2.5)
+            sleep(2)
         else:
-            sleep(.5)
+            sleep(1)
         self.__get_real_temp()
-        sleep(.1)
+        sleep(.5)
         self.__get_set_temp()
-        sleep(.1)
+        sleep(.5)
         self.__get_disp_temp()
 
 class ControllerWrapper(object):

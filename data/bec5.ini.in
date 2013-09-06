@@ -1,9 +1,10 @@
 [uwsgi]
 chdir=@BEC5_PREFIX@
 module=becv.wsgi:application
-master=True
+master=False
 vacuum=True
 processes=1
+workers=1
 threads=8
 socket=@UWSGI_SOCK_PATH@/bec5.sock
 plugin=python

@@ -28,7 +28,7 @@ from django.conf import settings
 from logger import TimeLogger, bin_logger
 import threading
 
-server_logger = TimeLogger(filename_fmt='room_temp_actoin-%Y-%m-%d.json',
+server_logger = TimeLogger(filename_fmt='room_temp_action-%Y-%m-%d.json',
                            dirname=settings.LOGGING_DIR)
 
 class RoomTempServer(WithHelper, ErrorLogger):

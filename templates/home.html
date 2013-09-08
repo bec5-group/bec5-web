@@ -271,7 +271,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
       <button class="btn" data-ng-click="update_ctrl_logs()">Get Logs</button>
     </form>
     <table class="table table-bordered"
-           style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
+           style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto"
+           data-ng-show="ControllerLog.cur.length">
       <thead>
         <tr>
           <th>Time</th>
@@ -321,7 +322,8 @@ data-ng-init="init({{ action_permissions | jsonify }}, {{ user_obj | jsonify }})
       <button class="btn" data-ng-click="update_auth_logs()">Get Logs</button>
     </form>
     <table class="table table-bordered"
-           style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto">
+           style="width: auto !important; white-space: nowrap; float: none; margin: 0 auto"
+           data-ng-show="TActionLog.cur.length">
       <thead>
         <tr>
           <th>Time</th>

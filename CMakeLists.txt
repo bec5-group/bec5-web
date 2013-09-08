@@ -6,6 +6,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 include(CompressJS)
 include(CMakePathMacros)
 include(CMakeTargetMacros)
+find_package(PythonLibrary REQUIRED)
 
 if("x${BEC5_UWSGI_USER}" STREQUAL "x")
   set(BEC5_UWSGI_USER http)
@@ -64,6 +65,29 @@ function(add_bec5_file src)
   add_dependencies(bec5-files "${target}")
 endfunction()
 
+function(add_bec5_utils_file src)
+  cmake_utils_to_abs(src)
+  cmake_utils_src_to_bin(_bin_path "${src}")
+  move_file("${src}" "${_bin_path}")
+  install(FILES "${_bin_path}"
+    DESTINATION "${PYTHON_SITE_PACKAGES_DIR}/becv_utils")
+  cmake_custom_files_to_target(target "${_bin_path}")
+  add_dependencies(bec5-files "${target}")
+endfunction()
+
+set(BEC5_UTILS_FILES
+  becv_utils/__init__.py
+  becv_utils/math.py
+  becv_utils/network.py
+  becv_utils/print_color.py
+  becv_utils/signal.py
+  becv_utils/thread_helper.py
+  )
+
+foreach(file ${BEC5_UTILS_FILES})
+  add_bec5_utils_file("${file}")
+endforeach()
+
 set(BEC5_FILES
   db/.gitignore
   log/.gitignore
@@ -74,12 +98,6 @@ set(BEC5_FILES
   becv/urls.py
   becv/views.py
   becv/wsgi.py
-  becv_utils/__init__.py
-  becv_utils/math.py
-  becv_utils/network.py
-  becv_utils/print_color.py
-  becv_utils/signal.py
-  becv_utils/thread_helper.py
   jsmodule/__init__.py
   jsmodule/admin.py
   jsmodule/finder.py

@@ -16,3 +16,4 @@
 1. Support multiple backend and plugin for oven controller and room temperature
    monitor
 2. Execute math expressions
+3. Use dbus for central task and remove the requirement for single process.

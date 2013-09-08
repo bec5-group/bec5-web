@@ -547,11 +547,11 @@ becv_app.controller('HomePageCtrl', ['$scope', '$dialog', '$location', 'msgMgr',
         auth_log_from_picker.setLocalDate(null);
         auth_log_to_picker.setLocalDate(null);
         $scope.update_auth_logs = function () {
-            var _from = +(auth_log_from_picker.getLocalDate() ||
-                          new Date()) / 1000;
             var _to = +(auth_log_to_picker.getLocalDate() ||
-                        new Date()) / 1000;
-            $scope.TActionLog.update(_from, _to);
+                        new Date());
+            var _from = +(auth_log_from_picker.getLocalDate() ||
+                          _to - 86400000);
+            $scope.TActionLog.update(_from / 1000, _to / 1000);
         };
 
         var ctrl_log_from_picker = $('#ctrl-log-from').data('datetimepicker');
@@ -559,11 +559,11 @@ becv_app.controller('HomePageCtrl', ['$scope', '$dialog', '$location', 'msgMgr',
         ctrl_log_from_picker.setLocalDate(null);
         ctrl_log_to_picker.setLocalDate(null);
         $scope.update_ctrl_logs = function () {
-            var _from = +(ctrl_log_from_picker.getLocalDate() ||
-                          new Date()) / 1000;
             var _to = +(ctrl_log_to_picker.getLocalDate() ||
-                        new Date()) / 1000;
-            $scope.ControllerLog.update(_from, _to);
+                        new Date());
+            var _from = +(ctrl_log_from_picker.getLocalDate() ||
+                          _to - 86400000);
+            $scope.ControllerLog.update(_from / 1000, _to / 1000);
         };
 
         $scope.addr_to_str = function (addr) {

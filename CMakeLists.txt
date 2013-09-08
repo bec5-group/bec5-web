@@ -95,6 +95,7 @@ endfunction()
 set(BEC5_UTILS_FILES
   becv_utils/__init__.py
   becv_utils/math.py
+  becv_utils/misc.py
   becv_utils/network.py
   becv_utils/print_color.py
   becv_utils/signal.py

@@ -17,6 +17,7 @@
 import weakref
 import threading
 from . import print_except
+from .misc import RefParent
 from time import sleep
 
 def repeat_call(func, args=(), kwargs={}, n=1, wait_time=0, wait_first=True):
@@ -30,18 +31,15 @@ def repeat_call(func, args=(), kwargs={}, n=1, wait_time=0, wait_first=True):
     return res
 
 # Run parent's .run() periodically or when activated in a separate thread.
-class ThreadHelper(object):
+class ThreadHelper(RefParent):
     def __init__(self, parent):
-        self.__parent = weakref.ref(parent)
+        RefParent.__init__(self, parent)
         self.__event = threading.Event()
         self.__thread = threading.Thread(target=self.__run, daemon=True)
         self.__timeout = 1
         self.__running = False
     def activate(self):
         self.__event.set()
-    @property
-    def parent(self):
-        return self.__parent()
     @property
     def timeout(self):
         return self.__timeout
@@ -59,6 +57,7 @@ class ThreadHelper(object):
     def __run_iter(self):
         parent = self.parent
         if parent is None:
+            self.__running = False
             return False
         try:
             parent.run()
@@ -73,7 +72,7 @@ class ThreadHelper(object):
                 break
 
 # class that uses ThreadHelper
-class WithHelper(object):
+class WithHelper:
     def __init__(self):
         self.__helper = ThreadHelper(self)
     def run(self):
@@ -94,4 +93,4 @@ class WithHelper(object):
         if value != old_value:
             self.activate()
     def __del__(self):
-        self.__helper.stop()
+        self.stop()

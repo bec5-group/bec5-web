@@ -15,5 +15,4 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .print_color import (printr, printg, printy, printb, printp,
-                         printbg, print_except, print_stack)
-from .signal import ObjSignal, bind_signal
+                          printbg, print_except, print_stack)

@@ -18,7 +18,7 @@ import os
 from os import path as _path
 import datetime
 import time
-from becv_utils import ObjSignal, bind_signal
+from becv_utils.signal import ObjSignal, bind_signal
 from .logger import BaseLogger
 from .record_cache import RecordCache
 import json

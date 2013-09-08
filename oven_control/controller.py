@@ -25,8 +25,8 @@ from django.utils import timezone as dj_tz
 from becv_utils import printr, printg, printy, printb
 from becv_utils.thread_helper import WithHelper, repeat_call
 from becv_utils.math import to_finite, fix_non_finite
-from logger.error_logger import ErrorLogger
-from logger import TimeLogger, bin_logger
+from becv_logger.error_logger import ErrorLogger
+from becv_logger import TimeLogger, bin_logger
 
 from . import utils
 from . import models

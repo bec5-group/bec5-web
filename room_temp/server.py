@@ -15,18 +15,20 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from . import utils
-from . import models
 import time
 import weakref
+import threading
+
+from django.db.models.signals import post_save, post_delete
+from django.conf import settings
 
 from becv_utils import printr, printg, printy, printb
 from becv_utils.thread_helper import WithHelper, repeat_call
-from logger.error_logger import ErrorLogger
-from django.db.models.signals import post_save, post_delete
-from django.conf import settings
-from logger import TimeLogger, bin_logger
-import threading
+from becv_logger.error_logger import ErrorLogger
+from becv_logger import TimeLogger, bin_logger
+
+from . import utils
+from . import models
 
 server_logger = TimeLogger(filename_fmt='room_temp_action-%Y-%m-%d.json',
                            dirname=settings.LOGGING_DIR)

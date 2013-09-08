@@ -18,7 +18,7 @@ from django.conf import settings
 from becv_utils import print_except
 import json
 from django.http import HttpResponse
-from logger import TimeLogger
+from becv_logger import TimeLogger
 
 auth_logger = TimeLogger(filename_fmt='auth_action_log-%Y-%m-%d.json',
                          dirname=settings.LOGGING_DIR)

@@ -51,7 +51,7 @@ function(move_file _from _to)
   get_filename_component(path "${_to}" PATH)
   add_custom_command(OUTPUT "${_to}"
     COMMAND mkdir -p "${path}"
-    COMMAND cp -i "${_from}" "${_to}"
+    COMMAND cp -if "${_from}" "${_to}"
     DEPENDS "${_from}")
   add_custom_target("${target}" ALL DEPENDS "${_to}")
 endfunction()
@@ -80,14 +80,14 @@ function(add_bec5_file src)
   install(FILES "${_bin_path}" DESTINATION "${install_path}")
 endfunction()
 
-function(add_bec5_utils_file src)
+function(add_bec5_pymodule_file src module)
   cmake_utils_to_abs(src)
   file(RELATIVE_PATH rel_path "${CMAKE_SOURCE_DIR}" "${src}")
   message(STATUS "Adding ${rel_path}.")
   cmake_utils_src_to_bin(_bin_path "${src}")
   move_file("${src}" "${_bin_path}")
   install(FILES "${_bin_path}"
-    DESTINATION "${PYTHON_SITE_PACKAGES_DIR}/becv_utils")
+    DESTINATION "${PYTHON_SITE_PACKAGES_DIR}/${module}")
   cmake_custom_files_to_target(target "${_bin_path}")
   add_dependencies(bec5-files "${target}")
 endfunction()
@@ -102,7 +102,20 @@ set(BEC5_UTILS_FILES
   )
 
 foreach(file ${BEC5_UTILS_FILES})
-  add_bec5_utils_file("${file}")
+  add_bec5_pymodule_file("${file}" becv_utils)
+endforeach()
+
+set(BEC5_LOGGER_FILES
+  becv_logger/__init__.py
+  becv_logger/bin_logger.py
+  becv_logger/date_fname.py
+  becv_logger/error_logger.py
+  becv_logger/logger.py
+  becv_logger/record_cache.py
+  )
+
+foreach(file ${BEC5_LOGGER_FILES})
+  add_bec5_pymodule_file("${file}" becv_logger)
 endforeach()
 
 set(BEC5_FILES
@@ -144,12 +157,6 @@ set(BEC5_FILES
   jsonify/__init__.py
   jsonify/templatetags/__init__.py
   jsonify/templatetags/jsonify.py
-  logger/__init__.py
-  logger/bin_logger.py
-  logger/date_fname.py
-  logger/error_logger.py
-  logger/logger.py
-  logger/record_cache.py
   manage.py
   oven_control/__init__.py
   oven_control/controller.py

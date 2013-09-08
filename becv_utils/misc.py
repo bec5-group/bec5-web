@@ -17,6 +17,8 @@
 import weakref
 import __main__
 
+debug = bool(os.environ.get("BEC5_DEBUG", ''))
+
 def run_no_sync(func, *args, **kwargs):
     if not getattr(__main__, '_django_syncdb', False):
         return func(*args, **kwargs)

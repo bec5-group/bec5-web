@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.yyc-arch.becv
+Exec=/usr/bin/python @BEC5_PREFIX@/bin/becv-manager
+User=@BEC5_UWSGI_USER@

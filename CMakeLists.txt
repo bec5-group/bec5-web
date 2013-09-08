@@ -25,7 +25,7 @@ if("x${SYSTEMD_UNIT_PATH}" STREQUAL "x")
 endif()
 
 if("x${SYSTEMD_TMP_PATH}" STREQUAL "x")
-  set(SYSTEMD_TMP_PATH "/usr/lib/tmpfiles.d/")
+  set(SYSTEMD_TMP_PATH "${CMAKE_INSTALL_PREFIX}/lib/tmpfiles.d/")
 endif()
 
 if("x${UWSGI_INI_PATH}" STREQUAL "x")
@@ -34,6 +34,15 @@ endif()
 
 if("x${UWSGI_SOCK_PATH}" STREQUAL "x")
   set(UWSGI_SOCK_PATH "/run/uwsgi/bec5/")
+endif()
+
+if("x${DBUS_SYSTEM_SERVICE_PATH}" STREQUAL "x")
+  set(DBUS_SYSTEM_SERVICE_PATH
+    "${CMAKE_INSTALL_PREFIX}/share/dbus-1/system-services/")
+endif()
+
+if("x${DBUS_SYSTEM_CONF_PATH}" STREQUAL "x")
+  set(DBUS_SYSTEM_CONF_PATH "/etc/dbus-1/system.d")
 endif()
 
 function(move_file _from _to)
@@ -106,6 +115,7 @@ set(BEC5_FILES
   becv/urls.py
   becv/views.py
   becv/wsgi.py
+  bin/becv-manager
   jsmodule/__init__.py
   jsmodule/admin.py
   jsmodule/finder.py
@@ -206,3 +216,11 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.conf"
 configure_file(data/bec5.service.in data/bec5.service)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.service"
   DESTINATION "${SYSTEMD_UNIT_PATH}")
+
+configure_file(data/org.yyc-arch.becv.service.in data/org.yyc-arch.becv.service)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/org.yyc-arch.becv.service"
+  DESTINATION "${DBUS_SYSTEM_SERVICE_PATH}")
+
+configure_file(data/org.yyc-arch.becv.conf.in data/org.yyc-arch.becv.conf)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/org.yyc-arch.becv.conf"
+  DESTINATION "${DBUS_SYSTEM_CONF_PATH}")

@@ -19,13 +19,12 @@ import time
 import json
 from datetime import datetime as _datetime
 from time import sleep
-from threading import Lock
 
 from dateutil.tz import tzlocal
 from gi.repository import GLib, GObject
 
 from becv_utils import printr, printg, printy, printb
-from becv_utils.misc import debug as _debug, RefParent
+from becv_utils.misc import debug as _debug, RefParent, WithLock
 from becv_utils.math import to_finite, fix_non_finite
 from becv_utils.thread_helper import WithHelper, repeat_call
 from becv_logger import TimeLogger, bin_logger
@@ -33,7 +32,8 @@ from becv_logger.error_logger import ErrorLogger
 
 from . import utils
 
-class Controller(GObject.Object, WithHelper, ErrorLogger, RefParent):
+class Controller(GObject.Object, WithHelper, ErrorLogger,
+                 RefParent, WithLock):
     def ctrl_cmd(cmd_func):
         def cmd_method(self, *args, **kwargs):
             res = cmd_func(self.addr, *args, **kwargs)
@@ -63,18 +63,12 @@ class Controller(GObject.Object, WithHelper, ErrorLogger, RefParent):
     temp = GObject.property(type=float, default=0.0)
     set_temp = GObject.property(type=float, default=0.0)
     real_set_temp = GObject.property(type=float, default=0.0)
-    def __with_lock(func):
-        def _func(self, *args, **kwargs):
-            with self.__lock:
-                return func(self, *args, **kwargs)
-        _func.__name__ = func.__name__
-        return _func
     def __init__(self, ctrl, mgr):
         GObject.Object.__init__(self)
         WithHelper.__init__(self)
+        WithLock.__init__(self)
         ErrorLogger.__init__(self)
         RefParent.__init__(self, mgr)
-        self.__lock = Lock()
         self.__json_fname = None
         self.update(ctrl)
         self.__disp_set_temp = None
@@ -87,10 +81,10 @@ class Controller(GObject.Object, WithHelper, ErrorLogger, RefParent):
         self.set_logger_path(self.parrent.log_dir)
         self.start()
     @property
-    @__with_lock
+    @WithLock.with_lock
     def data_logger(self):
         return self.__data_logger
-    @__with_lock
+    @WithLock.with_lock
     def set_logger_path(self, dirname):
         if dirname is None:
             return
@@ -139,7 +133,7 @@ class Controller(GObject.Object, WithHelper, ErrorLogger, RefParent):
         with open(fname, 'w') as fh:
             content = json.dumps(old_setting, indent=2)
             fh.write(content)
-    @__with_lock
+    @WithLock.with_lock
     def __temp_changed(self, *arg):
         self.__data_logger.info(self.temp)
     def __set_temp_changed(self, *arg):
@@ -147,8 +141,8 @@ class Controller(GObject.Object, WithHelper, ErrorLogger, RefParent):
     def update(self, ctrl):
         self.freeze_notify()
         try:
-            with self.__lock:
-                self.id = ctrl['id']
+            with self.lock:
+                self.id = str(ctrl['id'])
                 self.dev_no = ctrl['number']
                 self.url = ctrl['addr']
                 self.name = ctrl['name']
@@ -269,14 +263,14 @@ class Controller(GObject.Object, WithHelper, ErrorLogger, RefParent):
         self.__get_disp_temp()
 
 @run_no_sync
-class manager(GObject.Object):
+class manager(GObject.Object, WithLock):
     __gsignals__ = {
         'dev-added': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
         'dev-removed': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
     }
     def __init__(self):
         GObject.Object.__init__(self)
-        self.__lock = Lock()
+        WithLock.__init__(self)
         self.__ctrls = {}
         self.__logger = None
         self.__log_dir = None
@@ -286,13 +280,7 @@ class manager(GObject.Object):
     @property
     def logger(self):
         return self.__logger
-    def __with_lock(func):
-        def _func(self, *args, **kwargs):
-            with self.__lock:
-                return func(self, *args, **kwargs)
-        _func.__name__ = func.__name__
-        return _func
-    @__with_lock
+    @WithLock.with_lock
     def set_logger_path(self, dirname):
         if self.__log_dir == dirname:
             return
@@ -306,7 +294,7 @@ class manager(GObject.Object):
         for cid, ctrl_obj in self.__ctrls.items():
             ctrl_obj.set_logger_path(log_dir)
     profile_id = GObject.property(type=str)
-    @__with_lock
+    @WithLock.with_lock
     def __set_controllers(self, ctrls):
         dev_added = set()
         dev_removed = set()
@@ -343,7 +331,7 @@ class manager(GObject.Object):
             except:
                 pass
         return True
-    @__with_lock
+    @WithLock.with_lock
     def get_errors(self):
         errors = {}
         for cid, ctrl in self.__ctrls.items():
@@ -352,18 +340,18 @@ class manager(GObject.Object):
                 errors[cid] = {'name': ctrl.name,
                                'errors': ctrl_errors}
         return errors
-    @__with_lock
+    @WithLock.with_lock
     def get_temps(self):
         return dict((cid, fix_non_finite(ctrl.temp)) for (cid, ctrl)
                     in self.__ctrls.items())
-    @__with_lock
+    @WithLock.with_lock
     def get_setpoint(self):
         return {
             'id': self.profile_id,
             'temps': dict((cid, fix_non_finite(ctrl.set_temp)) for (cid, ctrl)
                           in self.__ctrls.items())
         }
-    @__with_lock
+    @WithLock.with_lock
     def get_data_loggers(self):
         return dict((cid, ctrl.data_logger) for (cid, ctrl)
                     in self.__ctrls.items())

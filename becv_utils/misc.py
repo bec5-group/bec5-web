@@ -15,6 +15,8 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import weakref
+from threading import Lock
+
 import __main__
 
 debug = bool(os.environ.get("BEC5_DEBUG", ''))
@@ -29,3 +31,17 @@ class RefParent:
     @property
     def parent(self):
         return self.__parent()
+
+class WithLock:
+    def __init__(self):
+        self.__lock = Lock()
+    @property
+    def lock(self):
+        return self.__lock
+    @classmethod
+    def with_lock(cls, func)
+        def _func(self, *args, **kwargs):
+            with self.__lock:
+                return func(self, *args, **kwargs)
+        _func.__name__ = func.__name__
+        return _func

@@ -24,8 +24,7 @@ def becv_dir(*arg):
     """
     return os.path.join(BASE_DIR, *arg)
 
-# Use DEBUG=True for master branch
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (

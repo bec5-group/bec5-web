@@ -4,11 +4,13 @@ import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
+from oven_control_service.controller import manager as oven_manager
 
-class BEC5ObjManager(dbus.service.Object):
+class BEC5OvenControlManager(dbus.service.Object):
     def __init__(self, conn):
         dbus.service.Object.__init__(self, conn,
-                                     '/org/yyc_arch/becv')
+                                     '/org/yyc_arch/becv/oven_control')
+        self.__manager = oven_manager
 
 class BEC5DBusManager:
     def __init__(self):
@@ -17,7 +19,7 @@ class BEC5DBusManager:
         self.__sys_bus = dbus.SystemBus()
         self.__bus_name = dbus.service.BusName('org.yyc-arch.becv',
                                                bus=self.__sys_bus)
-        self.__obj_mgr = BEC5ObjManager(self.__sys_bus)
+        self.__obj_mgr = BEC5OvenControlManager(self.__sys_bus)
     def run(self):
         self.__main_loop.run()
 

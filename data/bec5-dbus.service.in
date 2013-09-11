@@ -7,6 +7,7 @@ ExecStart=/usr/bin/python @BEC5_PREFIX@/bin/becv-manager
 Restart=always
 Type=dbus
 BusName=org.yyc-arch.becv
+User=@BEC5_UWSGI_USER@
 
 [Install]
 WantedBy=multi-user.target

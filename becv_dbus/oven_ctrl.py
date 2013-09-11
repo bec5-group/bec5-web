@@ -14,10 +14,28 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from oven_control_service.controller import manager as oven_manager
+from os import path as _path
+import os
+import dbus.service
 
+from oven_control_service.controller import manager as oven_manager
 from .utils import BEC5DBusObj
 
 class BEC5OvenControlManager(BEC5DBusObj):
     def __init__(self, conn):
-        BEC5DBusObj.__init__(self)
+        BEC5DBusObj.__init__(self, conn)
+        self.__manager = oven_manager
+    @dbus.service.method("org.yyc-arch.becv.oven-control",
+                         in_signature="s",
+                         out_signature="b", sender_keyword='sender')
+    def set_log_path(self, dirname, sender=None):
+        if sender is None or not _path.isabs(dirname):
+            return False
+        uid = dbus.get_peer_unix_user(sender)
+        if uid is None or (uid != 0 and uid != os.getuid()):
+            return False
+        try:
+            self.__manager.set_log_path(dirname)
+            return True
+        except:
+            return False

@@ -23,5 +23,5 @@ class BEC5DBusObj(dbus.service.Object):
         self.__mgr = weakref.ref(mgr)
         dbus.service.Object.__init__(self, mgr.conn, self.obj_path)
     @property
-    def manager(self):
+    def becv_manager(self):
         return self.__mgr()

@@ -99,14 +99,14 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
 
         self.update(ctrl)
         self.timeout = 10
-        self.set_logger_path(self.parent.log_dir)
+        self.set_log_path(self.parent.log_dir)
         self.start()
     @property
     @WithLock.with_lock
     def data_logger(self):
         return self.__data_logger
     @WithLock.with_lock
-    def set_logger_path(self, dirname):
+    def set_log_path(self, dirname):
         if dirname is None:
             return
         self.__json_fname = None
@@ -299,7 +299,7 @@ class manager(GObject.Object, WithLock):
     def logger(self):
         return self.__logger
     @WithLock.with_lock
-    def set_logger_path(self, dirname):
+    def set_log_path(self, dirname):
         if self.__log_dir == dirname:
             return
         logger = TimeLogger(filename_fmt='controller_action-%Y-%m-%d.json',
@@ -310,7 +310,7 @@ class manager(GObject.Object, WithLock):
         self.__logger = logger
         self.__log_dir = dirname
         for cid, ctrl_obj in self.__ctrls.items():
-            ctrl_obj.set_logger_path(log_dir)
+            ctrl_obj.set_log_path(log_dir)
     profile_id = GObject.property(type=str)
     @WithLock.with_lock
     def __set_controllers(self, ctrls):

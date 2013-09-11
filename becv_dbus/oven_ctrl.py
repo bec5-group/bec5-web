@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #   Copyright (C) 2013~2013 by Yichao Yu
 #   yyc1992@gmail.com
 #
@@ -15,8 +14,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from becv_dbus.main import BEC5DBusManager
+from oven_control_service.controller import manager as oven_manager
 
-if __name__ == '__main__':
-    manager = BEC5DBusManager()
-    manager.run()
+from .utils import BEC5DBusObj
+
+class BEC5OvenControlManager(BEC5DBusObj):
+    def __init__(self, conn):
+        BEC5DBusObj.__init__(self)

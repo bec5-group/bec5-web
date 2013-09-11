@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #   Copyright (C) 2013~2013 by Yichao Yu
 #   yyc1992@gmail.com
 #
@@ -15,8 +14,21 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from becv_dbus.main import BEC5DBusManager
+import dbus.service
+from dbus.mainloop.glib import DBusGMainLoop
+from gi.repository import GLib
+from .oven_ctrl import BEC5OvenControlManager
 
-if __name__ == '__main__':
-    manager = BEC5DBusManager()
-    manager.run()
+class BEC5DBusManager:
+    def __init__(self):
+        DBusGMainLoop(set_as_default=True)
+        self.__main_loop = GLib.MainLoop()
+        self.__sys_bus = dbus.SystemBus()
+        self.__bus_name = dbus.service.BusName('org.yyc-arch.becv',
+                                               bus=self.__sys_bus)
+        self.__obj_mgr = BEC5OvenControlManager(self)
+    @property
+    def conn(self):
+        return self.__sys_bus
+    def run(self):
+        self.__main_loop.run()

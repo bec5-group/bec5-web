@@ -21,6 +21,7 @@ from becv_utils import print_except, printb, printr, printg
 from oven_control_service.controller import manager as oven_manager
 from .utils import BEC5DBusObj, BEC5DBusFmtObj
 from .logger import BEC5Logger, BEC5DataLogger
+from becv_utils.math import fix_non_finite
 
 class BEC5OvenController(BEC5DBusFmtObj):
     obj_path_fmt = '/org/yyc_arch/becv/oven_control/%s'
@@ -55,15 +56,15 @@ class BEC5OvenController(BEC5DBusFmtObj):
     @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
                         in_signature="", out_signature="d", error_ret=0.0)
     def get_temp(self):
-        return self.__ctrl.temp
+        return fix_non_finite(self.__ctrl.temp)
     @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
                         in_signature="", out_signature="d", error_ret=0.0)
     def get_set_temp(self):
-        return self.__ctrl.set_temp
+        return fix_non_finite(self.__ctrl.set_temp)
     @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
                         in_signature="", out_signature="d", error_ret=0.0)
     def get_real_set_temp(self):
-        return self.__ctrl.real_set_temp
+        return fix_non_finite(self.__ctrl.real_set_temp)
     @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
                         in_signature="d", out_signature="b")
     def set_temp(self, value):
@@ -108,3 +109,24 @@ class BEC5OvenControlManager(BEC5DBusObj):
                         in_signature="", out_signature="o", error_ret=None)
     def get_logger(self):
         return BEC5Logger.get(self.becv_manager, self.__manager.logger)
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="sa{sd}", out_signature="b")
+    def set_temps(self, profile, temps):
+        return self.__manager.set_temps(profile, temps)
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="a{s(saa{ss})}")
+    def get_errors(self):
+        return self.__manager.get_errors()
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="a{sd}")
+    def get_temps(self):
+        return self.__manager.get_temps()
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="sa{sd}")
+    def get_setpoints(self):
+        return self.__manager.get_setpoints()
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="a{so}")
+    def get_data_loggers(self):
+        return {cid: BEC5DataLogger.get(self.becv_manager, logger)
+                for cid, logger in self.__manager.get_data_loggers().items()}

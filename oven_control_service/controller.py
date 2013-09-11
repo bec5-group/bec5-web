@@ -357,21 +357,17 @@ class manager(GObject.Object, WithLock):
         for cid, ctrl in self.__ctrls.items():
             ctrl_errors = ctrl.get_errors()
             if ctrl_errors:
-                errors[cid] = {'name': ctrl.name,
-                               'errors': ctrl_errors}
+                errors[cid] = (ctrl.name, ctrl_errors)
         return errors
     @WithLock.with_lock
     def get_temps(self):
-        return dict((cid, fix_non_finite(ctrl.temp)) for (cid, ctrl)
-                    in self.__ctrls.items())
+        return {cid: fix_non_finite(ctrl.temp) for cid, ctrl
+                in self.__ctrls.items()}
     @WithLock.with_lock
     def get_setpoints(self):
-        return {
-            'id': self.profile_id,
-            'temps': dict((cid, fix_non_finite(ctrl.set_temp)) for (cid, ctrl)
-                          in self.__ctrls.items())
-        }
+        return (self.profile_id,
+                {cid: fix_non_finite(ctrl.set_temp) for cid, ctrl
+                 in self.__ctrls.items()})
     @WithLock.with_lock
     def get_data_loggers(self):
-        return dict((cid, ctrl.data_logger) for (cid, ctrl)
-                    in self.__ctrls.items())
+        return {cid: ctrl.data_logger for cid, ctrl in self.__ctrls.items()}

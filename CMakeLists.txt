@@ -225,6 +225,10 @@ configure_file(data/bec5.service.in data/bec5.service)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.service"
   DESTINATION "${SYSTEMD_UNIT_PATH}")
 
+configure_file(data/bec5-dbus.service.in data/bec5-dbus.service)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5-dbus.service"
+  DESTINATION "${SYSTEMD_UNIT_PATH}")
+
 configure_file(data/org.yyc-arch.becv.service.in data/org.yyc-arch.becv.service)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/org.yyc-arch.becv.service"
   DESTINATION "${DBUS_SYSTEM_SERVICE_PATH}")

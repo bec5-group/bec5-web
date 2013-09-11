@@ -1,0 +1,12 @@
+[Unit]
+Description=BEC 5 control service
+After=syslog.target
+
+[Service]
+ExecStart=/usr/bin/python @BEC5_PREFIX@/bin/becv-manager
+Restart=always
+Type=dbus
+BusName=org.yyc-arch.becv
+
+[Install]
+WantedBy=multi-user.target

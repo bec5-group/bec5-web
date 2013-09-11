@@ -2,3 +2,4 @@
 Name=org.yyc-arch.becv
 Exec=/usr/bin/python @BEC5_PREFIX@/bin/becv-manager
 User=@BEC5_UWSGI_USER@
+SystemdServce=bec5-dbus.service

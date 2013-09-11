@@ -42,7 +42,7 @@ class BEC5OvenControlManager(BEC5DBusObj):
         self.__ctrl_objs[cid].remove_from_connection()
         del self.__ctrl_objs[cid]
     def __check_sender(self, sender):
-        if sender is None or not _path.isabs(dirname):
+        if sender is None:
             return False
         uid = self.becv_manager.conn.get_peer_unix_user(sender)
         if uid is None or (uid != 0 and uid != os.getuid()):
@@ -52,7 +52,7 @@ class BEC5OvenControlManager(BEC5DBusObj):
                          in_signature="s",
                          out_signature="b", sender_keyword='sender')
     def set_log_path(self, dirname, sender=None):
-        if not self.__check_sender(sender):
+        if not _path.isabs(dirname) or not self.__check_sender(sender):
             return False
         try:
             self.__manager.set_log_path(dirname)

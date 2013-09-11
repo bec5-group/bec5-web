@@ -43,7 +43,7 @@ def to_ins(args, **kwargs):
 
 @to_ins
 def set_attr():
-    class attr_setter(object):
+    class attr_setter:
         def __init__(self, attrs):
             self.__attrs = attrs
         def __getattr__(self, attr):
@@ -55,7 +55,7 @@ def set_attr():
                 setattr(obj, self.__attrs[-1], func)
                 return func
             return _deco
-    class _set_attr(object):
+    class _set_attr:
         def __getattr__(self, name):
             return attr_setter((name,))
     return _set_attr()

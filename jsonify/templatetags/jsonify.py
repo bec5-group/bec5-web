@@ -4,5 +4,5 @@ from django.template import Library
 register = Library()
 
 @register.filter
-def jsonify(object):
-    return simplejson.dumps(object, separators=(',', ':'))
+def jsonify(obj):
+    return simplejson.dumps(obj, separators=(',', ':'))

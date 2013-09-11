@@ -88,7 +88,7 @@ class RoomTempServer(WithHelper, ErrorLogger):
     def run(self):
         self.__update_values()
 
-class ServerWrapper(object):
+class ServerWrapper:
     def __init__(self, server):
         self.server = server
         self.__server = RoomTempServer((server.addr, server.port), self)
@@ -145,7 +145,7 @@ class ServerWrapper(object):
                 except:
                     pass
 
-class ServerManager(object):
+class ServerManager:
     def __init__(self):
         self.__servers = {}
         self.__update_server_list()

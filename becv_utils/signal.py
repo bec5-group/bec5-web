@@ -20,7 +20,7 @@ For object.signal.(dis)connect syntax.
 
 from django.dispatch import Signal
 
-class SignalWrapper(object):
+class SignalWrapper:
     def __init__(self, signal, obj):
         self.__signal = signal
         self.__obj = obj

@@ -15,7 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class BaseLogger(object):
+class BaseLogger:
     def _log_handler(self, level, *arg, **kwargs):
         pass
     def log(self, level, *arg, **kwargs):

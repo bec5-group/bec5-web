@@ -1,5 +1,6 @@
 set(BEC5_UTILS_FILES
   __init__.py
+  gsignal.py
   math.py
   misc.py
   network.py

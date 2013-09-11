@@ -18,6 +18,7 @@ from os import path as _path
 import os
 import dbus.service
 
+from becv_utils import print_except, printb, printr, printg
 from oven_control_service.controller import manager as oven_manager
 from .utils import BEC5DBusObj, BEC5DBusFmtObj
 
@@ -44,7 +45,8 @@ class BEC5OvenControlManager(BEC5DBusObj):
     def __check_sender(self, sender):
         if sender is None:
             return False
-        uid = self.becv_manager.conn.get_peer_unix_user(sender)
+        uid = self.becv_manager.get_peer_uid(sender)
+        printb(uid)
         if uid is None or (uid != 0 and uid != os.getuid()):
             return False
         return True
@@ -58,6 +60,7 @@ class BEC5OvenControlManager(BEC5DBusObj):
             self.__manager.set_log_path(dirname)
             return True
         except:
+            print_except()
             return False
     @dbus.service.method("org.yyc_arch.becv.oven_control",
                          in_signature="aa{sv}",

@@ -115,8 +115,8 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
             del self.__data_logger
         self.__data_logger = bin_logger.FloatDateLogger(self.__log_name_fmt,
                                                         dirname)
-        self.__data_logger.opened.connect(self.__on_log_open)
-    def __on_log_open(self, sender=None, name=None, **kwargs):
+        self.__data_logger.connect('opened', self.__on_log_open)
+    def __on_log_open(self, sender, name):
         if name.endswith('.log'):
             name = name[:-4]
         name = name + '.json'

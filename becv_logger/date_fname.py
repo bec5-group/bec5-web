@@ -15,23 +15,28 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from os import path as _path
-import datetime
+import json
 import time
-from becv_utils.signal import ObjSignal, bind_signal
+import datetime
+import threading
+from os import path as _path
+from gi.repository import GLib, GObject
+
+from becv_utils.gsignal import bind_gsignal
 from .logger import BaseLogger
 from .record_cache import RecordCache
-import json
-import threading
 
-class DateFileBase(object):
-    changed = ObjSignal(providing_args=['old_name', 'new_name'])
-    closed = ObjSignal(providing_args=['name'])
-    opened = ObjSignal(providing_args=['name'])
+class DateFileBase(GObject.Object):
+    __gsignals__ = {
+        'changed': (GObject.SIGNAL_RUN_FIRST, None, (str, str,)),
+        'closed': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
+        'opened': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
+    }
 
 class DateFileStream(DateFileBase):
     def __init__(self, filename_fmt, dirname, mode='a', file_open=open,
                  read_mode='r', read_open=open):
+        DateFileBase.__init__(self)
         self.__fname_fmt = filename_fmt
         self.__dirname = _path.abspath(dirname)
         self.__cur_fname = None
@@ -57,14 +62,14 @@ class DateFileStream(DateFileBase):
         old_fname = self.__cur_fname
         try:
             if self.__cur_stream is not None:
-                self.closed.send_robust(name=old_fname)
+                self.emit('closed', old_fname)
                 self.__cur_stream.close()
         except:
             pass
-        self.opened.send_robust(name=full_name)
+        self.emit('opened', full_name)
         self.__cur_stream = self.__file_open(full_name, self.__mode)
         if old_fname is not None:
-            self.changed.send_robust(new_name=full_name, old_name=old_fname)
+            self.emit('changed', full_name, old_fname)
         self.__cur_fname = full_name
     @property
     def stream(self):
@@ -72,7 +77,7 @@ class DateFileStream(DateFileBase):
         return self.__cur_stream
     def close(self):
         if self.__cur_stream is not None:
-            self.closed.send_robust(name=self.__cur_fname)
+            self.emit('closed', self.__cur_fname)
             self.__cur_stream.close()
             self.__cur_stream = None
         self.__cur_fname = None
@@ -117,17 +122,16 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
         RecordCache.__init__(self, record_num)
 
         self.__stm_factory = DateFileStream(filename_fmt, dirname, **kwargs)
-        self.__opened = bind_signal(self.__stm_factory.opened, self.opened)
-        self.__changed = bind_signal(self.__stm_factory.changed, self.changed)
-        self.__closed = bind_signal(self.__stm_factory.closed, self.closed)
+        bind_gsignal(self.__stm_factory, 'opened', self, 'opened')
+        bind_gsignal(self.__stm_factory, 'changed', self, 'changed')
+        bind_gsignal(self.__stm_factory, 'closed', self, 'closed')
 
         self.__lock = threading.Lock()
         self.__cur_record = None
         self.__cur_fname = None
-        self.opened.connect(self.__on_file_open)
-        stm = self.stream
+        self.connect('opened', self.__on_file_open)
 
-    def __on_file_open(self, name='', **kwargs):
+    def __on_file_open(self, sender, name):
         if self.__cur_fname == name:
             return
         if self.__cur_fname is not None:

@@ -27,6 +27,11 @@ class BEC5DBusManager:
         self.__bus_name = dbus.service.BusName('org.yyc_arch.becv',
                                                bus=self.__sys_bus)
         self.__obj_mgr = BEC5OvenControlManager(self)
+        self.__dbus_mgr = self.__sys_bus.get_object('org.freedesktop.DBus', '/')
+        self.__dbus_mgr_iface = dbus.Interface(
+            self.__dbus_mgr, dbus_interface='org.freedesktop.DBus')
+    def get_peer_uid(self, sender):
+        return self.__dbus_mgr_iface.GetConnectionUnixUser(sender)
     @property
     def conn(self):
         return self.__sys_bus

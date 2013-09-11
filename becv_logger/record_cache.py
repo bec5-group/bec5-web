@@ -20,8 +20,7 @@ Cache result retrieved from log.
 
 import threading
 
-class LinkedList(object):
-    __slots__ = ['prev', 'next']
+class LinkedList:
     def __init__(self):
         self.__init_link()
     def __init_link(self):
@@ -51,7 +50,6 @@ class LinkedList(object):
         self.prev = ele
 
 class _CacheItem(LinkedList):
-    __slots__ = ['prev', 'next', 'data', 'count', 'key']
     def __init__(self, key, data):
         LinkedList.__init__(self)
         self.data = data

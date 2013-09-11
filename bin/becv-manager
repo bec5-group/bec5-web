@@ -16,7 +16,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from becv_dbus.main import BEC5DBusManager
+from gi.repository import GLib
 
 if __name__ == '__main__':
+    GLib.threads_init()
     manager = BEC5DBusManager()
     manager.run()

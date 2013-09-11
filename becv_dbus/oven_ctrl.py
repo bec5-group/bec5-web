@@ -23,7 +23,7 @@ from oven_control_service.controller import manager as oven_manager
 from .utils import BEC5DBusObj, BEC5DBusFmtObj
 
 class BEC5OvenController(BEC5DBusFmtObj):
-    obj_path_fmt = '/org/yyc_arch/becv/oven_control/%d'
+    obj_path_fmt = '/org/yyc_arch/becv/oven_control/%s'
     def __init__(self, conn, ctrl):
         self.__ctrl = ctrl
         BEC5DBusFmtObj.__init__(self, conn, ctrl.id)
@@ -39,14 +39,13 @@ class BEC5OvenControlManager(BEC5DBusObj):
     def __on_dev_added(self, mgr, cid):
         self.__ctrl_objs[cid] = BEC5OvenController(self.becv_manager,
                                                    self.__manager[cid])
-    def __on_dev_removed(self):
+    def __on_dev_removed(self, mgr, cid):
         self.__ctrl_objs[cid].remove_from_connection()
         del self.__ctrl_objs[cid]
     def __check_sender(self, sender):
         if sender is None:
             return False
         uid = self.becv_manager.get_peer_uid(sender)
-        printb(uid)
         if uid is None or (uid != 0 and uid != os.getuid()):
             return False
         return True
@@ -72,4 +71,5 @@ class BEC5OvenControlManager(BEC5DBusObj):
             self.__manager.set_controllers(ctrls)
             return True
         except:
+            print_except()
             return False

@@ -39,9 +39,9 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
             res = cmd_func(self.addr, *args, **kwargs)
             if _debug:
                 if res is None:
-                    printr(cmd_func.__name__, self.addr, args, res)
+                    printr(cmd_func.__name__, time.time(), self.addr, args, res)
                 else:
-                    printg(cmd_func.__name__, self.addr, args, res)
+                    printg(cmd_func.__name__, time.time(), self.addr, args, res)
             return res
         cmd_method.__name__ = cmd_func.__name__
         cmd_method.use_dev_no = getattr(cmd_func, 'use_dev_no', True)
@@ -312,7 +312,7 @@ class manager(GObject.Object, WithLock):
         self.__logger = logger
         self.__log_dir = dirname
         for cid, ctrl_obj in self.__ctrls.items():
-            ctrl_obj.set_log_path(log_dir)
+            ctrl_obj.set_log_path(dirname)
     profile_id = GObject.property(type=str)
     @WithLock.with_lock
     def __set_controllers(self, ctrls):
@@ -332,8 +332,8 @@ class manager(GObject.Object, WithLock):
                 dev_added.add(cid)
         for cid, ctrl_obj in self.__ctrls.items():
             ctrl_obj.remove()
-            del self.__ctrls[cid]
             dev_removed.add(cid)
+        self.__ctrls.clear()
         self.__ctrls = ctrl_objs
         return dev_added, dev_removed
     def set_controllers(self, ctrls):

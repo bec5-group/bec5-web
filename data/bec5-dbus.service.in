@@ -6,7 +6,7 @@ After=syslog.target
 ExecStart=/usr/bin/python @BEC5_PREFIX@/bin/becv-manager
 Restart=always
 Type=dbus
-BusName=org.yyc-arch.becv
+BusName=org.yyc_arch.becv
 User=@BEC5_UWSGI_USER@
 
 [Install]

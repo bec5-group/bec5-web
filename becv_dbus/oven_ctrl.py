@@ -27,6 +27,48 @@ class BEC5OvenController(BEC5DBusFmtObj):
     def __init__(self, conn, ctrl):
         self.__ctrl = ctrl
         BEC5DBusFmtObj.__init__(self, conn, ctrl.id)
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="s", error_ret='')
+    def get_id(self):
+        return self.__ctrl.id
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="s", error_ret='')
+    def get_name(self):
+        return self.__ctrl.name
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="(si)",
+                        error_ret=('', -1))
+    def get_addr(self):
+        return self.__ctrl.addr
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="s", error_ret='')
+    def get_url(self):
+        return self.__ctrl.url
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="i", error_ret=-1)
+    def get_port(self):
+        return self.__ctrl.port
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="i", error_ret=-1)
+    def get_dev_no(self):
+        return self.__ctrl.dev_no
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="d", error_ret=0.0)
+    def get_temp(self):
+        return self.__ctrl.temp
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="d", error_ret=0.0)
+    def get_set_temp(self):
+        return self.__ctrl.set_temp
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="d", error_ret=0.0)
+    def get_real_set_temp(self):
+        return self.__ctrl.real_set_temp
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="d", out_signature="b")
+    def set_temp(self, value):
+        self.__ctrl.set_temp = value
+        return True
 
 class BEC5OvenControlManager(BEC5DBusObj):
     obj_path = '/org/yyc_arch/becv/oven_control'
@@ -42,34 +84,15 @@ class BEC5OvenControlManager(BEC5DBusObj):
     def __on_dev_removed(self, mgr, cid):
         self.__ctrl_objs[cid].remove_from_connection()
         del self.__ctrl_objs[cid]
-    def __check_sender(self, sender):
-        if sender is None:
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="s", out_signature="b")
+    def set_log_path(self, dirname):
+        if not _path.isabs(dirname):
             return False
-        uid = self.becv_manager.get_peer_uid(sender)
-        if uid is None or (uid != 0 and uid != os.getuid()):
-            return False
+        self.__manager.set_log_path(dirname)
         return True
-    @dbus.service.method("org.yyc_arch.becv.oven_control",
-                         in_signature="s",
-                         out_signature="b", sender_keyword='sender')
-    def set_log_path(self, dirname, sender=None):
-        if not _path.isabs(dirname) or not self.__check_sender(sender):
-            return False
-        try:
-            self.__manager.set_log_path(dirname)
-            return True
-        except:
-            print_except()
-            return False
-    @dbus.service.method("org.yyc_arch.becv.oven_control",
-                         in_signature="aa{sv}",
-                         out_signature="b", sender_keyword='sender')
-    def set_controllers(self, ctrls, sender=None):
-        if not self.__check_sender(sender):
-            return False
-        try:
-            self.__manager.set_controllers(ctrls)
-            return True
-        except:
-            print_except()
-            return False
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="aa{sv}", out_signature="b")
+    def set_controllers(self, ctrls):
+        self.__manager.set_controllers(ctrls)
+        return True

@@ -15,7 +15,10 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import weakref
+import decorator
+import inspect
 import dbus.service
+from becv_utils import print_except, printb, printr, printg
 
 class BEC5DBusObj(dbus.service.Object):
     obj_path = '/org/yyc_arch/becv'
@@ -25,6 +28,33 @@ class BEC5DBusObj(dbus.service.Object):
     @property
     def becv_manager(self):
         return self.__mgr()
+    def __check_sender(self, sender):
+        if sender is None:
+            return False
+        uid = self.__mgr().get_peer_uid(sender)
+        if uid is None or (uid != 0 and uid != os.getuid()):
+            return False
+        return True
+    @classmethod
+    def method(cls, *a, error_ret=False, **kw):
+        dbus_deco = dbus.service.method(*a, sender_keyword='_sender', **kw)
+        def _deco(func):
+            def _func(self, *_args, _sender=None):
+                if not self.__check_sender(_sender):
+                    return error_ret
+                try:
+                    return func(self, *_args)
+                except:
+                    print_except()
+                    return error_ret
+            eval_dict = {'_func': _func}
+            args = ', '.join(inspect.getfullargspec(func)[0])
+            name = func.__name__
+            _func = decorator.FunctionMaker.create(
+                '%s(%s, _sender=None)' % (name, args),
+                'return _func(%s, _sender=_sender)' % args, eval_dict)
+            return dbus_deco(_func)
+        return _deco
 
 class BEC5DBusFmtObj(BEC5DBusObj):
     obj_path_fmt = '/org/yyc_arch/becv/%d'

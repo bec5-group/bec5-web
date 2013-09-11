@@ -20,7 +20,7 @@ import dbus.service
 from becv_utils import print_except, printb, printr, printg
 from oven_control_service.controller import manager as oven_manager
 from .utils import BEC5DBusObj, BEC5DBusFmtObj
-from .logger import BEC5Logger
+from .logger import BEC5Logger, BEC5DataLogger
 
 class BEC5OvenController(BEC5DBusFmtObj):
     obj_path_fmt = '/org/yyc_arch/becv/oven_control/%s'
@@ -70,9 +70,13 @@ class BEC5OvenController(BEC5DBusFmtObj):
         self.__ctrl.set_temp = value
         return True
     @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
-                        in_signature="", out_signature="o")
+                        in_signature="", out_signature="o", error_ret=None)
     def get_data_logger(self):
-        return BEC5Logger.get(self.becv_manager, self.__ctrl.data_logger)
+        return BEC5DataLogger.get(self.becv_manager, self.__ctrl.data_logger)
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="aa{ss}")
+    def get_errors(self):
+        return self.__ctrl.get_errors()
 
 class BEC5OvenControlManager(BEC5DBusObj):
     obj_path = '/org/yyc_arch/becv/oven_control'
@@ -100,3 +104,7 @@ class BEC5OvenControlManager(BEC5DBusObj):
     def set_controllers(self, ctrls):
         self.__manager.set_controllers(ctrls)
         return True
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="o", error_ret=None)
+    def get_logger(self):
+        return BEC5Logger.get(self.becv_manager, self.__manager.logger)

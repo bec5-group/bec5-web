@@ -17,9 +17,10 @@
 import weakref
 import threading
 import dbus.service
+import json
 
 from becv_utils import print_except, printb, printr, printg
-from .utils import BEC5DBusFmtObj
+from .utils import BEC5DBusFmtObj, BEC5DBusObj
 
 class BEC5Logger(BEC5DBusFmtObj):
     __logger_count = 0
@@ -49,3 +50,17 @@ class BEC5Logger(BEC5DBusFmtObj):
     def __logger_destroied(self, *args):
         del self.__objs[self.__logger_id]
         self.remove_from_connection()
+    # May looks stupid to use json here but I'm too lazy to figure out how to
+    # make python-dbus does the right packaging. Also the json format is pretty
+    # efficient, at least better than pickle for types that it can handle.
+    @BEC5DBusObj.method("org.yyc_arch.becv.logger", threaded=True,
+                        in_signature="ddi", out_signature="s", error_ret='')
+    def get_records(self, _from, to, max_count):
+        return json.dumps(self.__logger().get_records(_from, to, max_count),
+                          separators=(',', ':'))
+
+class BEC5DataLogger(BEC5Logger):
+    @BEC5DBusObj.method("org.yyc_arch.becv.logger", threaded=True,
+                        in_signature="ddi", out_signature="a(id)", error_ret=())
+    def get_range(self, _from, to, max_count):
+        return self.logger.get_range(_from, to, max_count)

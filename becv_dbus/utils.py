@@ -18,6 +18,8 @@ import weakref
 import decorator
 import inspect
 import dbus.service
+import threading
+from gi.repository import GLib
 from becv_utils import print_except, printb, printr, printg
 
 class BEC5DBusObj(dbus.service.Object):
@@ -36,8 +38,14 @@ class BEC5DBusObj(dbus.service.Object):
             return False
         return True
     @classmethod
-    def method(cls, *a, error_ret=False, **kw):
-        dbus_deco = dbus.service.method(*a, sender_keyword='_sender', **kw)
+    def method(cls, *a, error_ret=False, threaded=False, **kw):
+        if threaded:
+            dbus_deco = dbus.service.method(*a, sender_keyword='_sender',
+                                            async_callbacks=('_reply_hdl',
+                                                             '_error_hdl'),
+                                            **kw)
+        else:
+            dbus_deco = dbus.service.method(*a, sender_keyword='_sender', **kw)
         def _deco(func):
             def _func(self, *_args, _sender=None):
                 if not self.__check_sender(_sender):
@@ -47,12 +55,28 @@ class BEC5DBusObj(dbus.service.Object):
                 except:
                     print_except()
                     return error_ret
+            func_fmt = '%s(%s, _sender=None)'
+            func_fmt2 = '_func(%s, _sender=_sender)'
+            if threaded:
+                func_fmt = ('%s(%s, _sender=None, _reply_hdl=None, '
+                            '_error_hdl=None)')
+                func_fmt2 = ('_func(%s, _sender=_sender, '
+                             '_reply_hdl=_reply_hdl, _error_hdl=_error_hdl)')
+                __func = _func
+                def _func(self, *_args, _sender=None, _reply_hdl=None,
+                          _error_hdl=None):
+                    def __worker():
+                        res = __func(self, *_args, _sender=_sender)
+                        ctx = GLib.main_context_default()
+                        ctx.invoke_full(0, _reply_hdl, res)
+                    thread = threading.Thread(target=__worker, daemon=True)
+                    thread.start()
             eval_dict = {'_func': _func}
-            args = ', '.join(inspect.getfullargspec(func)[0])
+            args_sig = ', '.join(inspect.getfullargspec(func)[0])
             name = func.__name__
             _func = decorator.FunctionMaker.create(
-                '%s(%s, _sender=None)' % (name, args),
-                'return _func(%s, _sender=_sender)' % args, eval_dict)
+                func_fmt % (name, args_sig),
+                'return ' + func_fmt2 % args_sig, eval_dict)
             return dbus_deco(_func)
         return _deco
 

@@ -97,13 +97,16 @@ class FloatDateLogger(BinDateLogger):
             last_t = t
             yield t, v
     def get_range_it(self, _from, to=None, max_count=None):
-        if max_count is None:
+        if max_count is None or max_count < 0:
             return self.get_records_it(_from, to)
         _from = int(float(_from))
         try:
-            to = int(float(to))
+            to = float(to)
+            if to < 0:
+                raise ValueError
         except:
             to = time.time()
+        to = int(to)
         return self.__get_range_it_limited(_from, to, max_count)
     def get_range(self, _from, to=None, max_count=None):
         return list(self.get_range_it(_from, to=to, max_count=max_count))

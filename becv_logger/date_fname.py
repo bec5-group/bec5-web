@@ -176,11 +176,16 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
     def get_records(self, _from, to=None, max_count=None):
         return list(self.get_records_it(_from, to=to, max_count=max_count))
     def get_records_it(self, _from, to=None, max_count=None):
+        if max_count is None:
+            max_count = -1
         _from = int(float(_from))
         try:
-            to = int(float(to))
+            to = float(to)
+            if to < 0:
+                raise ValueError
         except:
             to = time.time()
+        to = int(to)
         calc_name = self.__stm_factory.calc_name
         cur_time = _from
         cur_name = calc_name(_from)
@@ -197,7 +202,7 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
                     continue
                 count += 1
                 yield rec
-                if max_count is not None and count >= max_count:
+                if max_count > 0 and count >= max_count:
                     return
             cur_time, cur_name = find_next_fname(calc_name, cur_time,
                                                  cur_name, to)

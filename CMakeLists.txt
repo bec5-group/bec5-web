@@ -51,7 +51,7 @@ function(move_file _from _to)
   get_filename_component(path "${_to}" PATH)
   add_custom_command(OUTPUT "${_to}"
     COMMAND mkdir -p "${path}"
-    COMMAND cp -if "${_from}" "${_to}"
+    COMMAND cp -vf "${_from}" "${_to}"
     DEPENDS "${_from}")
   add_custom_target("${target}" ALL DEPENDS "${_to}")
 endfunction()
@@ -92,97 +92,27 @@ function(add_bec5_pymodule_file src module)
   add_dependencies(bec5-files "${target}")
 endfunction()
 
-set(BEC5_UTILS_FILES
-  becv_utils/__init__.py
-  becv_utils/math.py
-  becv_utils/misc.py
-  becv_utils/network.py
-  becv_utils/print_color.py
-  becv_utils/signal.py
-  becv_utils/thread_helper.py
-  )
-
-foreach(file ${BEC5_UTILS_FILES})
-  add_bec5_pymodule_file("${file}" becv_utils)
-endforeach()
-
-set(BEC5_LOGGER_FILES
-  becv_logger/__init__.py
-  becv_logger/bin_logger.py
-  becv_logger/date_fname.py
-  becv_logger/error_logger.py
-  becv_logger/logger.py
-  becv_logger/record_cache.py
-  )
-
-foreach(file ${BEC5_LOGGER_FILES})
-  add_bec5_pymodule_file("${file}" becv_logger)
-endforeach()
+add_subdirectory(becv)
+add_subdirectory(becv_logger)
+add_subdirectory(becv_utils)
+add_subdirectory(bin)
+add_subdirectory(data)
+add_subdirectory(jsmodule)
+add_subdirectory(json_view)
+add_subdirectory(jsonify)
+add_subdirectory(oven_control)
+add_subdirectory(oven_control_service)
+add_subdirectory(popup_form)
+add_subdirectory(room_temp)
+add_subdirectory(templates)
 
 set(BEC5_FILES
   db/.gitignore
   log/.gitignore
-  becv/__init__.py
-  becv/scripts.py
-  becv/settings.py
-  becv/settings_sync.py
-  becv/urls.py
-  becv/views.py
-  becv/wsgi.py
-  bin/becv-manager
-  jsmodule/__init__.py
-  jsmodule/admin.py
-  jsmodule/finder.py
-  jsmodule/manage.py
-  jsmodule/models.py
-  jsmodule/scripts.py
-  jsmodule/static/jsmodule/js/array.js
-  jsmodule/static/jsmodule/js/bootstrap-datetimepicker.min.js
-  jsmodule/static/jsmodule/js/gravatar-directive.js
-  jsmodule/static/jsmodule/js/logging.js
-  jsmodule/static/jsmodule/js/md5-service.js
-  jsmodule/static/jsmodule/js/request.js
-  jsmodule/static/jsmodule/js/script-loader.js
-  jsmodule/static/jsmodule/js/ui-bootstrap-tpls-0.3.0.min.js
-  jsmodule/tests.py
-  jsmodule/urls.py
-  jsmodule/views.py
-  json_view/__init__.py
-  json_view/models.py
-  json_view/scripts.py
-  json_view/static/json_view/js/log-mgr.js
-  json_view/tests.py
-  json_view/urls.py
-  json_view/utils.py
-  json_view/views.py
-  jsonify/__init__.py
-  jsonify/templatetags/__init__.py
-  jsonify/templatetags/jsonify.py
   manage.py
-  oven_control/__init__.py
-  oven_control/controller.py
-  oven_control/models.py
-  oven_control/tests.py
-  oven_control/urls.py
-  oven_control/utils.py
-  oven_control/views.py
-  popup_form/__init__.py
-  popup_form/admin.py
-  popup_form/models.py
-  popup_form/scripts.py
-  popup_form/static/popup_form/html/popup_form.html
-  popup_form/static/popup_form/js/popup-form.js
-  popup_form/tests.py
-  popup_form/views.py
-  room_temp/__init__.py
-  room_temp/models.py
-  room_temp/scripts.py
-  room_temp/server.py
-  room_temp/static/room_temp/js/room-temp.js
-  room_temp/tests.py
-  room_temp/urls.py
-  room_temp/utils.py
-  room_temp/views.py
+
+  # cannot put cmake file in static/ otherwise ./manage.py collectstatic will
+  # collect them
   static/css/bootstrap-datetimepicker.min.css
   static/css/home.css
   static/css/login_out.css
@@ -193,12 +123,7 @@ set(BEC5_FILES
   static/img/loading.gif
   static/js/home.js
   static/js/login.js
-  static/js/plot.js
-  templates/base.html
-  templates/home.html
-  templates/registration/logged_out.html
-  templates/registration/login.html
-  )
+  static/js/plot.js)
 
 foreach(file ${BEC5_FILES})
   add_bec5_file("${file}")
@@ -207,32 +132,9 @@ endforeach()
 add_custom_target(bec5-static ALL
   COMMAND rm -rf static_root
   COMMAND mkdir -p static_root
-  COMMAND /usr/bin/python manage.py collectstatic --noinput --settings=becv.settings_sync
+  COMMAND /usr/bin/python manage.py collectstatic
+  --noinput --settings=becv.settings_sync
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   DEPENDS bec5-files)
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/static_root/"
   DESTINATION "${BEC5_PREFIX}/static_root/" USE_SOURCE_PERMISSIONS)
-
-configure_file(data/bec5.ini.in data/bec5.ini)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.ini"
-  DESTINATION "${UWSGI_INI_PATH}")
-
-configure_file(data/bec5.conf.in data/bec5.conf)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.conf"
-  DESTINATION "${SYSTEMD_TMP_PATH}")
-
-configure_file(data/bec5.service.in data/bec5.service)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5.service"
-  DESTINATION "${SYSTEMD_UNIT_PATH}")
-
-configure_file(data/bec5-dbus.service.in data/bec5-dbus.service)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/bec5-dbus.service"
-  DESTINATION "${SYSTEMD_UNIT_PATH}")
-
-configure_file(data/org.yyc-arch.becv.service.in data/org.yyc-arch.becv.service)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/org.yyc-arch.becv.service"
-  DESTINATION "${DBUS_SYSTEM_SERVICE_PATH}")
-
-configure_file(data/org.yyc-arch.becv.conf.in data/org.yyc-arch.becv.conf)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/data/org.yyc-arch.becv.conf"
-  DESTINATION "${DBUS_SYSTEM_CONF_PATH}")

@@ -21,7 +21,6 @@ class ControllerManager(object):
         self.__profile_id = profile
         self.__set_temps(models.get_profile_temps(profile))
         return True
-    @models.with_oven_control_lock
     def get_setpoint(self):
         try:
             profile_name = models.get_profile.no_lock(self.__profile_id).name

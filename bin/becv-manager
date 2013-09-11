@@ -18,5 +18,5 @@ class BEC5Manager(dbus.service.Object):
 def main():
     main_loop.run()
 
-if __name__ = '__main__':
+if __name__ == '__main__':
     main()

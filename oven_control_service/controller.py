@@ -24,7 +24,7 @@ from dateutil.tz import tzlocal
 from gi.repository import GLib, GObject
 
 from becv_utils import printr, printg, printy, printb
-from becv_utils.misc import debug as _debug, RefParent, WithLock
+from becv_utils.misc import run_no_sync, debug as _debug, RefParent, WithLock
 from becv_utils.math import to_finite, fix_non_finite
 from becv_utils.thread_helper import WithHelper, repeat_call
 from becv_logger import TimeLogger, bin_logger

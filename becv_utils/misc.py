@@ -14,6 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import weakref
 from threading import Lock
 
@@ -22,7 +23,7 @@ import __main__
 debug = bool(os.environ.get("BEC5_DEBUG", ''))
 
 def run_no_sync(func, *args, **kwargs):
-    if not getattr(__main__, '_django_syncdb', False):
+    if not getattr(__main__, '_becv_syncdb', False):
         return func(*args, **kwargs)
 
 class RefParent:
@@ -39,7 +40,7 @@ class WithLock:
     def lock(self):
         return self.__lock
     @classmethod
-    def with_lock(cls, func)
+    def with_lock(cls, func):
         def _func(self, *args, **kwargs):
             with self.__lock:
                 return func(self, *args, **kwargs)

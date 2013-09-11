@@ -23,4 +23,4 @@ from running.
 from .settings import *
 import __main__
 
-__main__._django_syncdb = True
+__main__._becv_syncdb = True

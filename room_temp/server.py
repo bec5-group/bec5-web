@@ -184,5 +184,5 @@ class ServerManager(object):
         return dict((sid, server.get_loggers()) for (sid, server)
                     in self.__servers.items())
 
-if not getattr(__import__('__main__'), '_django_syncdb', False):
+if not getattr(__import__('__main__'), '_becv_syncdb', False):
     manager = ServerManager()

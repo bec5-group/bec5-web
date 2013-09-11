@@ -32,11 +32,11 @@ class BEC5Logger(BEC5DBusFmtObj):
         if logger_id not in cls.__objs:
             cls.__objs[logger_id] = cls(conn, logger)
         return cls.__objs[logger_id]
-    @classmethod
-    def __new_id(cls):
-        with cls.__lock:
-            cls.__logger_count += 1
-            return cls.__logger_count
+    @staticmethod
+    def __new_id():
+        with BEC5Logger.__lock:
+            BEC5Logger.__logger_count += 1
+            return BEC5Logger.__logger_count
     @property
     def logger(self):
         return self.__logger()

@@ -14,10 +14,10 @@ configure_file(bec5-dbus.service.in bec5-dbus.service)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bec5-dbus.service"
   DESTINATION "${SYSTEMD_UNIT_PATH}")
 
-configure_file(org.yyc-arch.becv.service.in org.yyc-arch.becv.service)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.yyc-arch.becv.service"
+configure_file(org.yyc_arch.becv.service.in org.yyc_arch.becv.service)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.yyc_arch.becv.service"
   DESTINATION "${DBUS_SYSTEM_SERVICE_PATH}")
 
-configure_file(org.yyc-arch.becv.conf.in org.yyc-arch.becv.conf)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.yyc-arch.becv.conf"
+configure_file(org.yyc_arch.becv.conf.in org.yyc_arch.becv.conf)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.yyc_arch.becv.conf"
   DESTINATION "${DBUS_SYSTEM_CONF_PATH}")

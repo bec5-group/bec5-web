@@ -115,6 +115,9 @@ def find_next_fname(calc_name, t, name, max_t):
     return r_t, r_n
 
 class TimeLogger(BaseLogger, DateFileBase, RecordCache):
+    __gsignals__ = {
+        'finished':  (GObject.SIGNAL_RUN_FIRST, None, ()),
+    }
     def __init__(self, filename_fmt='%Y-%m-%d.log', dirname='',
                  record_num=20000, **kwargs):
         BaseLogger.__init__(self)
@@ -214,4 +217,5 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
     def _read_record_objs(self, stm):
         return list(_json_reader(stm))
     def close(self):
+        self.emit('finished')
         self.__stm_factory.close()

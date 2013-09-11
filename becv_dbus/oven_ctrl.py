@@ -15,12 +15,12 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from os import path as _path
-import os
 import dbus.service
 
 from becv_utils import print_except, printb, printr, printg
 from oven_control_service.controller import manager as oven_manager
 from .utils import BEC5DBusObj, BEC5DBusFmtObj
+from .logger import BEC5Logger
 
 class BEC5OvenController(BEC5DBusFmtObj):
     obj_path_fmt = '/org/yyc_arch/becv/oven_control/%s'
@@ -69,6 +69,10 @@ class BEC5OvenController(BEC5DBusFmtObj):
     def set_temp(self, value):
         self.__ctrl.set_temp = value
         return True
+    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
+                        in_signature="", out_signature="o")
+    def get_data_logger(self):
+        return BEC5Logger.get(self.becv_manager, self.__ctrl.data_logger)
 
 class BEC5OvenControlManager(BEC5DBusObj):
     obj_path = '/org/yyc_arch/becv/oven_control'

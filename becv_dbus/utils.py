@@ -25,3 +25,9 @@ class BEC5DBusObj(dbus.service.Object):
     @property
     def becv_manager(self):
         return self.__mgr()
+
+class BEC5DBusFmtObj(BEC5DBusObj):
+    obj_path_fmt = '/org/yyc_arch/becv/%d'
+    def __init__(self, mgr, *args):
+        self.obj_path = self.obj_path_fmt % args
+        BEC5DBusObj.__init__(self, mgr)

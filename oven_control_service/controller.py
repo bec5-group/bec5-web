@@ -292,6 +292,8 @@ class manager(GObject.Object, WithLock):
         self.__ctrls = {}
         self.__logger = None
         self.__log_dir = None
+    def __getitem__(self, cid):
+        return self.__ctrls[cid]
     @property
     def log_dir(self):
         return self.__log_dir

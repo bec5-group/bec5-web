@@ -2,6 +2,7 @@ set(BEC5_LOGGER_FILES
   __init__.py
   bin_logger.py
   date_fname.py
+  dbus_proxy.py
   error_logger.py
   logger.py
   record_cache.py)

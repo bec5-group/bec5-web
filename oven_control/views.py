@@ -14,11 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import time
 from json_view import JSONPError, return_jsonp, auth_jsonp
 from json_view.views import get_log_view
-from . import models, controller as _controller
-from .controller import ctrl_logger
-import time
+
+from . import models
+from .controller import manager as _manager
 
 @return_jsonp
 def get_ovens(request):
@@ -177,11 +178,11 @@ def del_profile(request, pid=None):
 
 @return_jsonp
 def get_temps(request):
-    return _controller.manager.get_temps()
+    return _manager.get_temps()
 
 @return_jsonp
 def get_setpoint(request):
-    return _controller.manager.get_setpoint()
+    return _manager.get_setpoint()
 
 def _set_profile_logger(request, profile=None):
     profile = models.get_profile(profile)
@@ -190,7 +191,7 @@ def _set_profile_logger(request, profile=None):
 @return_jsonp
 @auth_jsonp('oven_control.set_profile', log=_set_profile_logger)
 def set_profile(request, profile=None):
-    res = _controller.manager.set_profile(profile)
+    res = _manager.set_profile(profile)
     if not res:
         raise JSONPError(400)
     return res
@@ -208,25 +209,26 @@ def _set_temps_logger(request):
 @return_jsonp
 @auth_jsonp('oven_control.set_temp', log=_set_temps_logger)
 def set_temps(request):
-    return _controller.manager.set_temps(request.GET)
+    return _manager.set_temps(request.GET)
 
 @return_jsonp
 @auth_jsonp
 def get_errors(request):
-    return _controller.manager.get_errors()
+    return _manager.get_errors()
 
-get_logs = get_log_view(ctrl_logger)
+get_logs = get_log_view(_manager.logger)
 
 @return_jsonp
 @auth_jsonp
 def get_temp_logs(request):
     max_count = 1000
     GET = request.GET
-    loggers = _controller.manager.get_loggers()
+    loggers = _manager.get_loggers()
     try:
-        _to = int(float(GET['to']))
+        _to = float(GET['to'])
     except:
         _to = time.time()
+    _to = int(_to)
     _from = max(int(float(GET['from'])), _to - 31622400) # one year
     return dict((ctrl, loggers[int(ctrl)].get_range(_from, _to, max_count))
                 for ctrl in GET.getlist('ctrl[]'))

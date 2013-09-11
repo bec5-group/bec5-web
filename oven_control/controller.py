@@ -14,23 +14,59 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class ControllerManager:
+from django.db.models.signals import post_save, post_delete
+from django.conf import settings
+
+from becv_utils.misc import run_no_sync, debug as _debug, RefParent, WithLock
+from becv_utils.dbus import sys_mgr
+from becv_logger.dbus_proxy import DBusLoggerProxy
+
+from . import models
+
+@run_no_sync
+class manager:
+    def __init__(self):
+        self.__oven_obj = sys_mgr.get_object(
+            'org.yyc_arch.becv', '/org/yyc_arch/becv/oven_control')
+        self.__oven_mgr = self.__oven_obj.get_iface(
+            'org.yyc_arch.becv.oven_control')
+        self.__oven_mgr.set_log_path(settings.LOGGING_DIR)
+        self.__set_controllers()
+        post_save.connect(self.__post_save_cb, sender=models.TempController)
+        post_delete.connect(self.__post_del_cb, sender=models.TempController)
+        self.__logger = DBusLoggerProxy(self.__oven_mgr.get_logger())
+    @property
+    def logger(self):
+        return self.__logger
+    def __post_save_cb(self, sender, **kwargs):
+        self.__set_controllers()
+    def __post_del_cb(self, sender, **kwargs):
+        self.__set_controllers()
+    def __set_controllers(self):
+        self.__oven_mgr.set_controllers(
+            [{'id': str(ctrl.id), 'name': ctrl.name, 'addr': ctrl.addr,
+              'port': ctrl.port, 'number': ctrl.number}
+             for ctrl in models.get_controllers()])
+    def get_temps(self):
+        return self.__oven_mgr.get_temps()
+    def get_setpoints(self):
+        pid, temps = self.__oven_mgr.get_setpoints()
+        return {
+            'id': pid,
+            'name': models.get_profile(pid).name,
+            'temps': temps
+        }
     def set_profile(self, profile):
         if not profile:
             return
-        self.__profile_id = profile
-        self.__set_temps(models.get_profile_temps(profile))
+        self.__oven_mgr.set_temps(profile, models.get_profile_temps(profile))
         return True
-    def get_setpoint(self):
-        try:
-            profile_name = models.get_profile.no_lock(self.__profile_id).name
-        except:
-            profile_name = None
-        return {
-            'id': self.__profile_id,
-            'name': profile_name,
-            'temps': dict((cid, fix_non_finite(ctrl.set_temp)) for (cid, ctrl)
-                          in self.__ctrls.items())
-        }
+    def set_temps(self, temps):
+        self.__oven_mgr.set_temps('', temps)
+        return True
+    def get_errors(self):
+        return {cid: {'name': name, 'errors': errors} for cid, (name, errors)
+                in self.__oven_mgr.get_errors().items()}
     def get_loggers(self):
-        return dict((cid, ctrl.logger) for (cid, ctrl) in self.__ctrls.items())
+        return {cid: DBusLoggerProxy(log_path) for cid, log_path
+                in self.__oven_mgr.get_data_loggers().items()}

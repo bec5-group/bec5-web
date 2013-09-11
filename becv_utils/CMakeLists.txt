@@ -1,5 +1,6 @@
 set(BEC5_UTILS_FILES
   __init__.py
+  dbus.py
   gsignal.py
   math.py
   misc.py

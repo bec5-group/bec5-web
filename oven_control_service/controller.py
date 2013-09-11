@@ -60,25 +60,46 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
     def addr(self):
         return self.url, self.port
 
-    temp = GObject.property(type=float, default=0.0)
-    set_temp = GObject.property(type=float, default=0.0)
-    real_set_temp = GObject.property(type=float, default=0.0)
+    @property
+    def temp(self):
+        return self.__temp
+    @temp.setter
+    def temp(self, value):
+        value = to_finite(value)
+        self.__temp = value
+        self.__data_logger.info(value)
+    @property
+    def set_temp(self):
+        return self.__set_temp
+    @set_temp.setter
+    def set_temp(self, value):
+        self.__set_temp = to_finite(value)
+        self.activate()
+    @property
+    def real_set_temp(self):
+        return self.__real_set_temp
+    @real_set_temp.setter
+    def real_set_temp(self, value):
+        self.__real_set_temp = value
     def __init__(self, ctrl, mgr):
         GObject.Object.__init__(self)
         WithHelper.__init__(self)
         WithLock.__init__(self)
         ErrorLogger.__init__(self)
         RefParent.__init__(self, mgr)
-        self.__json_fname = None
-        self.update(ctrl)
+
+        self.__temp = None
+        self.__set_temp = None
+        self.__real_set_temp = None
         self.__disp_set_temp = None
+        self.__json_fname = None
         self.__need_reset = False
-        self.timeout = 10
-        self.connect('notify::temp', self.__temp_changed)
-        self.connect('notify::set-temp', self.__set_temp_changed)
-        self.__log_name_fmt = ('temp_log_%s' % self.id) + '-%Y-%m-%d.log'
         self.__data_logger = None
-        self.set_logger_path(self.parrent.log_dir)
+        self.__log_name_fmt = ('temp_log_%s' % self.id) + '-%Y-%m-%d.log'
+
+        self.update(ctrl)
+        self.timeout = 10
+        self.set_logger_path(self.parent.log_dir)
         self.start()
     @property
     @WithLock.with_lock
@@ -133,20 +154,15 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
         with open(fname, 'w') as fh:
             content = json.dumps(old_setting, indent=2)
             fh.write(content)
-    @WithLock.with_lock
-    def __temp_changed(self, *arg):
-        self.__data_logger.info(self.temp)
-    def __set_temp_changed(self, *arg):
-        self.activate()
     def update(self, ctrl):
         self.freeze_notify()
         try:
             with self.lock:
                 self.id = str(ctrl['id'])
-                self.dev_no = ctrl['number']
+                self.dev_no = int(ctrl['number'])
                 self.url = ctrl['addr']
                 self.name = ctrl['name']
-                self.port = ctrl['port']
+                self.port = int(ctrl['port'])
         finally:
             self.thaw_notify()
         if self.__json_fname is not None:
@@ -160,7 +176,9 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
                                     ctrl=self.name)
     def remove(self):
         self.stop()
-        self.__data_logger.close()
+        if self.__data_logger is not None:
+            self.__data_logger.close()
+            self.__data_logger = None
     def __reset_set_temp(self):
         res = repeat_call(self.reset_dev, ('*', self.dev_no, 2), n=3,
                           wait_time=0.4)
@@ -345,7 +363,7 @@ class manager(GObject.Object, WithLock):
         return dict((cid, fix_non_finite(ctrl.temp)) for (cid, ctrl)
                     in self.__ctrls.items())
     @WithLock.with_lock
-    def get_setpoint(self):
+    def get_setpoints(self):
         return {
             'id': self.profile_id,
             'temps': dict((cid, fix_non_finite(ctrl.set_temp)) for (cid, ctrl)

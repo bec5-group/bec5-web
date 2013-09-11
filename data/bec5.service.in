@@ -1,6 +1,7 @@
 [Unit]
 Description=BEC 5 web interface
 After=syslog.target
+Require=bec5-dbus.service
 
 [Service]
 ExecStart=/usr/bin/uwsgi --ini @UWSGI_INI_PATH@/bec5.ini

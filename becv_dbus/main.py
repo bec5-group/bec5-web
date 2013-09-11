@@ -24,7 +24,7 @@ class BEC5DBusManager:
         DBusGMainLoop(set_as_default=True)
         self.__main_loop = GLib.MainLoop()
         self.__sys_bus = dbus.SystemBus()
-        self.__bus_name = dbus.service.BusName('org.yyc-arch.becv',
+        self.__bus_name = dbus.service.BusName('org.yyc_arch.becv',
                                                bus=self.__sys_bus)
         self.__obj_mgr = BEC5OvenControlManager(self)
     @property

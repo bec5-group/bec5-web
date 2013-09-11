@@ -25,7 +25,7 @@ class BEC5OvenControlManager(BEC5DBusObj):
     def __init__(self, conn):
         BEC5DBusObj.__init__(self, conn)
         self.__manager = oven_manager
-    @dbus.service.method("org.yyc-arch.becv.oven-control",
+    @dbus.service.method("org.yyc_arch.becv.oven_control",
                          in_signature="s",
                          out_signature="b", sender_keyword='sender')
     def set_log_path(self, dirname, sender=None):

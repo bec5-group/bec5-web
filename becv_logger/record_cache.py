@@ -81,8 +81,7 @@ class RecordCache(LinkedList):
             rec = rec.prev
     def __repr__(self):
         with self.__lock:
-            return repr(dict((rec.key, rec.data)
-                             for rec in self._rec_iter()))
+            return repr({rec.key: rec.data for rec in self._rec_iter()})
     __str__ = __repr__
     def get(self, key):
         try:

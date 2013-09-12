@@ -36,8 +36,8 @@ def get_servers(request):
 @auth_jsonp
 def get_server_setting(request, sid=None):
     server = models.get_server(sid)
-    return dict((key, getattr(server, key))
-                for key in ('id', 'name', 'addr', 'port', 'order'))
+    return {key: getattr(server, key)
+            for key in ('id', 'name', 'addr', 'port', 'order')}
 
 def _add_server_logger(request):
     GET = request.GET.get
@@ -196,5 +196,5 @@ def get_value_logs(request):
     except:
         _to = time.time()
     _from = max(int(float(GET['from'])), _to - 31622400) # one year
-    return dict((dev, _get_logger(loggers, dev).get_range(_from, _to, max_count))
-                for dev in GET.getlist('dev[]'))
+    return {dev: _get_logger(loggers, dev).get_range(_from, _to, max_count)
+            for dev in GET.getlist('dev[]')}

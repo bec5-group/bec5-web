@@ -31,28 +31,17 @@ class BEC5DBusObj(dbus.service.Object):
     @property
     def becv_manager(self):
         return self.__mgr()
-    def __check_sender(self, sender):
-        if sender is None:
-            return False
-        uid = self.__mgr().get_peer_uid(sender)
-        if uid is None or (uid != 0 and uid != os.getuid()):
-            return False
-        return True
     @classmethod
     def method(cls, *a, error_ret=False, threaded=False, **kw):
         if threaded:
-            dbus_deco = dbus.service.method(*a, sender_keyword='_sender',
-                                            async_callbacks=('_reply_hdl',
-                                                             '_error_hdl'),
+            dbus_deco = dbus.service.method(*a, async_callbacks=('_reply_hdl',
+                                                                 '_error_hdl'),
                                             **kw)
         else:
-            dbus_deco = dbus.service.method(*a, sender_keyword='_sender', **kw)
+            dbus_deco = dbus.service.method(*a, **kw)
         def _deco(func):
             if threaded:
-                def _func(self, *_args, _sender=None, _reply_hdl=None,
-                          _error_hdl=None):
-                    if not self.__check_sender(_sender):
-                        return error_ret
+                def _func(self, *_args, _reply_hdl=None, _error_hdl=None):
                     def __worker():
                         try:
                             res = func(self, *_args)
@@ -63,21 +52,18 @@ class BEC5DBusObj(dbus.service.Object):
                         ctx.invoke_full(0, _reply_hdl, res)
                     thread = threading.Thread(target=__worker, daemon=True)
                     thread.start()
-                func_fmt = ('%s(%s, _sender=None, _reply_hdl=None, '
-                            '_error_hdl=None)')
-                func_fmt2 = ('_func(%s, _sender=_sender, '
-                             '_reply_hdl=_reply_hdl, _error_hdl=_error_hdl)')
+                func_fmt = ('%s(%s, _reply_hdl=None, _error_hdl=None)')
+                func_fmt2 = ('_func(%s, _reply_hdl=_reply_hdl, '
+                             '_error_hdl=_error_hdl)')
             else:
-                def _func(self, *_args, _sender=None):
-                    if not self.__check_sender(_sender):
-                        return error_ret
+                def _func(self, *_args):
                     try:
                         return func(self, *_args)
                     except:
                         print_except()
                         return error_ret
-                func_fmt = '%s(%s, _sender=None)'
-                func_fmt2 = '_func(%s, _sender=_sender)'
+                func_fmt = '%s(%s)'
+                func_fmt2 = '_func(%s)'
             eval_dict = {'_func': _func}
             args_sig = ', '.join(inspect.getfullargspec(func)[0])
             name = func.__name__

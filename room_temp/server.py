@@ -114,7 +114,7 @@ class ServerWrapper:
                     v = {
                         'v': value,
                         'l': bin_logger.FloatDateLogger(log_name_fmt,
-                                                        settings.DATA_LOG_DIR)
+                                                        settings.LOGGING_DIR)
                     }
                 new_values[dev_id] = v
                 if value is None:

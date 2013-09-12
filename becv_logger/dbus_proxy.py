@@ -15,6 +15,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+from becv_utils.dbus import sys_mgr
 
 class DBusLoggerProxy:
     def __init__(self, path):

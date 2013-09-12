@@ -20,6 +20,10 @@ if("x${BEC5_PREFIX}" STREQUAL "x")
   set(BEC5_PREFIX "/srv/bec5/")
 endif()
 
+if("x${BEC5_CONFIG_PATH}" STREQUAL "x")
+  set(BEC5_CONFIG_PATH "/etc/")
+endif()
+
 if("x${SYSTEMD_UNIT_PATH}" STREQUAL "x")
   set(SYSTEMD_UNIT_PATH "${CMAKE_INSTALL_PREFIX}/lib/systemd/system/")
 endif()

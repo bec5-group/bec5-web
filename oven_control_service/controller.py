@@ -24,16 +24,16 @@ from dateutil.tz import tzlocal
 from gi.repository import GLib, GObject
 
 from becv_utils import printr, printg, printy, printb
-from becv_utils.misc import run_no_sync, debug as _debug, RefParent, WithLock
+from becv_utils.misc import debug as _debug, RefParent, WithLock
 from becv_utils.math import to_finite, fix_non_finite
 from becv_utils.thread_helper import WithHelper, repeat_call
 from becv_logger import TimeLogger, bin_logger
 from becv_logger.error_logger import ErrorLogger
+from becv_logger import log_dir as _log_dir
 
 from . import utils
 
-class Controller(GObject.Object, WithHelper, ErrorLogger,
-                 RefParent, WithLock):
+class Controller(GObject.Object, WithHelper, ErrorLogger, RefParent):
     def ctrl_cmd(cmd_func):
         def cmd_method(self, *args, **kwargs):
             res = cmd_func(self.addr, *args, **kwargs)
@@ -84,7 +84,6 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
     def __init__(self, ctrl, mgr):
         GObject.Object.__init__(self)
         WithHelper.__init__(self)
-        WithLock.__init__(self)
         ErrorLogger.__init__(self)
         RefParent.__init__(self, mgr)
 
@@ -92,30 +91,21 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
         self.__set_temp = None
         self.__real_set_temp = None
         self.__disp_set_temp = None
-        self.__json_fname = None
         self.__need_reset = False
-        self.__data_logger = None
-        self.__log_name_fmt = ('temp_log_%s' % self.id) + '-%Y-%m-%d.log'
+        self.__init_logger__()
 
         self.update(ctrl)
         self.timeout = 10
-        self.set_log_path(self.parent.log_dir)
         self.start()
+    def __init_logger__(self):
+        self.__json_fname = None
+        log_name_fmt = ('temp_log_%s' % self.id) + '-%Y-%m-%d.log'
+        self.__data_logger = bin_logger.FloatDateLogger(log_name_fmt,
+                                                        _log_dir.DATA_LOG_DIR)
+        self.__data_logger.connect('opened', self.__on_log_open)
     @property
-    @WithLock.with_lock
     def data_logger(self):
         return self.__data_logger
-    @WithLock.with_lock
-    def set_log_path(self, dirname):
-        if dirname is None:
-            return
-        self.__json_fname = None
-        if self.__data_logger is not None:
-            self.__data_logger.close()
-            del self.__data_logger
-        self.__data_logger = bin_logger.FloatDateLogger(self.__log_name_fmt,
-                                                        dirname)
-        self.__data_logger.connect('opened', self.__on_log_open)
     def __on_log_open(self, sender, name):
         if name.endswith('.log'):
             name = name[:-4]
@@ -157,12 +147,11 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
     def update(self, ctrl):
         self.freeze_notify()
         try:
-            with self.lock:
-                self.id = str(ctrl['id'])
-                self.dev_no = int(ctrl['number'])
-                self.url = ctrl['addr']
-                self.name = ctrl['name']
-                self.port = int(ctrl['port'])
+            self.id = str(ctrl['id'])
+            self.dev_no = int(ctrl['number'])
+            self.url = ctrl['addr']
+            self.name = ctrl['name']
+            self.port = int(ctrl['port'])
         finally:
             self.thaw_notify()
         if self.__json_fname is not None:
@@ -280,8 +269,7 @@ class Controller(GObject.Object, WithHelper, ErrorLogger,
         sleep(.5)
         self.__get_disp_temp()
 
-@run_no_sync
-class manager(GObject.Object, WithLock):
+class ControllerManager(GObject.Object, WithLock):
     __gsignals__ = {
         'dev-added': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
         'dev-removed': (GObject.SIGNAL_RUN_FIRST, None, (str,)),
@@ -290,29 +278,14 @@ class manager(GObject.Object, WithLock):
         GObject.Object.__init__(self)
         WithLock.__init__(self)
         self.__ctrls = {}
-        self.__logger = None
-        self.__log_dir = None
+        self.__logger = TimeLogger(
+            filename_fmt='controller_action-%Y-%m-%d.json',
+            dirname=_log_dir.LOG_DIR)
     def __getitem__(self, cid):
         return self.__ctrls[cid]
     @property
-    def log_dir(self):
-        return self.__log_dir
-    @property
     def logger(self):
         return self.__logger
-    @WithLock.with_lock
-    def set_log_path(self, dirname):
-        if self.__log_dir == dirname:
-            return
-        logger = TimeLogger(filename_fmt='controller_action-%Y-%m-%d.json',
-                            dirname=dirname)
-        if self.__logger is not None:
-            self.__logger.close()
-            del self.__logger
-        self.__logger = logger
-        self.__log_dir = dirname
-        for cid, ctrl_obj in self.__ctrls.items():
-            ctrl_obj.set_log_path(dirname)
     profile_id = GObject.property(type=str)
     @WithLock.with_lock
     def __set_controllers(self, ctrls):

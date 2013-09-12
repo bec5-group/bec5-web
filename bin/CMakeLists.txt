@@ -1,6 +1,5 @@
-set(BEC5_FILES
-  becv-manager)
-
-foreach(file ${BEC5_FILES})
-  add_bec5_file("${file}")
-endforeach()
+configure_file(becv-manager.in becv-manager @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/becv-manager"
+  DESTINATION "${BEC5_PREFIX}/bin/"
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+  GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

@@ -18,7 +18,9 @@
 from becv_dbus.main import BEC5DBusManager
 from gi.repository import GLib
 
+BEC5_CONFIG_FILE = "@BEC5_CONFIG_PATH@" + '/bec5.json'
+
 if __name__ == '__main__':
     GLib.threads_init()
-    manager = BEC5DBusManager()
+    manager = BEC5DBusManager(BEC5_CONFIG_FILE)
     manager.run()

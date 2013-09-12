@@ -31,7 +31,6 @@ class manager:
             'org.yyc_arch.becv', '/org/yyc_arch/becv/oven_control')
         self.__oven_mgr = self.__oven_obj.get_iface(
             'org.yyc_arch.becv.oven_control')
-        self.__oven_mgr.set_log_path(settings.LOGGING_DIR)
         self.__set_controllers()
         post_save.connect(self.__post_save_cb, sender=models.TempController)
         post_delete.connect(self.__post_del_cb, sender=models.TempController)

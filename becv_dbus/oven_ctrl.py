@@ -18,7 +18,7 @@ from os import path as _path
 import dbus.service
 
 from becv_utils import print_except, printb, printr, printg
-from oven_control_service.controller import manager as oven_manager
+from oven_control_service.controller import ControllerManager
 from .utils import BEC5DBusObj, BEC5DBusFmtObj
 from .logger import BEC5Logger, BEC5DataLogger
 from becv_utils.math import fix_non_finite
@@ -83,23 +83,16 @@ class BEC5OvenControlManager(BEC5DBusObj):
     obj_path = '/org/yyc_arch/becv/oven_control'
     def __init__(self, conn):
         BEC5DBusObj.__init__(self, conn)
-        self.__manager = oven_manager
+        self.__manager = ControllerManager()
         self.__ctrl_objs = {}
-        oven_manager.connect('dev-added', self.__on_dev_added)
-        oven_manager.connect('dev-removed', self.__on_dev_removed)
+        self.__manager.connect('dev-added', self.__on_dev_added)
+        self.__manager.connect('dev-removed', self.__on_dev_removed)
     def __on_dev_added(self, mgr, cid):
         self.__ctrl_objs[cid] = BEC5OvenController(self.becv_manager,
                                                    self.__manager[cid])
     def __on_dev_removed(self, mgr, cid):
         self.__ctrl_objs[cid].remove_from_connection()
         del self.__ctrl_objs[cid]
-    @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
-                        in_signature="s", out_signature="b")
-    def set_log_path(self, dirname):
-        if not _path.isabs(dirname):
-            return False
-        self.__manager.set_log_path(dirname)
-        return True
     @BEC5DBusObj.method("org.yyc_arch.becv.oven_control",
                         in_signature="aa{sv}", out_signature="b")
     def set_controllers(self, ctrls):

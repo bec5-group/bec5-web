@@ -14,14 +14,22 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import json
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
 from .oven_ctrl import BEC5OvenControlManager
+from becv_logger import log_dir as _log_dir
 
 class BEC5DBusManager:
-    def __init__(self):
+    def __init__(self, config_file):
         DBusGMainLoop(set_as_default=True)
+        try:
+            with open(config_file) as fh:
+                self.__config = json.load(fh)
+        except:
+            self.__config = {}
+        self.__init_log_dir__()
         self.__main_loop = GLib.MainLoop()
         self.__sys_bus = dbus.SystemBus()
         self.__bus_name = dbus.service.BusName('org.yyc_arch.becv',
@@ -30,6 +38,12 @@ class BEC5DBusManager:
         self.__dbus_mgr = self.__sys_bus.get_object('org.freedesktop.DBus', '/')
         self.__dbus_mgr_iface = dbus.Interface(
             self.__dbus_mgr, dbus_interface='org.freedesktop.DBus')
+    def __init_log_dir__(self):
+        self.__log_dir = self.__config.get('LOG_DIR', '/srv/bec5/log')
+        self.__data_log_dir = self.__config.get('DATA_LOG_DIR',
+                                                '/srv/bec5/log')
+        _log_dir.LOG_DIR = self.__log_dir
+        _log_dir.DATA_LOG_DIR = self.__data_log_dir
     def get_peer_uid(self, sender):
         return self.__dbus_mgr_iface.GetConnectionUnixUser(sender)
     @property

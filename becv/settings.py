@@ -15,14 +15,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, os.path
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+from os import path as _path
+BASE_DIR = _path.dirname(_path.dirname(_path.abspath(__file__)))
 
 def becv_dir(*arg):
     """
     Construct absolute directory name from base directory.
     """
-    return os.path.join(BASE_DIR, *arg)
+    return _path.join(BASE_DIR, *arg)
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG

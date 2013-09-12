@@ -19,6 +19,7 @@ from django.conf import settings
 
 from becv_utils.misc import run_no_sync, debug as _debug, RefParent, WithLock
 from becv_utils.dbus import sys_mgr
+from becv_utils import printg, printb, printr
 from becv_logger.dbus_proxy import DBusLoggerProxy
 
 from . import models
@@ -48,13 +49,15 @@ class manager:
               'port': ctrl.port, 'number': ctrl.number}
              for ctrl in models.get_controllers()])
     def get_temps(self):
-        return self.__oven_mgr.get_temps()
+        # Not sure how to do this automatically
+        return {str(cid): float(temp) for cid, temp
+                in self.__oven_mgr.get_temps().items()}
     def get_setpoints(self):
         pid, temps = self.__oven_mgr.get_setpoints()
         return {
-            'id': pid,
-            'name': models.get_profile(pid).name,
-            'temps': temps
+            'id': str(pid),
+            'name': models.get_profile(pid).name if pid else '',
+            'temps': {str(cid): float(temp) for cid, temp in temps.items()}
         }
     def set_profile(self, profile):
         if not profile:
@@ -65,8 +68,9 @@ class manager:
         self.__oven_mgr.set_temps('', temps)
         return True
     def get_errors(self):
-        return {cid: {'name': name, 'errors': errors} for cid, (name, errors)
+        return {str(cid): {'name': str(name), 'errors': errors}
+                for cid, (name, errors)
                 in self.__oven_mgr.get_errors().items()}
     def get_loggers(self):
-        return {cid: DBusLoggerProxy(log_path) for cid, log_path
+        return {str(cid): DBusLoggerProxy(log_path) for cid, log_path
                 in self.__oven_mgr.get_data_loggers().items()}

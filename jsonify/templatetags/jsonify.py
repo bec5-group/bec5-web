@@ -1,8 +1,8 @@
-from django.utils import simplejson
+import json
 from django.template import Library
 
 register = Library()
 
 @register.filter
 def jsonify(obj):
-    return simplejson.dumps(obj, separators=(',', ':'))
+    return json.dumps(obj, separators=(',', ':'))

@@ -199,4 +199,3 @@ LOGGING = {
 
 # directory for logging data, read by the apps that use the logger module
 LOGGING_DIR = becv_dir('log')
-DATA_LOG_DIR = becv_dir('log')

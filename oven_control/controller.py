@@ -214,7 +214,7 @@ class ControllerWrapper(object):
         self.__ctrl.timeout = 10
         log_name_fmt = ('temp_log_%s' % self.ctrl.id) + '-%Y-%m-%d.log'
         self.__logger = bin_logger.FloatDateLogger(log_name_fmt,
-                                                   settings.DATA_LOG_DIR)
+                                                   settings.LOGGING_DIR)
         self.__logger.opened.connect(self.__on_log_open)
     def get_errors(self):
         return self.__ctrl.get_errors()

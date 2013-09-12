@@ -11,3 +11,4 @@ User=@BEC5_UWSGI_USER@
 
 [Install]
 WantedBy=multi-user.target
+Alias=dbus-org.yyc_arch.becv.service

@@ -17,7 +17,7 @@
 import os
 import weakref
 from threading import Lock
-from .print_color import printg
+from .print_color import printg, printr, printb, print_stack
 
 import __main__
 

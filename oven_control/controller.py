@@ -59,14 +59,16 @@ class manager:
             'name': models.get_profile(pid).name if pid else '',
             'temps': {str(cid): float(temp) for cid, temp in temps.items()}
         }
+    def __set_temps(self, profile, temps):
+        self.__oven_mgr.set_temps(profile, {str(cid): temp for cid, temp
+                                            in temps.items})
+        return True
     def set_profile(self, profile):
         if not profile:
             return
-        self.__oven_mgr.set_temps(profile, models.get_profile_temps(profile))
-        return True
+        return self.__set_temps(profile, models.get_profile_temps(profile))
     def set_temps(self, temps):
-        self.__oven_mgr.set_temps('', temps)
-        return True
+        return self.__set_temps('', temps)
     def get_errors(self):
         return {str(cid): {'name': str(name), 'errors': errors}
                 for cid, (name, errors)

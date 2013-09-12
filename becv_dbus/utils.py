@@ -14,6 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import weakref
 import decorator
 import inspect
@@ -47,30 +48,36 @@ class BEC5DBusObj(dbus.service.Object):
         else:
             dbus_deco = dbus.service.method(*a, sender_keyword='_sender', **kw)
         def _deco(func):
-            def _func(self, *_args, _sender=None):
-                if not self.__check_sender(_sender):
-                    return error_ret
-                try:
-                    return func(self, *_args)
-                except:
-                    print_except()
-                    return error_ret
-            func_fmt = '%s(%s, _sender=None)'
-            func_fmt2 = '_func(%s, _sender=_sender)'
             if threaded:
-                func_fmt = ('%s(%s, _sender=None, _reply_hdl=None, '
-                            '_error_hdl=None)')
-                func_fmt2 = ('_func(%s, _sender=_sender, '
-                             '_reply_hdl=_reply_hdl, _error_hdl=_error_hdl)')
-                __func = _func
                 def _func(self, *_args, _sender=None, _reply_hdl=None,
                           _error_hdl=None):
+                    if not self.__check_sender(_sender):
+                        return error_ret
                     def __worker():
-                        res = __func(self, *_args, _sender=_sender)
+                        try:
+                            res = func(self, *_args)
+                        except:
+                            print_except()
+                            res = error_ret
                         ctx = GLib.main_context_default()
                         ctx.invoke_full(0, _reply_hdl, res)
                     thread = threading.Thread(target=__worker, daemon=True)
                     thread.start()
+                func_fmt = ('%s(%s, _sender=None, _reply_hdl=None, '
+                            '_error_hdl=None)')
+                func_fmt2 = ('_func(%s, _sender=_sender, '
+                             '_reply_hdl=_reply_hdl, _error_hdl=_error_hdl)')
+            else:
+                def _func(self, *_args, _sender=None):
+                    if not self.__check_sender(_sender):
+                        return error_ret
+                    try:
+                        return func(self, *_args)
+                    except:
+                        print_except()
+                        return error_ret
+                func_fmt = '%s(%s, _sender=None)'
+                func_fmt2 = '_func(%s, _sender=_sender)'
             eval_dict = {'_func': _func}
             args_sig = ', '.join(inspect.getfullargspec(func)[0])
             name = func.__name__

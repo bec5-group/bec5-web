@@ -182,7 +182,7 @@ def get_temps(request):
 
 @return_jsonp
 def get_setpoint(request):
-    return _manager.get_setpoint()
+    return _manager.get_setpoints()
 
 def _set_profile_logger(request, profile=None):
     profile = models.get_profile(profile)
@@ -230,5 +230,5 @@ def get_temp_logs(request):
         _to = time.time()
     _to = int(_to)
     _from = max(int(float(GET['from'])), _to - 31622400) # one year
-    return dict((ctrl, loggers[int(ctrl)].get_range(_from, _to, max_count))
+    return dict((ctrl, loggers[ctrl].get_range(_from, _to, max_count))
                 for ctrl in GET.getlist('ctrl[]'))

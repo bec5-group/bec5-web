@@ -18,20 +18,23 @@ import os
 import dbus
 
 from .misc import WithLock
+from .print_color import printb, printg, printr
 
 class DBusMethod(WithLock):
     def __init__(self, iface, name):
+        WithLock.__init__(self)
         self.__iface = iface
         self.__name = name
     @property
     @WithLock.with_lock
     def method(self):
-        return getattr(self.__iface, self.__name)
+        return getattr(self.__iface.iface, self.__name)
     def __call__(self, *args):
-        return self.method(*args)
+        return self.method(*args, timeout=60)
 
 class DBusIFace(WithLock):
     def __init__(self, obj, name):
+        WithLock.__init__(self)
         self.__obj = obj
         self.__name = name
     def __getattr__(self, name):
@@ -43,10 +46,11 @@ class DBusIFace(WithLock):
 
 class DBusObject(WithLock):
     def __init__(self, mgr, name, path):
+        WithLock.__init__(self)
         self.__mgr = mgr
         self.__name = name
         self.__path = path
-    def get_iface(name):
+    def get_iface(self, name):
         return DBusIFace(self, name)
     @property
     def conn(self):
@@ -59,6 +63,7 @@ class DBusObject(WithLock):
 class SysConnMgr(WithLock):
     __conn = None
     def __init__(self):
+        WithLock.__init__(self)
         self.__conn = None
         self.__pid = None
     def get_object(self, name, path):

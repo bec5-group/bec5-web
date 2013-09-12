@@ -47,6 +47,7 @@ class RoomTempServer(WithHelper, ErrorLogger):
         return cmd_method
     query_value = server_cmd(utils.query_value)
     enable_output = server_cmd(utils.enable_output)
+    get_output_enabled = server_cmd(utils.get_output_enabled)
     del server_cmd
     @property
     def mgr(self):
@@ -84,7 +85,8 @@ class RoomTempServer(WithHelper, ErrorLogger):
         devs = models.server_get_devices(self.mgr.server)
         values = dict((dev.id, self.__get_dev_value(dev)) for dev in devs)
         self.mgr.set_values(values)
-        repeat_call(self.enable_output, n=3, wait_time=0.3)
+        if not repeat_call(self.get_output_enabled, n=3, wait_time=0.3):
+            repeat_call(self.enable_output, n=3, wait_time=0.3)
     def run(self):
         self.__update_values()
 

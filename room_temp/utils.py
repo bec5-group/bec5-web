@@ -23,6 +23,14 @@ def query_value(addr, name):
     except:
         return
 
+# TODO set verbose level
+
+def get_output_enabled(addr):
+    try:
+        return send_once(addr, 'outputEnable?\n').lower() == 'on'
+    except:
+        return
+
 def enable_output(addr):
     try:
         send_once(addr, 'outputEnable On\n')

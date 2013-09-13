@@ -74,7 +74,7 @@ class ScriptManager:
             raise ValueError("Script %s already registered." % name)
         self.__scripts[name] = self.script_class(name, **info)
     def get_info(self, path):
-        return dict((name, script.to_obj(path)) for (name, script)
-                    in self.__scripts.items())
+        return {name: script.to_obj(path) for name, script
+                in self.__scripts.items()}
 
 script_manager = ScriptManager()

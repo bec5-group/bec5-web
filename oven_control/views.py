@@ -31,9 +31,8 @@ def get_ovens(request):
 @auth_jsonp
 def get_controller_setting(request, cid=None):
     ctrl = models.get_controller(cid)
-    return dict((key, getattr(ctrl, key))
-                for key in ('id', 'name', 'addr', 'port', 'number', 'order',
-                            'default_temp'))
+    return {key: getattr(ctrl, key) for key in
+            ('id', 'name', 'addr', 'port', 'number', 'order', 'default_temp')}
 
 def _add_controller_logger(request):
     GET = request.GET.get
@@ -47,8 +46,8 @@ def _add_controller_logger(request):
 def add_controller(request):
     ctrl = models.add_controller(
         request.GET['name'], request.GET['addr'], request.GET['port'],
-        request.GET['number'], **dict((key, request.GET[key])
-                                      for key in ('order', 'default_temp')))
+        request.GET['number'], **{key: request.GET[key]
+                                  for key in ('order', 'default_temp')})
     return {
         'id': ctrl.id,
         'name': ctrl.name,
@@ -230,5 +229,5 @@ def get_temp_logs(request):
         _to = time.time()
     _to = int(_to)
     _from = max(int(float(GET['from'])), _to - 31622400) # one year
-    return dict((ctrl, loggers[ctrl].get_range(_from, _to, max_count))
-                for ctrl in GET.getlist('ctrl[]'))
+    return {ctrl: loggers[ctrl].get_range(_from, _to, max_count)
+            for ctrl in GET.getlist('ctrl[]')}

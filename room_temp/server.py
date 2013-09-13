@@ -82,7 +82,7 @@ class RoomTempServer(WithHelper, ErrorLogger):
         return value
     def __update_values(self):
         devs = models.server_get_devices(self.mgr.server)
-        values = dict((dev.id, self.__get_dev_value(dev)) for dev in devs)
+        values = {dev.id: self.__get_dev_value(dev) for dev in devs}
         self.mgr.set_values(values)
         if not repeat_call(self.get_output_enabled, n=3, wait_time=0.3):
             repeat_call(self.enable_output, n=3, wait_time=0.3)
@@ -125,15 +125,13 @@ class ServerWrapper:
             self.__values = new_values
     def get_values(self):
         with self.__lock:
-            return dict((dev_id, v['v'])
-                        for (dev_id, v) in self.__values.items())
+            return {dev_id: v['v'] for dev_id, v in self.__values.items()}
     def get_value(self, dev_id):
         with self.__lock:
             return self.__values[dev_id]['v']
     def get_loggers(self):
         with self.__lock:
-            return dict((dev_id, v['l'])
-                        for (dev_id, v) in self.__values.items())
+            return {dev_id: v['l'] for dev_id, v in self.__values.items()}
     def get_logger(self, dev_id):
         with self.__lock:
             return self.__values[dev_id]['l']
@@ -179,11 +177,11 @@ class ServerManager:
                                'errors': server_errors}
         return errors
     def get_values(self):
-        return dict((sid, server.get_values()) for (sid, server)
-                    in self.__servers.items())
+        return {sid: server.get_values() for sid, server
+                in self.__servers.items()}
     def get_loggers(self):
-        return dict((sid, server.get_loggers()) for (sid, server)
-                    in self.__servers.items())
+        return {sid: server.get_loggers() for sid, server
+                in self.__servers.items()}
 
 if not getattr(__import__('__main__'), '_becv_syncdb', False):
     manager = ServerManager()

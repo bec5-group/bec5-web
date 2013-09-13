@@ -211,8 +211,7 @@ class TimeLogger(BaseLogger, DateFileBase, RecordCache):
 
     # To be override
     def _to_record_obj(self, l, t, **kwargs):
-        content = dict((k, v) for (k, v) in kwargs.items()
-                       if (v or v == False))
+        content = {k: v for k, v in kwargs.items() if v or v == False}
         return {'l': l, 't': t, 'c': content}
     def _write_record_obj(self, stm, obj):
         json.dump(obj, stm, separators=(',', ':'))

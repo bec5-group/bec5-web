@@ -14,8 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import time
 import weakref
 import threading
 
@@ -23,6 +21,7 @@ from django.db.models.signals import post_save, post_delete
 from django.conf import settings
 
 from becv_utils import printr, printg, printy, printb
+from becv_utils.misc import debug as _debug
 from becv_utils.thread_helper import WithHelper, repeat_call
 from becv_logger.error_logger import ErrorLogger
 from becv_logger import TimeLogger, bin_logger
@@ -37,7 +36,7 @@ class RoomTempServer(WithHelper, ErrorLogger):
     def server_cmd(cmd_func):
         def cmd_method(self, *args, **kwargs):
             res = cmd_func(self.__addr, *args, **kwargs)
-            if os.environ.get("BEC5_DEBUG", ''):
+            if _debug:
                 if res is None:
                     printr(cmd_func.__name__, self.__addr, args, res)
                 else:

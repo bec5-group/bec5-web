@@ -15,9 +15,8 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.db.models.signals import post_save, post_delete
-from django.conf import settings
 
-from becv_utils.misc import run_no_sync, debug as _debug, RefParent, WithLock
+from becv_utils.misc import run_no_sync
 from becv_utils.dbus import sys_mgr
 from becv_utils import printg, printb, printr
 from becv_logger.dbus_proxy import DBusLoggerProxy

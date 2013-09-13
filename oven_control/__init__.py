@@ -17,7 +17,7 @@
 try:
     from . import controller
 except ImportError:
-    # This import is for automatically starting the background process
+    # This import is for initializing the dbus service
     # An ImportError on this is usually caused by import loop in which
     # case the import is already done.
     pass

@@ -14,7 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from json_view import JSONPError, return_jsonp, auth_jsonp
+from json_view import return_jsonp, auth_jsonp
 from . import models
 from .models import with_room_temp_lock
 import time

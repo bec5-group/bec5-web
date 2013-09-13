@@ -16,7 +16,6 @@
 
 from django.db import models
 from threading import Lock
-import json
 
 from becv_utils.math import to_finite
 
@@ -34,9 +33,9 @@ class TempController(models.Model):
             ('set_controller', "Can change controller setting.")
         )
     def __str__(self):
-        return json.dumps({k: getattr(self, k)
-                           for k in ('name', 'addr', 'port', 'number',
-                                     'order', 'default_temp')}, indent=2)
+        return repr({k: getattr(self, k) for k
+                     in ('name', 'addr', 'port', 'number', 'order',
+                         'default_temp')})
 
 class TempProfile(models.Model):
     name = models.CharField(unique=True, max_length=1000)
@@ -48,8 +47,7 @@ class TempProfile(models.Model):
             ('set_profile_temp', "Can change profile setting.")
         )
     def __str__(self):
-        return json.dumps({k: getattr(self, k)
-                           for k in ('name', 'order')}, indent=2)
+        return repr({k: getattr(self, k) for k in ('name', 'order')})
 
 class TempSetPoint(models.Model):
     control = models.ForeignKey(TempController)

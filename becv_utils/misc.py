@@ -74,13 +74,18 @@ class _Ready:
             except:
                 print_except()
         cls.__cb.clear()
+    @classmethod
+    def is_ready(cls):
+        return cls.__ready
 
 call_when_ready = _Ready.register
 
 class InitWhenReady:
     def __init__(self):
-        call_when_ready(self.__ready_cb)
+        _Ready.register(self.__ready_cb)
     def __ready_cb(self):
         self.init()
+    def is_ready(self):
+        return _Ready.is_ready()
     def init(self):
         pass

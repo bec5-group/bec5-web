@@ -14,7 +14,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .print_color import (printr, printg, printy, printb, printp,
-                          printbg, print_except, print_stack)
+from django.apps import AppConfig
+from .print_color import *
 
-default_app_config = 'becv_utils.apps.BECVUtilsConfig'
+class BECVUtilsConfig(AppConfig):
+    name = 'becv_utils'
+    def ready(self):
+        pass

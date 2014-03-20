@@ -159,6 +159,7 @@ INSTALLED_APPS = (
     'popup_form',
     'json_view',
     'jsmodule',
+    'becv_utils'
 )
 
 # A sample logging configuration. The only tangible logging

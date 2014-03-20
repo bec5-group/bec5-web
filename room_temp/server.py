@@ -21,7 +21,7 @@ from django.db.models.signals import post_save, post_delete
 from django.conf import settings
 
 from becv_utils import printr, printg, printy, printb
-from becv_utils.misc import debug as _debug
+from becv_utils.misc import debug as _debug, run_no_sync, InitWhenReady
 from becv_utils.thread_helper import WithHelper, repeat_call
 from becv_logger.error_logger import ErrorLogger
 from becv_logger import TimeLogger, bin_logger
@@ -144,8 +144,9 @@ class ServerWrapper:
                 except:
                     pass
 
-class ServerManager:
-    def __init__(self):
+@run_no_sync
+class manager(InitWhenReady):
+    def init(self):
         self.__servers = {}
         self.__update_server_list()
         post_save.connect(self.__post_save_cb, sender=models.ControllerServer)
@@ -182,6 +183,3 @@ class ServerManager:
     def get_loggers(self):
         return {sid: server.get_loggers() for sid, server
                 in self.__servers.items()}
-
-if not getattr(__import__('__main__'), '_becv_syncdb', False):
-    manager = ServerManager()

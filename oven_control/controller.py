@@ -16,7 +16,7 @@
 
 from django.db.models.signals import post_save, post_delete
 
-from becv_utils.misc import run_no_sync
+from becv_utils.misc import run_no_sync, InitWhenReady
 from becv_utils.dbus import sys_mgr
 from becv_utils import printg, printb, printr
 from becv_logger.dbus_proxy import DBusLoggerProxy
@@ -24,8 +24,8 @@ from becv_logger.dbus_proxy import DBusLoggerProxy
 from . import models
 
 @run_no_sync
-class manager:
-    def __init__(self):
+class manager(InitWhenReady):
+    def init(self):
         self.__oven_obj = sys_mgr.get_object(
             'org.yyc_arch.becv', '/org/yyc_arch/becv/oven_control')
         self.__oven_mgr = self.__oven_obj.get_iface(

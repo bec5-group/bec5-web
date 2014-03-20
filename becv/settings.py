@@ -143,8 +143,6 @@ TEMPLATE_DIRS = (
 
 # add apps here in order to make models/static files/scripts registration work.
 INSTALLED_APPS = (
-    # Keep this app first to avoid import issues.
-    'jsmodule',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -160,6 +158,7 @@ INSTALLED_APPS = (
     'jsonify',
     'popup_form',
     'json_view',
+    'jsmodule',
 )
 
 # A sample logging configuration. The only tangible logging

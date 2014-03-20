@@ -14,25 +14,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Scan through all installed apps and import the `scripts` submodule.
-"""
+from django.apps import AppConfig
+from .finder import find_scripts
 
-from django.conf import settings
-from . import register_script
-from becv_utils import *
-
-def find_scripts():
-    main_script = '.'.join(settings.ROOT_URLCONF.split('.')[:-1])
-    for app in tuple(settings.INSTALLED_APPS) + (main_script,):
-        try:
-            app = app + '.scripts'
-            mod = __import__(app)
-            for n in app.split('.')[1:]:
-                mod = getattr(mod, n)
-            for name, info in mod.jsmodules.items():
-                register_script(name, **info)
-        except ImportError:
-            pass
-        except AttributeError:
-            pass
+class JSModuleConfig(AppConfig):
+    name = 'jsmodule'
+    def ready(self):
+        find_scripts()

@@ -21,4 +21,5 @@ See README.md
 from .manage import script_manager
 register_script = script_manager.register
 from .views import set_context
-from . import finder
+
+default_app_config = 'jsmodule.apps.JSModuleConfig'

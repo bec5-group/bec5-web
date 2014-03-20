@@ -16,8 +16,9 @@
 
 from django.apps import AppConfig
 from .print_color import *
+from .misc import _Ready
 
 class BECVUtilsConfig(AppConfig):
     name = 'becv_utils'
     def ready(self):
-        pass
+        _Ready._call()

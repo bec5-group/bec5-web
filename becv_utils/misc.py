@@ -17,7 +17,7 @@
 import os
 import weakref
 from threading import Lock
-from .print_color import printg, printr, printb, print_stack
+from .print_color import printg, printr, printb, print_stack, print_except
 
 import __main__
 
@@ -47,3 +47,40 @@ class WithLock:
                 return func(self, *args, **kwargs)
         _func.__name__ = func.__name__
         return _func
+
+class _Ready:
+    __cb = []
+    __ready = False
+    __lock = Lock()
+    @classmethod
+    def register(cls, func, *args, **kwargs):
+        with cls.__lock:
+            if not cls.__ready:
+                cls.__cb.append((func, args, kwargs))
+                return
+        try:
+            func(*args, **kwargs)
+        except:
+            print_except()
+    @classmethod
+    def _call(cls):
+        with cls.__lock:
+            if cls.__ready:
+                return
+            cls.__ready = True
+        for func, args, kwargs in cls.__cb:
+            try:
+                func(*args, **kwargs)
+            except:
+                print_except()
+        cls.__cb.clear()
+
+call_when_ready = _Ready.register
+
+class InitWhenReady:
+    def __init__(self):
+        call_when_ready(self.__ready_cb)
+    def __ready_cb(self):
+        self.init()
+    def init(self):
+        pass

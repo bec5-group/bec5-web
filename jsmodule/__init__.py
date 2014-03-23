@@ -21,5 +21,7 @@ See README.md
 from .manage import script_manager
 register_script = script_manager.register
 from .views import set_context
+from .finder import find_scripts
+from becv_utils.misc import call_when_ready
 
-default_app_config = 'jsmodule.apps.JSModuleConfig'
+call_when_ready(find_scripts)

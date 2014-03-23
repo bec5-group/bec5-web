@@ -1,6 +1,5 @@
 set(BEC5_FILES
   __init__.py
-  apps.py
   admin.py
   finder.py
   manage.py

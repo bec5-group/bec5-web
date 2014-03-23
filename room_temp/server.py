@@ -146,8 +146,10 @@ class ServerWrapper:
 
 @run_no_sync
 class manager(InitWhenReady):
-    def init(self):
+    def __init__(self):
+        InitWhenReady.__init__(self)
         self.__servers = {}
+    def init(self):
         self.__update_server_list()
         post_save.connect(self.__post_save_cb, sender=models.ControllerServer)
         post_delete.connect(self.__post_del_cb, sender=models.ControllerServer)

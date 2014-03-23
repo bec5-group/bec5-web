@@ -25,15 +25,17 @@ from . import models
 
 @run_no_sync
 class manager(InitWhenReady):
-    def init(self):
+    def __init__(self):
+        InitWhenReady.__init__(self)
         self.__oven_obj = sys_mgr.get_object(
             'org.yyc_arch.becv', '/org/yyc_arch/becv/oven_control')
         self.__oven_mgr = self.__oven_obj.get_iface(
             'org.yyc_arch.becv.oven_control')
+        self.__logger = DBusLoggerProxy(self.__oven_mgr.get_logger())
+    def init(self):
         self.__set_controllers()
         post_save.connect(self.__post_save_cb, sender=models.TempController)
         post_delete.connect(self.__post_del_cb, sender=models.TempController)
-        self.__logger = DBusLoggerProxy(self.__oven_mgr.get_logger())
     @property
     def logger(self):
         return self.__logger

@@ -27,6 +27,7 @@ settings_name = os.environ['DJANGO_SETTINGS_MODULE']
 # for n in settings_name.split('.')[1:]:
 #     settings = getattr(settings, n)
 
+# The following code initialize django in order to start our background processes
 import django.core.management
 # django.core.management.setup_environ(settings)
 utility = django.core.management.ManagementUtility()

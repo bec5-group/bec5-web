@@ -30,6 +30,7 @@ settings_name = os.environ['DJANGO_SETTINGS_MODULE']
 import django.core.management
 # django.core.management.setup_environ(settings)
 utility = django.core.management.ManagementUtility()
+django.setup()
 command = utility.fetch_command('runserver')
 
 command.validate()

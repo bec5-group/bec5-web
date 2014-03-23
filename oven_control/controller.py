@@ -60,8 +60,8 @@ class manager(InitWhenReady):
             'temps': {str(cid): float(temp) for cid, temp in temps.items()}
         }
     def __set_temps(self, profile, temps):
-        self.__oven_mgr.set_temps(profile, {str(cid): temp for cid, temp
-                                            in temps.items()})
+        self.__oven_mgr.set_temps(profile, {str(cid): float(temp)
+                                            for cid, temp in temps.items()})
         return True
     def set_profile(self, profile):
         if not profile:

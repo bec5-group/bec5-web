@@ -8,46 +8,23 @@ include(CMakePathMacros)
 include(CMakeTargetMacros)
 find_package(PythonLibrary REQUIRED)
 
-if("x${BEC5_UWSGI_USER}" STREQUAL "x")
-  set(BEC5_UWSGI_USER http)
-endif()
+macro(bec5_option name default)
+  if("x${${name}}" STREQUAL "x")
+    set("${name}" "${default}")
+  endif()
+endmacro()
 
-if("x${BEC5_UWSGI_GROUP}" STREQUAL "x")
-  set(BEC5_UWSGI_GROUP http)
-endif()
-
-if("x${BEC5_PREFIX}" STREQUAL "x")
-  set(BEC5_PREFIX "/srv/bec5/")
-endif()
-
-if("x${BEC5_CONFIG_PATH}" STREQUAL "x")
-  set(BEC5_CONFIG_PATH "/etc/")
-endif()
-
-if("x${SYSTEMD_UNIT_PATH}" STREQUAL "x")
-  set(SYSTEMD_UNIT_PATH "${CMAKE_INSTALL_PREFIX}/lib/systemd/system/")
-endif()
-
-if("x${SYSTEMD_TMP_PATH}" STREQUAL "x")
-  set(SYSTEMD_TMP_PATH "${CMAKE_INSTALL_PREFIX}/lib/tmpfiles.d/")
-endif()
-
-if("x${UWSGI_INI_PATH}" STREQUAL "x")
-  set(UWSGI_INI_PATH "/etc/uwsgi/")
-endif()
-
-if("x${UWSGI_SOCK_PATH}" STREQUAL "x")
-  set(UWSGI_SOCK_PATH "/run/uwsgi/bec5/")
-endif()
-
-if("x${DBUS_SYSTEM_SERVICE_PATH}" STREQUAL "x")
-  set(DBUS_SYSTEM_SERVICE_PATH
-    "${CMAKE_INSTALL_PREFIX}/share/dbus-1/system-services/")
-endif()
-
-if("x${DBUS_SYSTEM_CONF_PATH}" STREQUAL "x")
-  set(DBUS_SYSTEM_CONF_PATH "/etc/dbus-1/system.d")
-endif()
+bec5_option(BEC5_UWSGI_USER http)
+bec5_option(BEC5_UWSGI_GROUP http)
+bec5_option(BEC5_PREFIX /srv/bec5/)
+bec5_option(BEC5_CONFIG_PATH /etc/)
+bec5_option(SYSTEMD_UNIT_PATH "${CMAKE_INSTALL_PREFIX}/lib/systemd/system/")
+bec5_option(SYSTEMD_TMP_PATH "${CMAKE_INSTALL_PREFIX}/lib/tmpfiles.d/")
+bec5_option(UWSGI_INI_PATH "/etc/uwsgi/")
+bec5_option(UWSGI_SOCK_PATH "/run/uwsgi/bec5/")
+bec5_option(DBUS_SYSTEM_SERVICE_PATH
+  "${CMAKE_INSTALL_PREFIX}/share/dbus-1/system-services/")
+bec5_option(DBUS_SYSTEM_CONF_PATH "/etc/dbus-1/system.d")
 
 function(move_file _from _to)
   cmake_utils_to_abs(_from _to)

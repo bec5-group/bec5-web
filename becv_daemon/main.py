@@ -18,7 +18,6 @@ import json
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
-from .oven_ctrl import BEC5OvenControlManager
 from becv_logger import log_dir as _log_dir
 from becv_sql import BEC5Sql
 
@@ -36,10 +35,13 @@ class BEC5DBusManager:
         self.__sys_bus = dbus.SystemBus()
         self.__bus_name = dbus.service.BusName('org.yyc_arch.becv',
                                                bus=self.__sys_bus)
-        self.__obj_mgr = BEC5OvenControlManager(self)
         self.__dbus_mgr = self.__sys_bus.get_object('org.freedesktop.DBus', '/')
         self.__dbus_mgr_iface = dbus.Interface(
             self.__dbus_mgr, dbus_interface='org.freedesktop.DBus')
+
+        # Import after database is initialized
+        from .oven_ctrl import BEC5OvenControlManager
+        self.__obj_mgr = BEC5OvenControlManager(self)
     def __init_db__(self):
         dbpath = self.__config.get('DB_PATH', '/srv/bec5/db/bec5-daemon.db')
         self.__sql = BEC5Sql.instance("sqlite:///" + dbpath)

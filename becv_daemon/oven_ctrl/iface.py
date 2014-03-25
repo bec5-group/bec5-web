@@ -19,7 +19,7 @@ from os import path as _path
 from becv_utils import print_except, printb, printr, printg
 from oven_control_service.controller import ControllerManager
 from becv_dbus import BEC5DBusObj, BEC5DBusFmtObj
-from .logger import BEC5Logger, BEC5DataLogger
+from ..logger import BEC5Logger, BEC5DataLogger
 from becv_utils.math import fix_non_finite
 
 class BEC5OvenController(BEC5DBusFmtObj):

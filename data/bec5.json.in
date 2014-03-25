@@ -1,4 +1,5 @@
 {
     "LOG_DIR": "@BEC5_PREFIX@/log/",
-    "DATA_LOG_DIR": "@BEC5_PREFIX@/log/"
+    "DATA_LOG_DIR": "@BEC5_PREFIX@/log/",
+    "DB_PATH": "@BEC5_PREFIX@/db/becv-daemon.db"
 }

@@ -20,6 +20,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
 from .oven_ctrl import BEC5OvenControlManager
 from becv_logger import log_dir as _log_dir
+from becv_sql import BEC5Sql
 
 class BEC5DBusManager:
     def __init__(self, config_file):
@@ -29,6 +30,7 @@ class BEC5DBusManager:
                 self.__config = json.load(fh)
         except:
             self.__config = {}
+        self.__init_db__()
         self.__init_log_dir__()
         self.__main_loop = GLib.MainLoop()
         self.__sys_bus = dbus.SystemBus()
@@ -38,6 +40,9 @@ class BEC5DBusManager:
         self.__dbus_mgr = self.__sys_bus.get_object('org.freedesktop.DBus', '/')
         self.__dbus_mgr_iface = dbus.Interface(
             self.__dbus_mgr, dbus_interface='org.freedesktop.DBus')
+    def __init_db__(self):
+        dbpath = self.__config.get('DB_PATH', '/srv/bec5/db/bec5-daemon.db')
+        self.__sql = BEC5Sql.instance("sqlite:///" + dbpath)
     def __init_log_dir__(self):
         self.__log_dir = self.__config.get('LOG_DIR', '/srv/bec5/log')
         self.__data_log_dir = self.__config.get('DATA_LOG_DIR',

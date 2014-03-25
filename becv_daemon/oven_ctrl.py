@@ -1,4 +1,4 @@
-#   Copyright (C) 2013~2013 by Yichao Yu
+#   Copyright (C) 2013~2014 by Yichao Yu
 #   yyc1992@gmail.com
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -15,11 +15,10 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from os import path as _path
-import dbus.service
 
 from becv_utils import print_except, printb, printr, printg
 from oven_control_service.controller import ControllerManager
-from .utils import BEC5DBusObj, BEC5DBusFmtObj
+from becv_dbus import BEC5DBusObj, BEC5DBusFmtObj
 from .logger import BEC5Logger, BEC5DataLogger
 from becv_utils.math import fix_non_finite
 

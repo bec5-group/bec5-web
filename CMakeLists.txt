@@ -97,6 +97,7 @@ function(add_bec5_pymodule_file src module)
 endfunction()
 
 add_subdirectory(becv)
+add_subdirectory(becv_daemon)
 add_subdirectory(becv_dbus)
 add_subdirectory(becv_logger)
 add_subdirectory(becv_sql)

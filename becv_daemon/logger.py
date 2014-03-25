@@ -1,4 +1,4 @@
-#   Copyright (C) 2013~2013 by Yichao Yu
+#   Copyright (C) 2013~2014 by Yichao Yu
 #   yyc1992@gmail.com
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -16,11 +16,10 @@
 
 import weakref
 import threading
-import dbus.service
 import json
 
 from becv_utils import print_except, printb, printr, printg
-from .utils import BEC5DBusFmtObj, BEC5DBusObj
+from becv_dbus import BEC5DBusFmtObj, BEC5DBusObj
 
 class BEC5Logger(BEC5DBusFmtObj):
     __logger_count = 0

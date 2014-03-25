@@ -21,8 +21,12 @@ from threading import Lock
 
 class BEC5Sql:
     class RollBack(Exception):
+        """
+        For rollback changes in a `with session` statement
+        """
         pass
 
+    # Single instance
     __lock = Lock()
     __sql = None
     __sqls = {}
@@ -43,6 +47,9 @@ class BEC5Sql:
         self.__url = url
         self.__engine = create_engine(url, echo=False)
         class BEC5Session(Session):
+            """
+            For using session in with statement
+            """
             def __enter__(self):
                 return self
             def __exit__(self, _type, _value, traceback):
@@ -54,6 +61,7 @@ class BEC5Sql:
                 return False
         self.__Session = sessionmaker(bind=self.__engine, class_=BEC5Session)
 
+        # Automatically create table on declaration
         _engine = self.__engine
         class BEC5BaseMeta(DeclarativeMeta):
             def __init__(cls, name, bases, dct):

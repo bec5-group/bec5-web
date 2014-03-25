@@ -1,4 +1,4 @@
-#   Copyright (C) 2013~2013 by Yichao Yu
+#   Copyright (C) 2013~2014 by Yichao Yu
 #   yyc1992@gmail.com
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -14,14 +14,17 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+"""
+Object representations and manager for temperature controllers.
+"""
+
 import time
 import json
 from datetime import datetime as _datetime
 from time import sleep
 
 from dateutil.tz import tzlocal
-from gi.repository import GLib, GObject
+from gi.repository import GObject
 
 from becv_utils import printr, printg, printy, printb
 from becv_utils.misc import debug as _debug, RefParent, WithLock
@@ -34,6 +37,11 @@ from becv_logger import log_dir as _log_dir
 from . import utils
 
 class Controller(GObject.Object, WithHelper, ErrorLogger, RefParent):
+    """
+    Controller object
+    This class holds all information of a single controller and periodically
+    send commands and poll for information from the controller.
+    """
     def ctrl_cmd(cmd_func):
         def cmd_method(self, *args, **kwargs):
             res = cmd_func(self.addr, *args, **kwargs)

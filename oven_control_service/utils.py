@@ -1,4 +1,4 @@
-#   Copyright (C) 2013~2013 by Yichao Yu
+#   Copyright (C) 2013~2014 by Yichao Yu
 #   yyc1992@gmail.com
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -13,6 +13,10 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+Utility functions for sending and receiving commands.
+"""
 
 from becv_utils.network import send_once
 

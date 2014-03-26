@@ -21,6 +21,7 @@ from oven_control_service.controller import ControllerManager
 from becv_dbus import BEC5DBusObj, BEC5DBusFmtObj
 from ..logger import BEC5Logger, BEC5DataLogger
 from becv_utils.math import fix_non_finite
+from . import db
 
 class BEC5OvenController(BEC5DBusFmtObj):
     obj_path_fmt = '/org/yyc_arch/becv/oven_control/%s'

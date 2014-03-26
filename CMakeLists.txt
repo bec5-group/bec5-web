@@ -25,6 +25,7 @@ bec5_option(UWSGI_SOCK_PATH /run/uwsgi/bec5/)
 bec5_option(DBUS_SYSTEM_SERVICE_PATH
   "${CMAKE_INSTALL_PREFIX}/share/dbus-1/system-services/")
 bec5_option(DBUS_SYSTEM_CONF_PATH /etc/dbus-1/system.d)
+bec5_option(BEC5_DAEMON_DB_PATH "${BEC5_PREFIX}/db/becv-daemon.db")
 
 function(move_file _from _to)
   cmake_utils_to_abs(_from _to)
@@ -63,12 +64,14 @@ endfunction()
 
 function(add_bec5_pymodule_file src module)
   cmake_utils_to_abs(src)
-  file(RELATIVE_PATH rel_path "${CMAKE_SOURCE_DIR}" "${src}")
+  file(RELATIVE_PATH rel_path "${CMAKE_CURRENT_SOURCE_DIR}" "${src}")
   message(STATUS "Adding ${rel_path}.")
   cmake_utils_src_to_bin(_bin_path "${src}")
   move_file("${src}" "${_bin_path}")
-  install(FILES "${_bin_path}"
-    DESTINATION "${PYTHON_SITE_PACKAGES_DIR}/${module}")
+  cmake_utils_abs_path(install_file
+    "${PYTHON_SITE_PACKAGES_DIR}/${module}/${rel_path}")
+  get_filename_component(install_path "${install_file}" PATH)
+  install(FILES "${_bin_path}" DESTINATION "${install_path}")
   cmake_custom_files_to_target(target "${_bin_path}")
   add_dependencies(bec5-files "${target}")
 endfunction()

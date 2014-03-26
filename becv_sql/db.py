@@ -55,11 +55,11 @@ class BEC5Sql:
             def __exit__(self, _type, _value, traceback):
                 if _type is None:
                     self.commit()
-                    self.close()
                 elif _type is BEC5Sql.RollBack:
                     return True
                 return False
-        self.__Session = sessionmaker(bind=self.__engine, class_=BEC5Session)
+        __Session = sessionmaker(bind=self.__engine, class_=BEC5Session)
+        self.__session = __Session()
 
         # Automatically create table on declaration
         _engine = self.__engine
@@ -70,14 +70,14 @@ class BEC5Sql:
         self.__Base = declarative_base(metaclass=BEC5BaseMeta)
 
     @property
-    def engine(self):
-        return self.__engine
-    @property
-    def Session(self):
-        return self.__Session
-    @property
     def session(self):
-        return self.__Session()
+        return self.__session
     @property
     def Base(self):
         return self.__Base
+    def with_session(self, func):
+        def _func(*args, **kwargs):
+            with self.__session as session:
+                return func(session, *args, **kwargs)
+        _func.no_session = func
+        return _func
